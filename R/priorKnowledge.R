@@ -40,7 +40,7 @@
 #' testData <- test[test>=min(X)&test<=max(X)]
 #' 
 #' ## Learning
-#' type <- "MOP" ## type <- "MTE"
+#' type <- "MOP" 
 #' confident <- 3 ## confident <- 1,2,...,length(X)
 #' f <- learnMoTBFpriorInformation(priorData = priordata, data = X, s = confident,
 #' POTENTIAL_TYPE = type)
@@ -123,7 +123,7 @@ learnMoTBFpriorInformation <- function(priorData, data, s, POTENTIAL_TYPE, domai
 #' priordata <- rnorm(5000)
 #' 
 #' ## Learning
-#' type = "MTE" ## type <- "MOP"
+#' type = "MTE" 
 #' fPrior <- univMoTBF(priordata, POTENTIAL_TYPE = type)
 #' 
 #' ## New range
@@ -440,12 +440,14 @@ rnormMultiv <- function(n, dataParents, dataChild)
 generateNormalPriorData <- function(graph, data, size, means, deviations=NULL)
 {
   if(is.null(deviations)){
-    options(warn=-1)
+    #options(warn=-1)
+    suppressWarnings({
     for(i in 1:length(means)){
       if(is.na(means[i])) deviations[i] <- NA
       else deviations[i] <- sd(data[,i])
     }
     #deviations <- sapply(data, sd)
+    })
   }
   columnsNames <- colnames(data); XX=c()
   for(i in 1:length(columnsNames)){ 

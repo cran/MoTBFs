@@ -105,7 +105,7 @@ mte.learning <- function(X, nparam, domain)
   
   ## Free parameters
   nparam <- nparam-1
-  if((nparam%%2)!=0) cat("The nearest function with odd number of coefficients \n")
+  if((nparam%%2)!=0) message("The nearest function with odd number of coefficients \n")
   if(nparam==1){
     P <- asMTEString(1/diff(domain), num)
     P <- list(Function = P, Subclass = "mte", Domain = domain,
@@ -399,8 +399,10 @@ coeffExp <- function(fx){
     t1 <- strsplit(t3[i], split="*x)", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
     t2 <- c(t2,t1[1])
   }
-  options(warn=-1)
+  # options(warn=-1)
+  suppressWarnings({
   if(length(param)==(length(t2)+1)) t2 <- c(0,t2)
+  })
   return(as.numeric(t2))
 }
 
@@ -425,18 +427,20 @@ coeffExp <- function(fx){
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
 #' derivMTE(Px)
 #' 
+#' \dontrun{
 #' ## 3. EXAMPLE
 #' X <- rnorm(1000)
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
 #' derivMTE(Px)
-#' ## Message: It is an 'motbf' function but not 'mte' subclass.
+#' ## Error in derivMTE(Px): fx is an 'motbf' function but not 'mte' subclass.
 #' class(Px)
 #' subclass(Px)
-#' 
+#' }
+
 derivMTE <- function(fx)
 {
-  if(!is.motbf(fx)) return(cat("It is not an 'motbf' function."))
-  if(is.motbf(fx)&&!is.mte(fx)) return(cat("It is an 'motbf' function but not 'mte' subclass."))
+  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
+  if(is.motbf(fx)&&!is.mte(fx)) stop("fx is an 'motbf' function but not 'mte' subclass.")
 
   parameters <- coef(fx)
   parExp <- coeffExp(fx)[-1]
@@ -470,18 +474,20 @@ derivMTE <- function(fx)
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
 #' integralMTE(Px)
 #' 
+#' \dontrun{
 #' ## 3. EXAMPLE
 #' X <- rnorm(1000)
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
 #' integralMTE(Px)
-#' ## Message: It is an 'motbf' function but not 'mte' subclass.
+#' ## Error in integralMTE(Px): fx is an 'motbf' function but not 'mte' subclass.
 #' class(Px)
 #' subclass(Px)
-#' 
+#' }
+
 integralMTE <- function(fx)
 {  
-  if(!is.motbf(fx)) return(cat("It is not an 'motbf' function."))
-  if(is.motbf(fx)&&!is.mte(fx)) return(cat("It is an 'motbf' function but not 'mte' subclass"))
+  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
+  if(is.motbf(fx)&&!is.mte(fx)) stop("fx is an 'motbf' function but not 'mte' subclass")
   
   parameters <- coeffMTE(fx)
   coefExponential <- coeffExp(fx)[-1]

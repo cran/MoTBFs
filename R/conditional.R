@@ -52,30 +52,36 @@
 #' printConditional(fMTE)
 #' 
 #' ##############################################################################
-#' ## potential <- "MOP"
-#' ## fMOP <- conditionalMethod(data, nameParents = parents, nameChild = child, 
-#' ## numIntervals = intervals, POTENTIAL_TYPE = potential, maxParam = 15)
-#' ## printConditional(fMOP)
+#' \donttest{
+#' potential <- "MOP"
+#' fMOP <- conditionalMethod(data, nameParents = parents, nameChild = child,
+#' numIntervals = intervals, POTENTIAL_TYPE = potential, maxParam = 15)
+#' printConditional(fMOP)
+#' }
+
 #' ##############################################################################
 #' 
 #' ##############################################################################
 #' ## Internal functions: Not needed to run #####################################
 #' ##############################################################################
-#' ## domainP <- range(data[,parents])
-#' ## domainC <- range(data[, child])
-#' ## t <- conditional(data, nameParents = parents, nameChild = child, 
-#' ## domainParents = domainP, domainChild = domainC, numIntervals = intervals, 
-#' ## mm = NULL, POTENTIAL_TYPE = potential)
-#' ## printConditional(t)
-#' ## selection <- select(data, nameParents = parents, nameChild = child, 
-#' ## domainParents = domainP, domainChild = domainC, numIntervals = intervals, 
-#' ## POTENTIAL_TYPE = potential)
-#' ## parent1 <- selection$parent; parent1
-#' ## domainParent1 <- range(data[,parent1])
-#' ## treeParent1 <- learn.tree.Intervals(data, nameParents = parent1, 
-#' ## nameChild = child, domainParents = domainParent1, domainChild = domainC, 
-#' ## numIntervals = intervals, POTENTIAL_TYPE = potential)
-#' ## BICscoreMoTBF(treeParent1, data, nameParents = parent1, nameChild = child)
+#' \donttest{
+#' domainP <- range(data[,parents])
+#' domainC <- range(data[, child])
+#' t <- conditional(data, nameParents = parents, nameChild = child,
+#' domainParents = domainP, domainChild = domainC, numIntervals = intervals,
+#' mm = NULL, POTENTIAL_TYPE = potential)
+#' printConditional(t)
+#' selection <- select(data, nameParents = parents, nameChild = child,
+#' domainParents = domainP, domainChild = domainC, numIntervals = intervals,
+#' POTENTIAL_TYPE = potential)
+#' parent1 <- selection$parent; parent1
+#' domainParent1 <- range(data[,parent1])
+#' treeParent1 <- learn.tree.Intervals(data, nameParents = parent1,
+#' nameChild = child, domainParents = domainParent1, domainChild = domainC,
+#' numIntervals = intervals, POTENTIAL_TYPE = potential)
+#' BICscoreMoTBF(treeParent1, data, nameParents = parent1, nameChild = child)
+#' }
+
 #' ###############################################################################
 #' ###############################################################################
 
@@ -101,7 +107,7 @@ conditionalMethod <- function(data, nameParents, nameChild, numIntervals, POTENT
     mm <- conditional(data, nameParents, nameChild, domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam, s, priorData)
     return(mm)
   }else{
-    return(cat("Unknown method, please use MOP or MTE"))
+    return(message("Unknown method, please use MOP or MTE"))
   }
 }
 
@@ -480,6 +486,9 @@ BICMultiFunctions <- function(Px, X){
 #' 
 plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FALSE, color=NULL)
 {
+  opar <- par(no.readonly =TRUE)       
+  on.exit(par(opar)) 
+  
   ## Define the color
   if(is.null(color)) color <- colorRampPalette(c("#FFFFD9", "#EDF8B1", "#C7E9B4", "#7FCDBB", "#41B6C4", "#1D91C0", "#225EA8", "#253494", "#081D58"))
   
@@ -487,11 +496,11 @@ plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FA
   if(length(nameParent)==1){ 
     if(is.null(nameChild)){
       if(ncol(data)==2) nameChild <- colnames(data)[which(colnames(data)!=nameParent)]
-      else return(cat("The name of the child variable is needed because the number of columns in the dataset is bigger than two."))
+      else (stop("The name of the child variable is needed because the number of columns in the dataset is bigger than two."))
     }else{
       if(ncol(data)==2)
         if(colnames(data)[which(colnames(data)!=nameParent)]!=nameChild)
-          return(cat("The name of the child variable has not been found in the dataset."))
+          (stop("The name of the child variable has not been found in the dataset."))
     }
     X <- data[, nameParent]
     Y <- data[, nameChild]
@@ -514,7 +523,7 @@ plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FA
 
     filled.contour(x = ygrid, y = xgrid, z = t(d), nlevels = nlevels,
                    levels = levels, col = color(nlevels),                           
-                   plot.title = {title(xlab = "X", ylab = "Y")},     
+                   plot.title = {title(xlab = nameParent, ylab = nameChild)},     
     )
     if(points){
       mar.orig <- par("mar")
@@ -524,7 +533,7 @@ plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FA
       par(mfrow=c(1,1))
     }
   }else{
-    return(cat("It is not possible plotting the conditional function."))
+    (stop("It is not possible plotting the conditional function."))
   }
 }
 

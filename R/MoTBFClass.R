@@ -21,7 +21,8 @@
 #' print(fMOP) ## fMOP
 #' as.character(fMOP)
 #' as.list(fMOP)
-#' is(fMOP) ## is.motbf(fMOP)
+#' is(fMOP) 
+#' is.motbf(fMOP)
 #' 
 #' ## Subclass 'MTE'
 #' param <- c(6,7,8,9,10)
@@ -30,7 +31,8 @@
 #' print(fMTE) ## MTE
 #' as.character(fMTE)
 #' as.list(fMTE)
-#' is(fMTE) ## is.motbf(fMTE)
+#' is(fMTE) 
+#' is.motbf(fMTE)
 
 
 #' @rdname Class-MoTBF
@@ -215,18 +217,20 @@ is.jointmotbf <- function(x, class="jointmotbf") is(x, class)
 #' ##############################################################################
 #' ## MORE EXAMPLES #############################################################
 #' ##############################################################################
-#' ## X <- rnorm(100)
-#' ## Y <- rexp(100)
-#' ## Z <- rnorm(100, mean=1)
-#' ## data <- data.frame(X, Y, Z)
-#' ## dim <- c(3,2,4)
-#' ## param <- parametersJointMoTBF(data, dimensions=dim)
-#' ## P <- jointMoTBF(param)
-#' ## summary(P)
-#' ## attributes(sP <- summary(P))
-#' ## sP$Function
-#' ## sP$Domain
-#' ## sP$Iterations
+#' \donttest{
+#' X <- rnorm(100)
+#' Y <- rexp(100)
+#' Z <- rnorm(100, mean=1)
+#' data <- data.frame(X, Y, Z)
+#' dim <- c(3,2,4)
+#' param <- parametersJointMoTBF(data, dimensions=dim)
+#' P <- jointMoTBF(param)
+#' summary(P)
+#' attributes(sP <- summary(P))
+#' sP$Function
+#' sP$Domain
+#' sP$Iterations
+#' }
 #' ##############################################################################
 #' ##############################################################################
 

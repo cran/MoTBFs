@@ -72,7 +72,7 @@ univMoTBF <- function(data, POTENTIAL_TYPE, evalRange=NULL, nparam=NULL,  maxPar
     } else if(POTENTIAL_TYPE=="MTE"){
       P=bestMTE(data, evalRange, maxParam=maxParam)$bestPx
     } else{
-      return(cat("Unknown method, please use MOP or MTE \n"))
+      stop("Unknown method, please use MOP or MTE \n")
     } 
   } else {
     if(POTENTIAL_TYPE=="MOP"){
@@ -80,7 +80,7 @@ univMoTBF <- function(data, POTENTIAL_TYPE, evalRange=NULL, nparam=NULL,  maxPar
     } else if(POTENTIAL_TYPE=="MTE"){
       P <- mte.learning(data, nparam, evalRange)
     } else{
-      return(cat("Unknown method, please use MOP or MTE"))
+      stop("Unknown method, please use MOP or MTE")
     } 
   }
   return(P)
@@ -248,15 +248,17 @@ subclass <- function(fx)
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
 #' derivMoTBF(Px)
 #' 
+#' \dontrun{
 #' ## 4. EXAMPLE
 #' Px <- "x+2"
 #' class(Px)
 #' derivMoTBF(Px)
-#' ## Message: "It is not an 'motbf' function."
-#' 
+#' ## Error in derivMoTBF(Px): "fx is not an 'motbf' function."
+#' }
+
 derivMoTBF <- function(fx)
 {
-  if(!is.motbf(fx)) return(cat("It is not an 'motbf' function."))
+  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
   if(is.mop(fx)) f <- derivMOP(fx)
   if(is.mte(fx)) f <- derivMTE(fx)
   return(f)
@@ -302,15 +304,17 @@ derivMoTBF <- function(fx)
 #' integralMoTBF(Px, 1)
 #' integralMoTBF(Px, min(X), max(X))
 #' 
+#' \dontrun{
 #' ## 4. EXAMPLE
 #' Px <- "1+x+5"
 #' class(Px)
 #' integralMoTBF(Px)
-#' ## Message: "It is not an 'motbf' function."
-#'
+#' ## Error in integralMoTBF(Px): "fx is not an 'motbf' function."
+#'}
+
 integralMoTBF <- function(fx, min=NULL, max=NULL)
 {
-  if(!is.motbf(fx)) return(cat("It is not an 'motbf' function."))
+  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
   if(is.null(min)&&is.null(max)){
     if(is.mop(fx)) return(integralMOP(fx))
     if(is.mte(fx)) return(integralMTE(fx))

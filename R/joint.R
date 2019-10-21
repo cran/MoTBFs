@@ -27,8 +27,9 @@
 #' is the mathematical expression, furthermore it contains the other elements of the output of the
 #' \code{parametersJointMoTBF()} function.
 #' @examples
+#' \donttest{
 #' ## 1. EXAMPLE 
-#' require(mnormt) ## Load the package to generate a multinormal dataset
+#' ## Load the mnormt package to generate a multinormal dataset
 #' ## Dataset
 #' Mean <- 0; nVar <- 2; ro <- 0
 #' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
@@ -41,7 +42,7 @@
 #' param <- parametersJointMoTBF(X = data, dimensions = dim)
 #'
 #' param$Parameters
-#' length(param$Parameters) ## prod(dim)
+#' length(param$Parameters)
 #' param$Dimension
 #' param$Range
 #' 
@@ -49,33 +50,35 @@
 #' P
 #' attributes(P)
 #' class(P)
-#' 
+#' }
 #' ###############################################################################
 #' ## MORE EXAMPLES ##############################################################
 #' ###############################################################################
-#' ## ## Dataset
-#' ## Mean <- 1; nVar <- 3; ro <- 0.5
-#' ## varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' ## means <- rep(Mean, nVar)
-#' ## X <- rmnorm(200,means,varcov) 
-#' ## data <- standardizeDataset(data.frame(X))
-#' ## 
-#' ## ## Joint learnings
-#' ## dim <- c(3,2,4,2)
-#' ## param <- parametersJointMoTBF(X = data, dimensions = dim)
-#' ## 
-#' ## param$Parameters
-#' ## length(param$Parameters) ## prod(dim)
-#' ## param$Dimension
-#' ## param$Range
-#' ## param$Time
-#' ## 
-#' ## P <- jointMoTBF(param)
-#' ## P
-#' ## attributes(P)
-#' ## class(P)
-#' ###############################################################################
-#' ###############################################################################
+#' \donttest{
+#' ## Load the mnormt package to generate a multinormal dataset
+#' ## Dataset
+#' Mean <- 1; nVar <- 3; ro <- 0.5
+#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
+#' means <- rep(Mean, nVar)
+#' X <- rmnorm(200,means,varcov)
+#' data <- standardizeDataset(data.frame(X))
+#' 
+#' ## Joint learnings
+#' dim <- c(3,2,4,2)
+#' param <- parametersJointMoTBF(X = data, dimensions = dim)
+#' 
+#' param$Parameters
+#' length(param$Parameters) ## prod(dim)
+#' param$Dimension
+#' param$Range
+#' param$Time
+#' 
+#' P <- jointMoTBF(param)
+#' P
+#' attributes(P)
+#' class(P)
+#' }
+
 
 #' @rdname jointmotbf.learning
 #' @export
@@ -284,7 +287,7 @@ jointMoTBF <- function(object){
 #' dim <- c(4,5) 
 #' ## Potentials of each term of the CDF
 #' c <- coefExpJointCDF(dim)
-#' length(c) + 1 ## prod(dim+1) ## plus 1 because of the constant coefficient
+#' length(c) + 1 ## plus 1 because of the constant coefficient
 #'
 #' ## Dimension of the joint density function of 2 variables
 #' dim <- c(5,5,3)
@@ -396,21 +399,20 @@ posGrid <- function(nrows, data, grid)
 #' #############################################################################
 #' ## MORE EXAMPLES ############################################################
 #' #############################################################################
-#' ## ## Dataset
-#' ## data <- data.frame(X = rnorm(100), Y = rexp(100), Z = rnorm(100))
-#' ##
-#' ## ## Joint function
-#' ## dim <- c(2,3,4)
-#' ## param <- parametersJointMoTBF(data, dimensions = dim)
-#' ## P <- jointMoTBF(param)
-#' ## density <- as.function(P)(data[,1], data[,2], data[,3])
-#' ## density
-#' ##
-#' ## ## Log-likelihood
-#' ## sum(log(density))
-#' #############################################################################
-#' #############################################################################
+#' \donttest{
+#' ## Dataset
+#' data <- data.frame(X = rnorm(100), Y = rexp(100), Z = rnorm(100))
 #' 
+#' ## Joint function
+#' dim <- c(2,3,4)
+#' param <- parametersJointMoTBF(data, dimensions = dim)
+#' P <- jointMoTBF(param)
+#' density <- as.function(P)(data[,1], data[,2], data[,3])
+#' density
+#' 
+#' ## Log-likelihood
+#' sum(log(density))
+#' }
 as.function.jointmotbf <- function(x, ...)
 {
   P <- x[[1]]
@@ -433,7 +435,8 @@ as.function.jointmotbf <- function(x, ...)
 #' @seealso \link{parametersJointMoTBF} and \link{jointMoTBF}
 #' @export
 #' @examples
-#' require(mnormt) ## Load the package to generate a multinormal dataset
+#'\donttest{
+#' ## Load the mnormt package to generate a multinormal dataset
 #' ## Dataset
 #' Mean <- 0; nVar <- 2; ro <- 0
 #' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
@@ -449,27 +452,28 @@ as.function.jointmotbf <- function(x, ...)
 #' 
 #' ## Coefficients
 #' coef(P)
-#'
+#' }
 #' #############################################################################
 #' ## MORE EXAMPLES ############################################################
 #' #############################################################################
-#' ## ## Dataset
-#' ## Mean <- 0; nVar <- 3; ro <- 0
-#' ## varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' ## means <- rep(Mean, nVar)
-#' ## X <- rmnorm(100,means,varcov) 
-#' ## data <- standardizeDataset(data.frame(X))
-#' ## 
-#' ## ## Joint function
-#' ## dim <-c(2,4,3)
-#' ## param <- parametersJointMoTBF(data, dimensions = dim)
-#' ## P <- jointMoTBF(param)
-#' ## P$Time
-#' ##
-#' ## ## Coefficients
-#' ## coef(P)
-#' ##############################################################################
-#' ##############################################################################
+#' \donttest{
+#' ## Dataset
+#' Mean <- 0; nVar <- 3; ro <- 0
+#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
+#' means <- rep(Mean, nVar)
+#' X <- rmnorm(100,means,varcov) 
+#' data <- standardizeDataset(data.frame(X))
+#'  
+#' ## Joint function
+#' dim <-c(2,4,3)
+#' param <- parametersJointMoTBF(data, dimensions = dim)
+#' P <- jointMoTBF(param)
+#' P$Time
+#' 
+#' ## Coefficients
+#' coef(P)
+#' }
+
 coef.jointmotbf <- function(object, ...) coeffMOP(object)
 
 
@@ -481,9 +485,10 @@ coef.jointmotbf <- function(object, ...) coeffMOP(object)
 #' @return A \code{"character"} vector with the names of variables of the function.
 #' @export
 #' @examples
+#' \donttest{
 #' # 1. EXAMPLE
 #' ## Dataset
-#' require(mnormt) ## Load the package to generate a multinormal dataset
+#' ## Load the mnormt package to generate a multinormal dataset
 #' ## Dataset
 #' Mean <- 0; nVar <- 2; ro <- 0
 #' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
@@ -499,45 +504,47 @@ coef.jointmotbf <- function(object, ...) coeffMOP(object)
 #' 
 #' ## Variables
 #' nVariables(P)
-#' 
+#' }
 #' ##############################################################################
 #' ## MORE EXAMPLES #############################################################
 #' ##############################################################################
-#' ## ## Dataset
-#' ## Mean <- 0; nVar <- 3; ro <- 0
-#' ## varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' ## means <- rep(Mean, nVar)
-#' ## X <- rmnorm(100,means,varcov) 
-#' ## data <- standardizeDataset(data.frame(X))
-#' ##
-#' ## ## Joint function
-#' ## dim <- c(2,1,3)
-#' ## param <- parametersJointMoTBF(data, dimensions = dim)
-#' ## P <- jointMoTBF(param)
-#' ##
-#' ## ## Variables
-#' ## nVariables(P)
-#' #############################################################################
-#' #############################################################################
+#' \donttest{
+#' ## Dataset
+#' Mean <- 0; nVar <- 3; ro <- 0
+#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
+#' means <- rep(Mean, nVar)
+#' X <- rmnorm(100,means,varcov) 
+#' data <- standardizeDataset(data.frame(X))
+#' 
+#' ## Joint function
+#' dim <- c(2,1,3)
+#' param <- parametersJointMoTBF(data, dimensions = dim)
+#' P <- jointMoTBF(param)
+#' 
+#' ## Variables
+#' nVariables(P)
+#' }
+
 nVariables=function(P)
 {
-  Letters <- letters[c(24:26,1:23)]
-  string <- as.character(P)
-  t <- strsplit(string, split="-", fixed = T)[[1]]
-  t2 <- c()
-  for(i in 1:length(t)){
-    t1 <- strsplit(t[i], split="+", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
-    t2 <- c(t2,t1)
-  }
-  t <- unlist(sapply(1:length(t2), function(i) strsplit(t2[i], split="*", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]))
-  
-  options(warn=-1)
-  variables <- t[is.na(as.numeric(t))]
-  t <- unlist(strsplit(variables, split="^", fixed = T, perl = FALSE, useBytes = FALSE))
-  t <- unlist(strsplit(t, split="(", fixed = T, perl = FALSE, useBytes = FALSE))
-  variables <- t[is.na(as.numeric(t))]
-  variables <- unique(variables)
-  variables <- Letters[Letters%in%variables]
+  suppressWarnings({
+    Letters <- letters[c(24:26,1:23)]
+    string <- as.character(P)
+    t <- strsplit(string, split="-", fixed = T)[[1]]
+    t2 <- c()
+    for(i in 1:length(t)){
+      t1 <- strsplit(t[i], split="+", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
+      t2 <- c(t2,t1)
+    }
+    t <- unlist(sapply(1:length(t2), function(i) strsplit(t2[i], split="*", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]))
+    
+    variables <- t[is.na(as.numeric(t))]
+    t <- unlist(strsplit(variables, split="^", fixed = T, perl = FALSE, useBytes = FALSE))
+    t <- unlist(strsplit(t, split="(", fixed = T, perl = FALSE, useBytes = FALSE))
+    variables <- t[is.na(as.numeric(t))]
+    variables <- unique(variables)
+    variables <- Letters[Letters%in%variables]
+  })
   return(variables)
 }
 
@@ -628,22 +635,23 @@ dimensionFunction <- function(P){
 #' ##############################################################################
 #' ## MORE EXAMPLES #############################################################
 #' ##############################################################################
-#' ## ## Dataset with 3 variables
-#' ## X <- data.frame(rnorm(50), rnorm(50), rnorm(50))
-#' ##
-#' ## ## Joint function
-#' ## dim <- c(2,1,3)
-#' ## param <- parametersJointMoTBF(X, dimensions = dim)
-#' ## P <- jointMoTBF(param)
-#' ## 
-#' ## ## Integral
-#' ## integralJointMoTBF(P)
-#' ## integralJointMoTBF(P, var="x")
-#' ## integralJointMoTBF(P, var="y")
-#' ## integralJointMoTBF(P, var="z")
-#' ## integralJointMoTBF(P, var=c("x","z"))
-#' ##############################################################################
-#' ##############################################################################
+#' \donttest{
+#' ## Dataset with 3 variables
+#' X <- data.frame(rnorm(50), rnorm(50), rnorm(50))
+#' 
+#' ## Joint function
+#' dim <- c(2,1,3)
+#' param <- parametersJointMoTBF(X, dimensions = dim)
+#' P <- jointMoTBF(param)
+#'  
+#' ## Integral
+#' integralJointMoTBF(P)
+#' integralJointMoTBF(P, var="x")
+#' integralJointMoTBF(P, var="y")
+#' integralJointMoTBF(P, var="z")
+#' integralJointMoTBF(P, var=c("x","z"))
+#' }
+
 integralJointMoTBF <- function(P, var=NULL)
 {
   Letters <- c(letters[24:26], letters[1:23])
@@ -756,27 +764,28 @@ integralJointMoTBF <- function(P, var=NULL)
 #' ##############################################################################
 #' ## MORE EXAMPLES #############################################################
 #' ############################################################################## 
-#' ## ## Dataset with 3 variables
-#' ## X <- data.frame(rnorm(100), rexp(100), rnorm(100, 1))
-#' ##
-#' ## ## Joint function
-#' ## dim <- c(2,1,3)
-#' ## param <- parametersJointMoTBF(X, dimensions = dim)
-#' ## P <- jointMoTBF(param)
-#' ## P
-#' ##
-#' ## ## Evaluation
-#' ## nVariables(P)
-#' ## val <- list(x = 0.8, y = -2.1, z = 1.2)
-#' ## evalJointFunction(P, values = val)
-#' ## val <- list(x = 0.8, z = 1.2)
-#' ## evalJointFunction(P, values = val)
-#' ## val <- list(y = -2.1)
-#' ## evalJointFunction(P, values = val)
-#' ## val <- list(y = -2.1)
-#' ## evalJointFunction(P, values = val)
-#' ##############################################################################
-#' ##############################################################################
+#' \donttest{
+#' ## Dataset with 3 variables
+#' X <- data.frame(rnorm(100), rexp(100), rnorm(100, 1))
+#' 
+#' ## Joint function
+#' dim <- c(2,1,3)
+#' param <- parametersJointMoTBF(X, dimensions = dim)
+#' P <- jointMoTBF(param)
+#' P
+#' 
+#' ## Evaluation
+#' nVariables(P)
+#' val <- list(x = 0.8, y = -2.1, z = 1.2)
+#' evalJointFunction(P, values = val)
+#' val <- list(x = 0.8, z = 1.2)
+#' evalJointFunction(P, values = val)
+#' val <- list(y = -2.1)
+#' evalJointFunction(P, values = val)
+#' val <- list(y = -2.1)
+#' evalJointFunction(P, values = val)
+#' }
+
 evalJointFunction <- function(P, values)
 {
   nVar <- nVariables(P)
@@ -859,7 +868,7 @@ evalJointFunction <- function(P, values)
   for(i in 1:length(exp)) str <- paste(str, sign[i], param[i], exp[i], sep="")
   
   if(all(names(values)==nVar)){
-    cat("The method 'as.function()' can be used. \n")
+    message("The method 'as.function()' can be used. \n")
     return(eval(parse(text=str)))
   } else{
     f <- noquote(str)
@@ -898,28 +907,29 @@ evalJointFunction <- function(P, values)
 #' ##############################################################################
 #' ## MORE EXAMPLES #############################################################
 #' ##############################################################################
-#' ## require(mnormt) ## Load the package to generate a multinormal dataset
-#' ## ## Dataset with 5 variables
-#' ## Mean <- 0; nVar <- 5; ro <- 0.3
-#' ## varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' ## means <- rep(Mean, nVar)
-#' ## X <- rmnorm(100,means,varcov) 
-#' ## data <- standardizeDataset(data.frame(X))
-#' ##
-#' ## ## Joint function
-#' ## dim <- c(2,1,3,1,2)
-#' ## param <- parametersJointMoTBF(data, dimensions = dim)
-#' ## P <- jointMoTBF(param)
-#' ## nVariables(P)
-#' ##
-#' ## ## Marginal
-#' ## marginalJointMoTBF(P, var="x")
-#' ## marginalJointMoTBF(P, var="y")
-#' ## marginalJointMoTBF(P, var="z")
-#' ## marginalJointMoTBF(P, var="a")
-#' ## marginalJointMoTBF(P, var="b")
-#' #############################################################################
-#' #############################################################################
+#' \donttest{
+#' ## Load the mnormt package to generate a multinormal dataset
+#' ## Dataset with 5 variables
+#' Mean <- 0; nVar <- 5; ro <- 0.3
+#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
+#' means <- rep(Mean, nVar)
+#' X <- rmnorm(100,means,varcov) 
+#' data <- standardizeDataset(data.frame(X))
+#' 
+#' ## Joint function
+#' dim <- c(2,1,3,1,2)
+#' param <- parametersJointMoTBF(data, dimensions = dim)
+#' P <- jointMoTBF(param)
+#' nVariables(P)
+#' 
+#' ## Marginal
+#' marginalJointMoTBF(P, var="x")
+#' marginalJointMoTBF(P, var="y")
+#' marginalJointMoTBF(P, var="z")
+#' marginalJointMoTBF(P, var="a")
+#' marginalJointMoTBF(P, var="b")
+#' }
+
 marginalJointMoTBF <- function(P, var)
 {
   Letters <- c(letters[24:26], letters[1:23])
@@ -1061,7 +1071,7 @@ marginalJointMoTBF <- function(P, var)
 #' X <- data.frame(rnorm(500), rnorm(500))
 #' 
 #' ## Joint function
-#' dim <- c(3,3) ## dim <- c(5,5)
+#' dim <- c(3,3) 
 #' param1 <- parametersJointMoTBF(X, dimensions = dim)
 #' P <- jointMoTBF(param1)
 #' P
@@ -1073,25 +1083,29 @@ marginalJointMoTBF <- function(P, var)
 #' #############################################################################
 #' ## MORE EXAMPLES ############################################################
 #' #############################################################################
-#' ## ## Dataset
-#' ## X <- data.frame(rnorm(200,2), rexp(200, 1))
-#' ##
-#' ## ## Joint function
-#' ## dim <- c(4,5)
-#' ## param2 <- parametersJointMoTBF(X, dimensions = dim)
-#' ## P <- jointMoTBF(param2)
-#' ## P
-#' ##
-#' ## ## Plots
-#' ## plot(P)
-#' ## plot(P, filled = FALSE, data = X)
-#' ## plot(P, type = "perspective", orientation = c(10,180))
-#' #############################################################################
-#' #############################################################################
+#' \donttest{
+#' ## Dataset
+#' X <- data.frame(rnorm(200,2), rexp(200, 1))
+#' 
+#' ## Joint function
+#' dim <- c(4,5)
+#' param2 <- parametersJointMoTBF(X, dimensions = dim)
+#' P <- jointMoTBF(param2)
+#' P
+#' 
+#' ## Plots
+#' plot(P)
+#' plot(P, filled = FALSE, data = X)
+#' plot(P, type = "perspective", orientation = c(10,180))
+#' }
+
 plot.jointmotbf <- function(x, type="contour", ranges=NULL, orientation=c(5,-30), 
                             data=NULL, filled=TRUE, ticktype="simple", ...)
 {
-  if(length(nVariables(x))!=2) return(cat("It is not possible plotting a joint function with more than 2 variables."))
+  opar <- par(no.readonly =TRUE)       
+  on.exit(par(opar)) 
+  
+  if(length(nVariables(x))!=2) stop("It is not possible plotting a joint function with more than 2 variables.")
   if(is.null(ranges)) ranges <- x$Domain
   #{ranges <- x$Domain; ranges[1,] <- ranges[1,]+2E-1; ranges[2,] <- ranges[2,]-2E-1}
   X <- seq(min(ranges[,1]), max(ranges[,1]), length = 20)

@@ -38,7 +38,7 @@
 #' ## dataset: 2 continuous variables, 1 discrete variable.
 #' data <- data.frame(X = rnorm(100),Y = rexp(100,1/2), Z = as.factor(rep(c("s","a"), 50)))
 #' disVar <- "Z" ## Discrete variable
-#' class(data[,disVar]) ## class(data[,3]) ## factor
+#' class(data[,disVar]) ## factor
 #' 
 #' data <- discreteVariables_as.character(dataset = data, discreteVariables = disVar)
 #' class(data[,disVar]) ## character
@@ -156,6 +156,7 @@ scaleData <- function(dataset, scale)
 #' @return A list of datasets for \code{TrainingandTestData()} or a subset of the original
 #' dataset for the others two functions.
 #' @examples
+#' \donttest{
 #' ## Dataset
 #' X <- rnorm(1000)
 #' Y <- rchisq(1000, df = 8)
@@ -171,6 +172,7 @@ scaleData <- function(dataset, scale)
 #' ## Subset Dataset
 #' newData(data, nameX = "X", nameY = "Z")
 #' splitdata(data, nameVariable = "X", min = 2, max= 3)
+#' }
 
 #' @rdname subsetData
 #' @export

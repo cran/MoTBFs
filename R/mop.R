@@ -392,18 +392,20 @@ coeffPol <- function(fx)
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
 #' derivMOP(Px)
 #' 
+#' \dontrun{
 #' ## 3. EXAMPLE
 #' X <- rnorm(1000)
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
 #' derivMOP(Px)
-#' ## Message: It is an 'motbf' function but not 'mop' subclass.
+#' ## Error in derivMOP(Px): fx is an 'motbf' function but not 'mop' subclass.
 #' class(Px)
 #' subclass(Px)
-#' 
+#' }
+
 derivMOP <- function(fx) 
 {
-  if(!is.motbf(fx)) return(cat("It is not an 'motbf' function."))
-  if(is.motbf(fx)&&!is.mop(fx)) return(cat("It is an 'motbf' function but not 'mop' subclass."))
+  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
+  if(is.motbf(fx)&&!is.mop(fx)) stop("fx is an 'motbf' function but not 'mop' subclass.")
   
   parameters <- coef(fx)
   str <- parameters[2]
@@ -440,39 +442,45 @@ derivMOP <- function(fx)
 #' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
 #' integralMOP(Px)
 #' 
+#' \dontrun{
 #' ## 3. EXAMPLE
 #' X <- rnorm(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
+#' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
 #' integralMOP(Px)
-#' ## Message: It is an 'motbf' function but not 'mop' subclass.
+#' ## Error in integralMOP(Px): fx is an 'motbf' function but not 'mop' subclass.
 #' class(Px)
 #' subclass(Px)
-#' 
+#' }
+
 integralMOP <- function(fx)
 {
-  if(!is.motbf(fx)) return(cat("It is not an 'motbf' function."))
-  if(is.motbf(fx)&&!is.mop(fx)) return(cat("It is an 'motbf' function but not 'mop' subclass."))
+  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
+  if(is.motbf(fx)&&!is.mop(fx)) stop("fx is an 'motbf' function but not 'mop' subclass.")
   
-  options(warn=-1)
-  parameters <- coeffMOP(fx)
-  mu <- tryCatch(meanMOP(fx), error = function(e) NA) 
-  str <- paste(parameters[1], "*x", sep="")
-  if(length(parameters)==1){
-    f <- noquote(str)
-    f <- motbf(f)
-    return(f)
-  }
-  for(i in 2:length(parameters)){
-    if(parameters[i]>=0) sign <- "+" else sign <- ""
-    if(is.na(mu)){
-      str <- paste(str, sign, (parameters[i]/i), "*x^", i, sep="")
-    }else{
-      if(mu>=0) signmean <- "-" else signmean <- "+"
-      str <- paste(str,sign,parameters[i]/i,"*(x",signmean, mu, ")^",i, sep="")
+  #options(warn=-1)
+  
+  suppressWarnings({
+    parameters <- coeffMOP(fx)
+    mu <- tryCatch(meanMOP(fx), error = function(e) NA) 
+    str <- paste(parameters[1], "*x", sep="")
+    if(length(parameters)==1){
+      f <- noquote(str)
+      f <- motbf(f)
+      return(f)
     }
-  }
-  f <- noquote(str)
-  f <- list(Function = f, Subclass = "mop")
-  f <- motbf(f)
+    for(i in 2:length(parameters)){
+      if(parameters[i]>=0) sign <- "+" else sign <- ""
+      if(is.na(mu)){
+        str <- paste(str, sign, (parameters[i]/i), "*x^", i, sep="")
+      }else{
+        if(mu>=0) signmean <- "-" else signmean <- "+"
+        str <- paste(str,sign,parameters[i]/i,"*(x",signmean, mu, ")^",i, sep="")
+      }
+    }
+    f <- noquote(str)
+    f <- list(Function = f, Subclass = "mop")
+    f <- motbf(f)
+  })
+  
   return(f)
 }

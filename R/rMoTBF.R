@@ -58,7 +58,7 @@
 rMoTBF <- function(size, fx, domain = NULL)
 {
   if(is.null(domain)) domain <- fx$Domain
-  if(is.null(domain)) return(cat("Domain is required."))
+  if(is.null(domain)) stop("Domain is required.")
   CDF <- integralMoTBF(fx)
   intmin <- as.function(CDF)(min(domain))
   mUnif <- runif(size)
@@ -73,6 +73,9 @@ rMoTBF <- function(size, fx, domain = NULL)
 #' @export
 inversionMethod <- function(size, fx, domain = NULL, data = NULL)
 {
+  opar <- par(no.readonly =TRUE)       
+  on.exit(par(opar))     
+  
   simulatedValues <- rMoTBF(size, fx, domain)
   
   plot(ecdf(simulatedValues), cex = 0, main = "")

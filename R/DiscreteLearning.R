@@ -29,6 +29,7 @@ probDiscreteVariable <- function(stateNames, Variable)
     probability <- (length(which(Variable==stateNames[j]))+1)/(length(Variable)+length(stateNames))###Corrección de laplace
     coeff <- c(coeff, probability) 
   }
+  names(coeff) <- stateNames
   return(list(coeff=coeff,sizeDataLeaf=sizeDataLeaf))
 }
 

@@ -35,7 +35,7 @@
 #' ## Learning BN
 #' intervals <- 3
 #' potential <- "MOP"
-#' P1 <- MoTBFs_Learning(graph = dag, data = data, POTENTIAL_TYPE=potential,
+#' P1 <- MoTBFs_Learning(graph = dag, data = data, numIntervals = intervals, POTENTIAL_TYPE=potential,
 #' maxParam = 5)
 #' printBN(P1)
 #' 
@@ -120,7 +120,7 @@ MoTBFs_Learning <- function(graph, data, numIntervals, POTENTIAL_TYPE, maxParam=
 #' ## Learning BN
 #' intervals <- 3
 #' potential <- "MOP"
-#' P <- MoTBFs_Learning(graph = dag, data = data, POTENTIAL_TYPE=potential,
+#' P <- MoTBFs_Learning(graph = dag, data = data, numIntervals = intervals, POTENTIAL_TYPE=potential,
 #' maxParam = 15)
 #' printBN(P)
 #' 
@@ -169,7 +169,7 @@ printBN <- function(MoTBF.BN)
 #' intervals <- 3
 #' potential <- "MOP"
 #' P1 <- MoTBFs_Learning(graph = dag, data = data, POTENTIAL_TYPE=potential,
-#' maxParam = 5)
+#' numIntervals = intervals, maxParam = 5)
 #' logLikelihood.MoTBFBN(P1, data) ##BIC$LogLikelihood
 #' BIC <- BiC.MoTBFBN(P1, data)
 #' BIC$BIC
@@ -178,7 +178,7 @@ printBN <- function(MoTBF.BN)
 #' intervals <- 2
 #' potential <- "MTE"
 #' P2 <- MoTBFs_Learning(graph = dag, data = data, POTENTIAL_TYPE=potential,
-#' maxParam = 10)
+#' numIntervals = intervals, maxParam = 10)
 #' logLikelihood.MoTBFBN(P2, data) ##BIC$LogLikelihood
 #' BIC <- BiC.MoTBFBN(P2, data)
 #' BIC$BIC 

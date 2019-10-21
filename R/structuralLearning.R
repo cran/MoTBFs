@@ -106,7 +106,9 @@ getChildParentsFromGraph <- function(graph, nameVars=NULL)
 },
 
 ## type <- 3
-{if(is.null(nameVars)) nameVars <- names(graph$nodes);
+{
+  #if(is.null(nameVars)) nameVars <- names(graph$nodes);
+ nameVars <- names(graph$nodes);
  childrenAndParents = list();
  for(i in 1:length(graph$nodes)){
    Child <- nameVars[i]

@@ -23,10 +23,11 @@
 #' hist(modX, prob = TRUE, add = TRUE)
 #' 
 #' ## Rescale
-#' origF <- rescaledMoTBFs(f, X) ## rescaledMOP(f, X)
+#' origF <- rescaledMoTBFs(f, X) 
 #' plot(origF, xlim = range(X), col=2)
 #' hist(X, prob = TRUE, add = TRUE)
-#' meanMOP(origF) ## mean(X)
+#' meanMOP(origF) 
+#' mean(X)
 #' 
 #' ## 2. EXAMPLE 
 #' X <- rweibull(1000, shape = 20, scale= 10) ## data
@@ -38,7 +39,7 @@
 #' hist(modX, prob = TRUE, add = TRUE)
 #' 
 #' ## Rescale
-#' origF <- rescaledMoTBFs(f, X) ## rescaledMTE(f, X)
+#' origF <- rescaledMoTBFs(f, X) 
 #' plot(origF, xlim = range(X), col=2)
 #' hist(X, prob = TRUE, add = TRUE)
 #' 
