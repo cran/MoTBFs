@@ -1,4 +1,4 @@
-e70feb89cfd113e21a1e73cc02c9dd02 *DESCRIPTION
+cb4d0cbb393587b2fe6da7947b8dc212 *DESCRIPTION
 b6c8e266884a44f7d0b1542136f034bd *NAMESPACE
 d63e0797b3ed04027088459655549f65 *R/DiscreteLearning.R
 c4f08eddc7123d5beb6db79feb5db8e4 *R/Inference.R
@@ -7,7 +7,7 @@ ee9c02ff225683c55c8d4bf78d003b1d *R/MoTBFClass.R
 7e2df5e2cc3d7cae37bf0b98ec8799c4 *R/conditional.R
 10adb8685b7631ac0bcf01e3caa00794 *R/datasets.R
 f7423ce02bd6e45850014ceb74b25c68 *R/functions.R
-32b8d2ced8ac456b00bdcdc46757308c *R/joint.R
+e1832e486edabf1bcc9a923a5d6ce565 *R/joint.R
 b24241113a1247ef8e70279d0b011d12 *R/mop.R
 6ba4a5704d163df41ac8c503ea45bcab *R/motbf.R
 dc9a2d29eb64055c98534fca67959114 *R/mte.R
@@ -19,11 +19,11 @@ c641ff498333597a0c01b0ec0a4c6d8b *data/ecoli.rda
 91464f86b583ad134b72347233d443e8 *data/thyroid.rda
 52ec4dd4fba69574979b3623707f2ce4 *man/BICMoTBF.Rd
 59b6fac7e3484f57c786669ad14fbff7 *man/BICMultiFunctions.Rd
-089baa5e94cc13f5c43b3b259ceacd88 *man/Class-JointMoTBF.Rd
-0e2202e93a9e5977a75f9b6bec98f87f *man/Class-MoTBF.Rd
+5479e111fafb1974b5bd7e3a003d4b4e *man/Class-JointMoTBF.Rd
+d276f463da88f5838fc83991eb12507a *man/Class-MoTBF.Rd
 fd26bcad24e9a7a6edd23464f7798cab *man/LearningHC.Rd
 febb384d0eb2acd2ba75eaa9cb2acea0 *man/MoTBF-Distribution.Rd
-a4af180aa4337b6dc02f54d663e0e5df *man/MoTBFs_Learning.Rd
+326abd15b21693df78955eeb574a9a77 *man/MoTBFs_Learning.Rd
 ec0972e20fb4e21ca16401ee4ce5125c *man/Subclass-MoTBF.Rd
 3f59007346e55bd2b9c2945443cbc0f5 *man/UpperBoundLogLikelihood.Rd
 94d5dca8f15acb76e3d5928864dcdd53 *man/as.function.jointmotbf.Rd
@@ -36,8 +36,8 @@ a4f6926a28f576a6b29fd6d7f16bffe6 *man/coef.mop.Rd
 0a7aa9f3590cef74ef9318cdb151c3ac *man/coef.motbf.Rd
 303b1885e1911b494596d75d836f89ef *man/coef.mte.Rd
 678af4ba26669d3667d71e0484f3fc03 *man/coefExpJointCDF.Rd
-f8505421226117520a3dd5e16925c3ca *man/conditionalmotbf.learning.Rd
-d01850967ebec652df6f0406a233b1d1 *man/dataMining.Rd
+5d3883a712ac39013f14a0c21ea78432 *man/conditionalmotbf.learning.Rd
+30fc5f35b01f06d1cbfea4182c758c6b *man/dataMining.Rd
 d0f360ab672cb92d634515646ef24a4c *man/derivMOP.Rd
 007e3aad5f7efc0c61b2fa34b2e2e3b6 *man/derivMTE.Rd
 2ebaabd6dfcc3c6089e1d101864cba45 *man/derivMoTBF.Rd
@@ -62,7 +62,7 @@ dbf65f0cf3d03874ceb4e4c6ec3c2288 *man/is.observed.Rd
 e4004f011ff002ad18677fc0ddbc7c11 *man/is.root.Rd
 2c380139233e07ad00ccc3075e97302c *man/jointCDF.Rd
 bfd05eff60e76c12104d05117b59fdba *man/jointmotbf.learning.Rd
-8fef34a9188ac7840f3a3f5dc3d466a9 *man/learnMoTBFpriorInformation.Rd
+556677d7f77810ada6cbac64f089367e *man/learnMoTBFpriorInformation.Rd
 ea5ac5c8021490bfd053cbbb2dab603a *man/marginalJointMoTBF.Rd
 47f4f21ae9fb390e44435c5078703fde *man/mop.learning.Rd
 0af414865a7e46be8292a485163ad44b *man/motbf_type.Rd
@@ -70,9 +70,9 @@ b594ab80546341bc06a8ab78e4effe90 *man/mte.learning.Rd
 477890547214f7bff42522eaf62fb5c9 *man/nVariables.Rd
 6425c6c8366423a9406b937091e0672c *man/newRangePriorData.Rd
 147905e769b137e9f97ec58a40fda249 *man/parentValues.Rd
-a8b39328f87508f7ac1a1ecf38cf8dbd *man/plot.jointmotbf.Rd
+cec92d40169d5666999c418d0a6534f5 *man/plot.jointmotbf.Rd
 beb4476c942dc851777ab9db92d86f3f *man/plot.motbf.Rd
-dcb656aa9055ac2f0cd3ec6029ff4386 *man/plotConditional.Rd
+3253b119b1f07f3ccb96cb9781a14041 *man/plotConditional.Rd
 ec9b193ba59633b669cc977047eed639 *man/preprocessedData.Rd
 7bb792fd63b27424cdd28ca3a9945363 *man/printBN.Rd
 ffc4d7acb04fb6f9b0c6054eaf677095 *man/printConditional.Rd
@@ -83,7 +83,7 @@ ffc4d7acb04fb6f9b0c6054eaf677095 *man/printConditional.Rd
 e4bfcd92f6da4788116ccbb4ef9c6897 *man/rnormMultiv.Rd
 98b7072b2dc8d571033185649979595f *man/sample_MoTBFs.Rd
 d6b5fa49f0b528f89d26f17510eaa038 *man/subsetData.Rd
-96f7680be9d24088251cb484841973ad *man/summary.jointmotbf.Rd
-df92da313781f18a5c205c934fef3df4 *man/summary.motbf.Rd
+dd5f317c6bebc3102e306a7d729ed39c *man/summary.jointmotbf.Rd
+976add9f8af2f996edb4786fe18c0ebd *man/summary.motbf.Rd
 bc1bf8227ee58c421983f319ee8f6b83 *man/thyroid.Rd
-44be0021ce1893dc5e2ebe9cb8d37de3 *man/univMoTBF.Rd
+f9c606cbe3753c79e1e58e6dd24a65f9 *man/univMoTBF.Rd

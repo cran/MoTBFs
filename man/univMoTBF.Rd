@@ -4,8 +4,13 @@
 \alias{univMoTBF}
 \title{Fitting MoTBFs}
 \usage{
-univMoTBF(data, POTENTIAL_TYPE, evalRange = NULL, nparam = NULL,
-  maxParam = NULL)
+univMoTBF(
+  data,
+  POTENTIAL_TYPE,
+  evalRange = NULL,
+  nparam = NULL,
+  maxParam = NULL
+)
 }
 \arguments{
 \item{data}{A \code{"numeric"} data vector.}

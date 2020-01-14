@@ -9,20 +9,56 @@
 \alias{BICscoreMoTBF}
 \title{Learning Conditional Functions}
 \usage{
-conditionalMethod(data, nameParents, nameChild, numIntervals,
-  POTENTIAL_TYPE, maxParam = NULL, s = NULL, priorData = NULL)
+conditionalMethod(
+  data,
+  nameParents,
+  nameChild,
+  numIntervals,
+  POTENTIAL_TYPE,
+  maxParam = NULL,
+  s = NULL,
+  priorData = NULL
+)
 
-conditional(data, nameParents, nameChild, domainChild, domainParents,
-  numIntervals, mm, POTENTIAL_TYPE, maxParam = NULL, s = NULL,
-  priorData = NULL)
+conditional(
+  data,
+  nameParents,
+  nameChild,
+  domainChild,
+  domainParents,
+  numIntervals,
+  mm,
+  POTENTIAL_TYPE,
+  maxParam = NULL,
+  s = NULL,
+  priorData = NULL
+)
 
-select(data, nameParents, nameChild, domainChild, domainParents,
-  numIntervals, POTENTIAL_TYPE, maxParam = NULL, s = NULL,
-  priorData = NULL)
+select(
+  data,
+  nameParents,
+  nameChild,
+  domainChild,
+  domainParents,
+  numIntervals,
+  POTENTIAL_TYPE,
+  maxParam = NULL,
+  s = NULL,
+  priorData = NULL
+)
 
-learn.tree.Intervals(data, nameParents, nameChild, domainParents,
-  domainChild, numIntervals, POTENTIAL_TYPE, maxParam = NULL, s = NULL,
-  priorData = NULL)
+learn.tree.Intervals(
+  data,
+  nameParents,
+  nameChild,
+  domainParents,
+  domainChild,
+  numIntervals,
+  POTENTIAL_TYPE,
+  maxParam = NULL,
+  s = NULL,
+  priorData = NULL
+)
 
 BICscoreMoTBF(conditionalfunction, data, nameParents, nameChild)
 }

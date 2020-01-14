@@ -4,8 +4,13 @@
 \alias{plotConditional}
 \title{Plots for Conditional Functions}
 \usage{
-plotConditional(conditionalFunction, data, nameChild = NULL,
-  points = FALSE, color = NULL)
+plotConditional(
+  conditionalFunction,
+  data,
+  nameChild = NULL,
+  points = FALSE,
+  color = NULL
+)
 }
 \arguments{
 \item{conditionalFunction}{the output of the conditionalMethod. A list with the the interval of the parent

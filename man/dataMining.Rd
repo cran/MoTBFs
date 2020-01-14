@@ -18,8 +18,7 @@ discreteVariables_as.character(dataset, discreteVariables)
 
 standardizeDataset(dataset)
 
-discretizeVariablesEWdis(dataset, numIntervals, factor = FALSE,
-  binary = FALSE)
+discretizeVariablesEWdis(dataset, numIntervals, factor = FALSE, binary = FALSE)
 
 discreteVariablesStates(namevariables, discreteData)
 

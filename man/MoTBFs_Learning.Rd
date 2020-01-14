@@ -4,8 +4,15 @@
 \alias{MoTBFs_Learning}
 \title{Learning MoTBFs in a Network}
 \usage{
-MoTBFs_Learning(graph, data, numIntervals, POTENTIAL_TYPE,
-  maxParam = NULL, s = NULL, priorData = NULL)
+MoTBFs_Learning(
+  graph,
+  data,
+  numIntervals,
+  POTENTIAL_TYPE,
+  maxParam = NULL,
+  s = NULL,
+  priorData = NULL
+)
 }
 \arguments{
 \item{graph}{A network of the class \code{"bn"}, \code{"graphNEL"} or \code{"network"}.}

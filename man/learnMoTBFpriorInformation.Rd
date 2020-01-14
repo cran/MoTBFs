@@ -4,9 +4,16 @@
 \alias{learnMoTBFpriorInformation}
 \title{Incorporating Prior Knowledge}
 \usage{
-learnMoTBFpriorInformation(priorData, data, s, POTENTIAL_TYPE,
-  domain = range(data), coeffversion = 4, restrictDomain = TRUE,
-  maxParam = NULL)
+learnMoTBFpriorInformation(
+  priorData,
+  data,
+  s,
+  POTENTIAL_TYPE,
+  domain = range(data),
+  coeffversion = 4,
+  restrictDomain = TRUE,
+  maxParam = NULL
+)
 }
 \arguments{
 \item{priorData}{A \code{"numeric"} array which contains the values of the variable we have information apriori about.}

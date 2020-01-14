@@ -106,45 +106,13 @@ parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL)
   
   ## Create the grid: depending on the n.record and the n.variables
   npointsgrid <- 100
-  if(nrow(X)>npointsgrid){
-    num <- round((npointsgrid^2)^(1/ncol(X)))
-    ran <- sapply(X, range)
-    d <- unique(as.vector(sapply(1:ncol(ran), function(i) which(X[,i]%in%ran[,i]))))
-    if((num-length(d)<=0)) x1 <- sort(X[d,1])
-    else{
-      x <- X[-d,]
-      p <- sample(1:nrow(x), (num-length(d)))
-      p <- c(p,d)
-      x1 <- sort(X[p,1])
-    }
-    p <- sapply(1:length(x1), function(i) which(x1[i]==X[,1]))
-    if(class(p)=="list") p <- unlist(unique(p))
-    x <- X[p,]
-    rownames(x) <- 1:nrow(x)
-  }else{
-    if(ncol(X)==2){
-      x1 <- sort(X[,1])
-      p <- sapply(1:length(x1), function(i) which(x1[i]==X[,1]))
-      if(class(p)=="list") p <- unlist(unique(p))
-      x <- X[p,]
-    } else{
-      num <- round((npointsgrid^2)^(1/ncol(X)))
-      ran <- sapply(X, range)
-      d <- unique(as.vector(sapply(1:ncol(ran), function(i) which(X[,i]%in%ran[,i]))))
-      if((num-length(d)<=0)) x1 <- sort(X[d,1])
-      else{
-        x <- X[-d,]
-        p <- sample(1:nrow(x), (num-length(d)))
-        p <- c(p,d)
-        x1 <- sort(X[p,1])
-      }
-      p <- sapply(1:length(x1), function(i) which(x1[i]==X[,1]))
-      if(class(p)=="list") p <- unlist(unique(p))
-      x <- X[p,]
-      rownames(x) <- 1:nrow(x)
-    }
+
+  eg <- list()
+  for(i in 1: ncol(X)){
+    eg[[i]] <- seq(ranges[1,i], ranges[2,i], length.out = npointsgrid)
+    
   }
-  x <- expand.grid(x)
+  x <- expand.grid(eg)
   
   ## Cumulative densities
   y <- jointCDF(X,x)
@@ -665,6 +633,9 @@ integralJointMoTBF <- function(P, var=NULL)
     t <- strsplit(string, split="-", fixed = T)[[1]]
     for(i in 1:length(t)) t[i] <- paste("-", t[i], sep="")##le volvemos a añadir el simbolo negativo
     if(f1!=substr(t[1], 1, 1)) t[1] <- substr(t[1], 2, nchar(t[1]))
+    if(f1 == "-"){
+      t <- t[-1]
+    }
     
     t2 <- c()
     for(i in 1:(length(t))){
@@ -796,6 +767,9 @@ evalJointFunction <- function(P, values)
   t <- strsplit(string, split="-", fixed = T)[[1]]
   for(i in 1:length(t)) t[i] <- paste("-", t[i], sep="")##le volvemos a añadir el simbolo negativo
   if(f1!=substr(t[1], 1, 1)) t[1] <- substr(t[1], 2, nchar(t[1]))
+  if(f1 == "-"){
+    t <- t[-1]
+  }
   
   t2 <- c()
   for(i in 1:(length(t))){
@@ -1105,6 +1079,8 @@ plot.jointmotbf <- function(x, type="contour", ranges=NULL, orientation=c(5,-30)
   opar <- par(no.readonly =TRUE)       
   on.exit(par(opar)) 
   
+  varname <- attr(x$Domain, "dimnames")[[2]]
+  
   if(length(nVariables(x))!=2) stop("It is not possible plotting a joint function with more than 2 variables.")
   if(is.null(ranges)) ranges <- x$Domain
   #{ranges <- x$Domain; ranges[1,] <- ranges[1,]+2E-1; ranges[2,] <- ranges[2,]-2E-1}
@@ -1148,7 +1124,7 @@ plot.jointmotbf <- function(x, type="contour", ranges=NULL, orientation=c(5,-30)
                      las=1,
                      col=color(nlevels),                           
                      #col=rainbow(nlevels, alpha=0.8),                           
-                     plot.title = {title(xlab = "X", ylab = "Y")},
+                     plot.title = {title(xlab = varname[1], ylab = varname[2])},
       )
       if(!is.null(data)){
         mar.orig <- par("mar")
