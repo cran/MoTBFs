@@ -65,7 +65,7 @@ MoTBFs_Learning <- function(graph, data, numIntervals, POTENTIAL_TYPE, maxParam=
         if(is.null(priorParent)) PX <- univMoTBF(data[,Child], POTENTIAL_TYPE)
         else PX <- learnMoTBFpriorInformation(priorParent, data[,Child], s, POTENTIAL_TYPE, maxParam=maxParam)$posteriorFunction 
         UnivMoTBFs <- list(PX)
-        information <- list(Child=Child, functions=UnivMoTBFs)
+        information <- list(Child=Child, functions=UnivMoTBFs, varType = "Continuous")
         MoTBFs[[length(MoTBFs)+1]] <- information
       }else{
         
@@ -73,7 +73,7 @@ MoTBFs_Learning <- function(graph, data, numIntervals, POTENTIAL_TYPE, maxParam=
         states <- discreteVariablesStates(Child, data)[[1]]$states
         prob <- probDiscreteVariable(states, data[,Child])
         UnivDisc <- list(prob)
-        information <- list(Child=Child, functions=UnivDisc)
+        information <- list(Child=Child, functions=UnivDisc, varType = "Discrete")
         MoTBFs[[length(MoTBFs)+1]] <- information
       }
     } else{
@@ -90,9 +90,9 @@ MoTBFs_Learning <- function(graph, data, numIntervals, POTENTIAL_TYPE, maxParam=
       } else{ 
         priorChild <- NULL
       }
-      
+      varType <- ifelse(is.numeric(data[,Child]), "Continuous", "Discrete")
       result <- conditionalMethod(data, Parents, Child, numIntervals, POTENTIAL_TYPE, maxParam=maxParam, s, priorChild)
-      information <- list(Child=Child, functions=result)
+      information <- list(Child=Child, functions=result, varType = varType)
       MoTBFs[[length(MoTBFs)+1]] <- information
     }
   }

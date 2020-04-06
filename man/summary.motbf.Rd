@@ -12,9 +12,9 @@
 \arguments{
 \item{object}{An object of class \code{"motbf"}.}
 
-\item{x}{An object of class \code{"summary.motbf"}.}
-
 \item{...}{further arguments passed to or from other methods.}
+
+\item{x}{An object of class \code{"summary.motbf"}.}
 }
 \value{
 The summary of an \code{"motbf"} object. It contains a list of

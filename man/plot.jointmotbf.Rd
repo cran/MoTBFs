@@ -25,14 +25,14 @@
 \item{orientation}{A \code{"numeric"} vector indicating the perpective of the plot in degrees.
 By default it is \code{(5,-30)}.}
 
-\item{ticktype}{A \code{"character"} string: by default it is \code{"simple"} which draws just an arrow parallel to the axis 
-to indicate direction of increase; \code{"detailed"} draws normal ticks.}
-
 \item{data}{A dataset of class \code{"data.frame"}. Only two columns are allowed, it means two variables.
 It is only necessary to draw the points over the main plot. By defailt it is \code{NULL}.}
 
 \item{filled}{A logical argument; it is only used if \code{type = "contour"}
 is active; by default is \code{TRUE}  so filled contours are plotted.}
+
+\item{ticktype}{A \code{"character"} string: by default it is \code{"simple"} which draws just an arrow parallel to the axis 
+to indicate direction of increase; \code{"detailed"} draws normal ticks.}
 
 \item{\dots}{Further arguments to be passed as for \link{plot}.}
 }

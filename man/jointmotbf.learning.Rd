@@ -42,15 +42,9 @@ the previously learned parameters and converting this \code{"character"} string 
 object of class \code{"jointmotbf"}.
 }
 \examples{
-\donttest{
 ## 1. EXAMPLE 
-## Load the mnormt package to generate a multinormal dataset
-## Dataset
-Mean <- 0; nVar <- 2; ro <- 0
-varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-means <- rep(Mean, nVar)
-X <- rmnorm(100,means,varcov) 
-data <- standardizeDataset(data.frame(X))
+## Generate a multinormal dataset
+data <- data.frame(X1 = rnorm(100), X2 = rnorm(100))
 
 ## Joint learnings
 dim <- c(2,3)
@@ -65,21 +59,16 @@ P <- jointMoTBF(param)
 P
 attributes(P)
 class(P)
-}
+
 ###############################################################################
 ## MORE EXAMPLES ##############################################################
 ###############################################################################
 \donttest{
-## Load the mnormt package to generate a multinormal dataset
-## Dataset
-Mean <- 1; nVar <- 3; ro <- 0.5
-varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-means <- rep(Mean, nVar)
-X <- rmnorm(200,means,varcov)
-data <- standardizeDataset(data.frame(X))
+## Generate a dataset
+data <- data.frame(X1 = rnorm(100), X2 = rnorm(100), X3 = rnorm(100))
 
 ## Joint learnings
-dim <- c(3,2,4,2)
+dim <- c(3,2,3)
 param <- parametersJointMoTBF(X = data, dimensions = dim)
 
 param$Parameters

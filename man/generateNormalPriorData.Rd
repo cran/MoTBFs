@@ -13,7 +13,7 @@ generateNormalPriorData(graph, data, size, means, deviations = NULL)
 
 \item{size}{A \code{"numeric"} value indicating the number of records to generate for each variable in the dataset.}
 
-\item{means}{A \code{"numeric"} vector with the averiage of each variable. The names of the vector must be the name
+\item{means}{A \code{"numeric"} vector with the average of each variable. The names of the vector must be the name
 of the variables of which the information is given a priori by the expert.}
 
 \item{deviations}{A \code{"numeric"} vector with the desviations of each variable. The names of the vector must be the name
@@ -43,13 +43,9 @@ plot(dag)
 ## Means and desviations
 colnames(data)
 
-m <- sapply(data, mean)
-m <- m[-which(is.na(m))]
-names(m)
+m <- sapply(data, function(x){ifelse(is.numeric(x), mean(x),NA)})
+d <- sapply(data, function(x){ifelse(is.numeric(x), sd(x),NA)})
 
-d <- sapply(data, sd)
-d <- d[-which(is.na(m))]
-names(d)
 
 ## Prior Dataset
 n <- 5600

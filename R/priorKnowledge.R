@@ -397,7 +397,7 @@ rnormMultiv <- function(n, dataParents, dataChild)
 #' @param graph A network of the class \code{"bn"}, \code{"graphNEL"} or \code{"network"}.
 #' @param data A datase of class \code{"data.frame"} containing the continuous variables of the dataset.
 #' @param size A \code{"numeric"} value indicating the number of records to generate for each variable in the dataset.
-#' @param means A \code{"numeric"} vector with the averiage of each variable. The names of the vector must be the name
+#' @param means A \code{"numeric"} vector with the average of each variable. The names of the vector must be the name
 #' of the variables of which the information is given a priori by the expert.
 #' @param deviations A \code{"numeric"} vector with the desviations of each variable. The names of the vector must be the name
 #' of the variables of which the information is given a priori by the expert. By default it is \code{NULL} and the desviations
@@ -421,13 +421,9 @@ rnormMultiv <- function(n, dataParents, dataChild)
 #' ## Means and desviations
 #' colnames(data)
 #' 
-#' m <- sapply(data, mean)
-#' m <- m[-which(is.na(m))]
-#' names(m)
+#' m <- sapply(data, function(x){ifelse(is.numeric(x), mean(x),NA)})
+#' d <- sapply(data, function(x){ifelse(is.numeric(x), sd(x),NA)})
 #' 
-#' d <- sapply(data, sd)
-#' d <- d[-which(is.na(m))]
-#' names(d)
 #' 
 #' ## Prior Dataset
 #' n <- 5600
@@ -485,7 +481,7 @@ generateNormalPriorData <- function(graph, data, size, means, deviations=NULL)
     YY <- XX   
   }
   pos <- which(sapply(YY[1,], is.na))
-  if(length(pos)!=0) YY <- YY[,-pos]
+  if(length(pos)!=0) YY <- YY[,-pos, drop = F]
   return(as.data.frame(YY))
 }
 

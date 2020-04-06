@@ -16,16 +16,10 @@ A \code{"character"} vector with the names of variables of the function.
 Compute the number of variables which are in a 'jointmotbf' object.
 }
 \examples{
-\donttest{
+
 # 1. EXAMPLE
-## Dataset
-## Load the mnormt package to generate a multinormal dataset
-## Dataset
-Mean <- 0; nVar <- 2; ro <- 0
-varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-means <- rep(Mean, nVar)
-X <- rmnorm(100,means,varcov) 
-data <- standardizeDataset(data.frame(X))
+## Generate a dataset
+data <- data.frame(X1 = rnorm(100), X2 = rnorm(100))
 
 ## Joint function
 dim <-c(3,2)
@@ -35,17 +29,13 @@ P
 
 ## Variables
 nVariables(P)
-}
+
 ##############################################################################
 ## MORE EXAMPLES #############################################################
 ##############################################################################
 \donttest{
-## Dataset
-Mean <- 0; nVar <- 3; ro <- 0
-varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-means <- rep(Mean, nVar)
-X <- rmnorm(100,means,varcov) 
-data <- standardizeDataset(data.frame(X))
+## Generate a dataset
+data <- data.frame(X1 = rnorm(100), X2 = rnorm(100), X3 = rnorm(100))
 
 ## Joint function
 dim <- c(2,1,3)

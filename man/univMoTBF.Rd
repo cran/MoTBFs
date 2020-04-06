@@ -55,7 +55,7 @@ plot(f2, xlim = range(X), col = 2, add = TRUE)
 ## Data test
 Xtest <- rnorm(1000)
 ## Filtered data test
-Xtest <- Xtest[Xtest>=min(X) && Xtest<=max(X)]
+Xtest <- Xtest[Xtest>=min(X) & Xtest<=max(X)]
 
 ## Log-likelihood
 sum(log(as.function(f1)(Xtest)))
@@ -77,7 +77,7 @@ plot(f2, xlim = range(X), col = 4, add = TRUE)
 ## Data test
 Xtest <- rchisq(1000, df = 5)
 ## Filtered data test
-Xtest <- Xtest[Xtest>=min(X) && Xtest<=max(X)]
+Xtest <- Xtest[Xtest>=min(X) & Xtest<=max(X)]
 
 ## Log-likelihood
 sum(log(as.function(f1)(Xtest)))

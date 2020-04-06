@@ -12,9 +12,9 @@
 \arguments{
 \item{object}{An object of class \code{"jointmotbf"}.}
 
-\item{x}{An object of class \code{"summary.jointmotbf"}.}
-
 \item{...}{further arguments passed to or from other methods.}
+
+\item{x}{An object of class \code{"summary.jointmotbf"}.}
 }
 \value{
 The summary of a \code{"jointmotbf"} object. It contains a list of

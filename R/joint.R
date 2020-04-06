@@ -27,15 +27,10 @@
 #' is the mathematical expression, furthermore it contains the other elements of the output of the
 #' \code{parametersJointMoTBF()} function.
 #' @examples
-#' \donttest{
+#
 #' ## 1. EXAMPLE 
-#' ## Load the mnormt package to generate a multinormal dataset
-#' ## Dataset
-#' Mean <- 0; nVar <- 2; ro <- 0
-#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' means <- rep(Mean, nVar)
-#' X <- rmnorm(100,means,varcov) 
-#' data <- standardizeDataset(data.frame(X))
+#' ## Generate a multinormal dataset
+#' data <- data.frame(X1 = rnorm(100), X2 = rnorm(100))
 #' 
 #' ## Joint learnings
 #' dim <- c(2,3)
@@ -50,21 +45,16 @@
 #' P
 #' attributes(P)
 #' class(P)
-#' }
+#' 
 #' ###############################################################################
 #' ## MORE EXAMPLES ##############################################################
 #' ###############################################################################
 #' \donttest{
-#' ## Load the mnormt package to generate a multinormal dataset
-#' ## Dataset
-#' Mean <- 1; nVar <- 3; ro <- 0.5
-#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' means <- rep(Mean, nVar)
-#' X <- rmnorm(200,means,varcov)
-#' data <- standardizeDataset(data.frame(X))
+#' ## Generate a dataset
+#' data <- data.frame(X1 = rnorm(100), X2 = rnorm(100), X3 = rnorm(100))
 #' 
 #' ## Joint learnings
-#' dim <- c(3,2,4,2)
+#' dim <- c(3,2,3)
 #' param <- parametersJointMoTBF(X = data, dimensions = dim)
 #' 
 #' param$Parameters
@@ -403,14 +393,8 @@ as.function.jointmotbf <- function(x, ...)
 #' @seealso \link{parametersJointMoTBF} and \link{jointMoTBF}
 #' @export
 #' @examples
-#'\donttest{
-#' ## Load the mnormt package to generate a multinormal dataset
-#' ## Dataset
-#' Mean <- 0; nVar <- 2; ro <- 0
-#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' means <- rep(Mean, nVar)
-#' X <- rmnorm(100,means,varcov) 
-#' data <- standardizeDataset(data.frame(X))
+#' ## Generate a dataset
+#' data <- data.frame(X1 = rnorm(100), X2 = rnorm(100))
 #' 
 #' ## Joint function
 #' dim <-c(2,4)
@@ -420,17 +404,13 @@ as.function.jointmotbf <- function(x, ...)
 #' 
 #' ## Coefficients
 #' coef(P)
-#' }
+#'
 #' #############################################################################
 #' ## MORE EXAMPLES ############################################################
 #' #############################################################################
 #' \donttest{
-#' ## Dataset
-#' Mean <- 0; nVar <- 3; ro <- 0
-#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' means <- rep(Mean, nVar)
-#' X <- rmnorm(100,means,varcov) 
-#' data <- standardizeDataset(data.frame(X))
+#' ## Generate a dataset
+#' data <- data.frame(X1 = rnorm(100), X2 = rnorm(100), X3 = rnorm(100))
 #'  
 #' ## Joint function
 #' dim <-c(2,4,3)
@@ -453,16 +433,10 @@ coef.jointmotbf <- function(object, ...) coeffMOP(object)
 #' @return A \code{"character"} vector with the names of variables of the function.
 #' @export
 #' @examples
-#' \donttest{
+#' 
 #' # 1. EXAMPLE
-#' ## Dataset
-#' ## Load the mnormt package to generate a multinormal dataset
-#' ## Dataset
-#' Mean <- 0; nVar <- 2; ro <- 0
-#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' means <- rep(Mean, nVar)
-#' X <- rmnorm(100,means,varcov) 
-#' data <- standardizeDataset(data.frame(X))
+#' ## Generate a dataset
+#' data <- data.frame(X1 = rnorm(100), X2 = rnorm(100))
 #' 
 #' ## Joint function
 #' dim <-c(3,2)
@@ -472,17 +446,13 @@ coef.jointmotbf <- function(object, ...) coeffMOP(object)
 #' 
 #' ## Variables
 #' nVariables(P)
-#' }
+#' 
 #' ##############################################################################
 #' ## MORE EXAMPLES #############################################################
 #' ##############################################################################
 #' \donttest{
-#' ## Dataset
-#' Mean <- 0; nVar <- 3; ro <- 0
-#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' means <- rep(Mean, nVar)
-#' X <- rmnorm(100,means,varcov) 
-#' data <- standardizeDataset(data.frame(X))
+#' ## Generate a dataset
+#' data <- data.frame(X1 = rnorm(100), X2 = rnorm(100), X3 = rnorm(100))
 #' 
 #' ## Joint function
 #' dim <- c(2,1,3)
@@ -547,6 +517,7 @@ nVariables=function(P)
 #' dimensionFunction(P)
 #'
 dimensionFunction <- function(P){
+  suppressWarnings({
   string <- as.character(P)
   nVar <- nVariables(P)
   
@@ -571,6 +542,7 @@ dimensionFunction <- function(P){
     } else dimensions=c(dimensions, 1)
   }
   return(dimensions+1)
+  })
 }
 
 #' Integral Joint MoTBF
@@ -622,6 +594,7 @@ dimensionFunction <- function(P){
 
 integralJointMoTBF <- function(P, var=NULL)
 {
+  suppressWarnings({
   Letters <- c(letters[24:26], letters[1:23])
   if(is.numeric(var)) var <- Letters[var]
   if(is.null(var)) var <- nVariables(P)
@@ -700,6 +673,7 @@ integralJointMoTBF <- function(P, var=NULL)
   }
   
   return(P)
+  })
 }
 
 
@@ -882,16 +856,11 @@ evalJointFunction <- function(P, values)
 #' ## MORE EXAMPLES #############################################################
 #' ##############################################################################
 #' \donttest{
-#' ## Load the mnormt package to generate a multinormal dataset
-#' ## Dataset with 5 variables
-#' Mean <- 0; nVar <- 5; ro <- 0.3
-#' varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-#' means <- rep(Mean, nVar)
-#' X <- rmnorm(100,means,varcov) 
-#' data <- standardizeDataset(data.frame(X))
+#' ## Generate a dataset with 3 variables
+#' data <- data.frame(rnorm(100), rnorm(100), rnorm(100))
 #' 
 #' ## Joint function
-#' dim <- c(2,1,3,1,2)
+#' dim <- c(2,1,3)
 #' param <- parametersJointMoTBF(data, dimensions = dim)
 #' P <- jointMoTBF(param)
 #' nVariables(P)
@@ -900,12 +869,11 @@ evalJointFunction <- function(P, values)
 #' marginalJointMoTBF(P, var="x")
 #' marginalJointMoTBF(P, var="y")
 #' marginalJointMoTBF(P, var="z")
-#' marginalJointMoTBF(P, var="a")
-#' marginalJointMoTBF(P, var="b")
 #' }
 
 marginalJointMoTBF <- function(P, var)
 {
+  suppressWarnings({
   Letters <- c(letters[24:26], letters[1:23])
   if(is.numeric(var)) var <- Letters[var] else var <- var
   varN <- nVariables(P); noVar=varN[!varN%in%var]
@@ -1017,6 +985,7 @@ marginalJointMoTBF <- function(P, var)
     }
   }
   return(P)
+  })
 }
 
 #' Bidimensional Plots for \code{'jointmotbf'} Objects

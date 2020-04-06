@@ -19,14 +19,8 @@ Extracts the parameters of the learned multivariate mixtures of truncated basis
 functions.
 }
 \examples{
-\donttest{
-## Load the mnormt package to generate a multinormal dataset
-## Dataset
-Mean <- 0; nVar <- 2; ro <- 0
-varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-means <- rep(Mean, nVar)
-X <- rmnorm(100,means,varcov) 
-data <- standardizeDataset(data.frame(X))
+## Generate a dataset
+data <- data.frame(X1 = rnorm(100), X2 = rnorm(100))
 
 ## Joint function
 dim <-c(2,4)
@@ -36,17 +30,13 @@ P$Time
 
 ## Coefficients
 coef(P)
-}
+
 #############################################################################
 ## MORE EXAMPLES ############################################################
 #############################################################################
 \donttest{
-## Dataset
-Mean <- 0; nVar <- 3; ro <- 0
-varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-means <- rep(Mean, nVar)
-X <- rmnorm(100,means,varcov) 
-data <- standardizeDataset(data.frame(X))
+## Generate a dataset
+data <- data.frame(X1 = rnorm(100), X2 = rnorm(100), X3 = rnorm(100))
  
 ## Joint function
 dim <-c(2,4,3)

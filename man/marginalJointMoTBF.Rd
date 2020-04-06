@@ -37,16 +37,11 @@ marginalJointMoTBF(P, var = 2)
 ## MORE EXAMPLES #############################################################
 ##############################################################################
 \donttest{
-## Load the mnormt package to generate a multinormal dataset
-## Dataset with 5 variables
-Mean <- 0; nVar <- 5; ro <- 0.3
-varcov <- matrix(c(rep(c(1, rep(ro, nVar)), nVar-1),1), nrow=nVar)
-means <- rep(Mean, nVar)
-X <- rmnorm(100,means,varcov) 
-data <- standardizeDataset(data.frame(X))
+## Generate a dataset with 3 variables
+data <- data.frame(rnorm(100), rnorm(100), rnorm(100))
 
 ## Joint function
-dim <- c(2,1,3,1,2)
+dim <- c(2,1,3)
 param <- parametersJointMoTBF(data, dimensions = dim)
 P <- jointMoTBF(param)
 nVariables(P)
@@ -55,8 +50,6 @@ nVariables(P)
 marginalJointMoTBF(P, var="x")
 marginalJointMoTBF(P, var="y")
 marginalJointMoTBF(P, var="z")
-marginalJointMoTBF(P, var="a")
-marginalJointMoTBF(P, var="b")
 }
 }
 \seealso{

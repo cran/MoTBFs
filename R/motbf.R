@@ -35,7 +35,7 @@
 #' ## Data test
 #' Xtest <- rnorm(1000)
 #' ## Filtered data test
-#' Xtest <- Xtest[Xtest>=min(X) && Xtest<=max(X)]
+#' Xtest <- Xtest[Xtest>=min(X) & Xtest<=max(X)]
 #' 
 #' ## Log-likelihood
 #' sum(log(as.function(f1)(Xtest)))
@@ -57,7 +57,7 @@
 #' ## Data test
 #' Xtest <- rchisq(1000, df = 5)
 #' ## Filtered data test
-#' Xtest <- Xtest[Xtest>=min(X) && Xtest<=max(X)]
+#' Xtest <- Xtest[Xtest>=min(X) & Xtest<=max(X)]
 #' 
 #' ## Log-likelihood
 #' sum(log(as.function(f1)(Xtest)))

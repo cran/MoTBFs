@@ -35,12 +35,16 @@ is.discrete <- function(node, bn) {
   if(is.character(node)){
    node <-  which(lapply(bn, `[[`, "Child") == node)
   }
-  if(!is.null(bn[[node]]$functions[[1]]$coeff) || !is.null(bn[[node]]$functions[[1]]$Px$coeff)){
-    discrete <- TRUE
+  # if(!is.null(bn[[node]]$functions[[1]]$coeff) || !is.null(bn[[node]]$functions[[1]]$Px$coeff))){
+  #   discrete <- TRUE
+  # }else{
+  #   discrete <- FALSE
+  # }
+  if(bn[[node]]$varType =="Discrete"){
+    discrete <-  TRUE
   }else{
     discrete <- FALSE
   }
-  
   return(discrete)
 }
 
@@ -87,8 +91,10 @@ discreteStatesFromBN <- function(bn, dag){
       k <- k+1
       if(is.root(variables[i], dag)){
         states <- names(bn[[i]]$functions[[1]]$coeff)
-      }else{
+      }else if(!is.null(names(bn[[i]]$functions[[1]]$Px$coeff))){ 
         states <- names(bn[[i]]$functions[[1]]$Px$coeff)
+      }else{
+        states <- names(bn[[i]]$functions[[1]]$Px[[1]]$coeff)
       }
       
       discreteStates[[k]] <- states
@@ -407,7 +413,12 @@ findConditional <- function(node, bn, evi = NULL){
       }
     }
     if(is.discrete(node, bn)){
-      fx <- cases[[j]]$Px$coeff
+      if(!is.null(cases[[j]]$Px$coeff)){
+        fx <- cases[[j]]$Px$coeff
+      }else{
+        fx <- cases[[j]]$Px[[1]]$coeff
+      }
+      
     }
     else{
       fx <- cases[[j]]$Px
@@ -528,7 +539,7 @@ sample_MoTBFs<- function(bn, dag, obs = NULL, size, force_size = T){
       # Muestrear
       if(is.discrete(node, bn)){
         # caso discreto
-        if(is.na(any(fx))){
+        if(any(is.na(fx))){
           rdf[s,] <- NA
           
           break

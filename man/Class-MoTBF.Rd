@@ -26,9 +26,9 @@ the number of iterations needed to solve the optimization problem, among others.
 Any \R object can be entered, but the utility of this function is not to transform
 objects of other classes into objects of class \code{"motbf"}.}
 
-\item{class}{By default is \code{"motbf"}.}
-
 \item{...}{Additional arguments, not needed for these methods.}
+
+\item{class}{By default is \code{"motbf"}.}
 }
 \description{
 Defines an object of class \code{"motbf"} and other basis functions for manipulating 
