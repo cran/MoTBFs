@@ -1,6 +1,6 @@
-#' Probabilities Discrete Variables
+#' Probability distribution of discrete variables
 #' 
-#' Computes the probabilities of discrete variables.
+#' Compute the probabilities of a discrete variable from a dataset.
 #' 
 #' @param stateNames A \code{"character"} array indicating the states of the variable.
 #' @param Variable A \code{"numeric"} array containing the records of the variable.
@@ -33,16 +33,16 @@ probDiscreteVariable <- function(stateNames, Variable)
   return(list(coeff=coeff,sizeDataLeaf=sizeDataLeaf))
 }
 
-#' Goodness of discrete probabilities
+#' BIC scxore and log-likelihood
 #' 
-#' Get the loglikelihood and the BIC for discrete models, i.e discrete Bayesian Networks.
+#' Compute the loglikelihood and the BIC score for discrete models, i.e multinomial Bayesian Networks.
 #' 
 #' @name goodnessDiscreteVariables
 #' @rdname goodnessDiscreteVariables
 #' @param discreteBN A list of multiples lists. Each list contains two entries,
 #' the probabilities and the size of the data which is in each leaf of the discrete tree.
-#' @param sameData A logical argument; if \code{FALSE} means differents datasets had been used for the learnings.
-#' @return The loglikelihood and the BIC of the discrete network.
+#' @param sameData A logical argument; \code{FALSE} means that different datasets were used for learning.
+#' @return The loglikelihood and the BIC score of the discrete network.
 #' @examples
 #' ## 1. EXAMPLE 
 #' ## Discrete data
@@ -111,12 +111,12 @@ getBICDiscreteBN <- function (discreteBN, sameData = FALSE)
   return(bic)
 }
 
-#' Prints Discrete Learnings
+#' Printing discrete Bayesian networks
 #' 
-#' Shows the results of univariate and conditional learning of a discrete BN.
+#' Prints the univariate and conditional distributions of a discrete BN.
 #' 
 #' @param BN A discrete learning.
-#' @return The results are shown by screen.
+#' @return The results are shown on the screen.
 #' @export
 printDiscreteBN <- function(BN)
 {

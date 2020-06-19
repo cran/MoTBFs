@@ -5,7 +5,7 @@
 \alias{TrainingandTestData}
 \alias{newData}
 \alias{splitdata}
-\title{Subset a Dataset}
+\title{Dataset subsetting}
 \usage{
 TrainingandTestData(data, percentage_test, discreteVariables = NULL)
 
@@ -14,29 +14,27 @@ newData(data, nameX, nameY)
 splitdata(data, nameVariable, min, max)
 }
 \arguments{
-\item{data}{A dataset of class \code{"data.frame"}.}
+\item{data}{A dataset of class \code{data.frame}.}
 
-\item{percentage_test}{The percentage to be data test. Between 0 and 1.}
+\item{percentage_test}{The proportion of data that goes to the test set (between 0 and 1).}
 
-\item{discreteVariables}{A \code{"character"} array with the name of the discrete variables.}
+\item{discreteVariables}{A \code{character} vector with the name of the discrete variables.}
 
-\item{nameX}{The name of the child variable in the conditional method.}
+\item{nameX}{A \code{character} vector with the name of the child variable in the conditional method.}
 
-\item{nameY}{The name of the parent variables in the conditional method.}
+\item{nameY}{A \code{character} vector with the name of the parent variables in the conditional method.}
 
-\item{nameVariable}{Name of the variable to filter.}
+\item{nameVariable}{A \code{character} vector with the name of the variable to be filtered.}
 
-\item{min}{The lower value of the interval for filter.}
-
-\item{max}{The higher value of the interval for filter.}
+\item{min, max}{Boundary values to filter out.}
 }
 \value{
-A list of datasets for \code{TrainingandTestData()} or a subset of the original
-dataset for the others two functions.
+\code{TrainingandTestData()} returns a list of 2 elements containing the train and test datasets. 
+\code{newData()} and \code{splitdata()} return a subset of variables or observations, respectively.
 }
 \description{
-Collection of functions for subsetting a dataset by entries, by variables, 
-and for splitting it in a training dataset and in a test dataset.
+Collection of functions for subsetting a \code{"data.frame"} by rows or columns, and
+to create training and test partitions.
 }
 \examples{
 \donttest{

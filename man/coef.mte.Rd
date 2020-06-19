@@ -4,14 +4,14 @@
 \alias{coef.mte}
 \alias{coeffMTE}
 \alias{coeffExp}
-\title{Extract MTE Coefficients}
+\title{Extracting the coefficients of an MTE}
 \usage{
 coeffMTE(fx)
 
 coeffExp(fx)
 }
 \arguments{
-\item{fx}{An \code{"motbf"} function of subclass \code{'mop'}.}
+\item{fx}{An \code{"motbf"} function of subclass \code{'mte'}.}
 }
 \value{
 An array with the parameters of the function.
@@ -22,7 +22,7 @@ It extracts the parameters of the learned mixtures of truncated exponential mode
 \details{
 \code{coeffMOP()} return the coefficients of the terms in the function.
 
-\code{coeffPol()} returns the coefficients of the potential of the polynomial basis in the function.
+\code{coeffPol()} returns the coefficients of the potential of the exponential basis in the function.
 }
 \examples{
 

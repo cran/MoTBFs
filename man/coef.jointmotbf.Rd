@@ -2,7 +2,7 @@
 % Please edit documentation in R/joint.R
 \name{coef.jointmotbf}
 \alias{coef.jointmotbf}
-\title{Extract Coefficients  of a \code{"jointmotbf"} Object}
+\title{Coefficients of a \code{"jointmotbf"} object}
 \usage{
 \method{coef}{jointmotbf}(object, ...)
 }
@@ -15,8 +15,7 @@
 A \code{"numeric"} vector with the parameters of the function.
 }
 \description{
-Extracts the parameters of the learned multivariate mixtures of truncated basis
-functions.
+Extracts the parameters of a joint MoTBF density.
 }
 \examples{
 ## Generate a dataset

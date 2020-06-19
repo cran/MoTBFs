@@ -3,7 +3,7 @@
 \name{mte.learning}
 \alias{mte.learning}
 \alias{bestMTE}
-\title{Fitting Exponential Models}
+\title{Fitting mixtures of truncated exponentials.}
 \usage{
 mte.learning(X, nparam, domain)
 
@@ -12,23 +12,23 @@ bestMTE(X, domain, maxParam = NULL)
 \arguments{
 \item{X}{A \code{"numeric"} data vector.}
 
-\item{nparam}{Number of parameters of the function.}
+\item{nparam}{Number of parameters of the resulting density function.}
 
-\item{domain}{A \code{"numeric"} containing the range where defining the function.}
+\item{domain}{A \code{"numeric"} containing the domain if the function to estimate.}
 
-\item{maxParam}{A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-if not, the output is the function which gets the best BIC with at most this number of parameters.}
+\item{maxParam}{A \code{"numeric"} value indicating the maximum number of coefficients in the function. By default it is \code{NULL}; 
+otherwise, the output is the function which gets the best BIC with at most this number of parameters.}
 }
 \value{
 \code{mte.lerning()} returns a list of n elements:
 \item{Function}{An \code{"motbf"} object of the \code{'mte'} subclass.}
 \item{Subclass}{\code{'mte'}.}
 \item{Domain}{The range where the function is defined to be a legal density function.}
-\item{Iterations}{The number of iterations that the optimization problem needs to minimize
+\item{Iterations}{The number of iterations that the optimization problem employed to minimize
 the errors.}
-\item{Time}{The time which spend the CPU for solving the problem.}
+\item{Time}{The CPU time consumed.}
 
-\code{bestMTE()} returns a list including the polynomial function with the best BIC score, 
+\code{bestMTE()} returns a list including the MTE function with the best BIC score, 
 the number of parameters, the best BIC value and an array contained 
 the BIC values of the evaluated functions.
 }
@@ -36,11 +36,11 @@ the BIC values of the evaluated functions.
 These functions fit mixtures of truncated exponentials (MTEs). 
 Least square optimization is used to  
 minimize the quadratic error between the empirical 
-cumulative distribution and the estimated one.
+cumulative distribution function and the estimated one.
 }
 \details{
 \code{mte.learning()}:
-The returned value \code{$Function} is the only visible element which contains the mathematical expression. 
+The returned value \code{$Function} is the only visible element which contains the algebraic expression. 
 Using \link{attributes} the name of the others elements are shown and also they can be abstract with \code{$}.
 The \link{summary} of the function also shows all this elements.
 
@@ -85,5 +85,5 @@ hist(data, prob=TRUE, main="")
 plot(fMTE$bestPx, col=2, xlim=range(data), add=TRUE)
 }
 \seealso{
-\link{univMoTBF} A complete function for learning MOPs which includes extra options.
+\link{univMoTBF} A complete function for learning MoTBFs which includes extra options.
 }

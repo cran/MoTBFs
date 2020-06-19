@@ -8,7 +8,7 @@
 \alias{rescaledMTE}
 \alias{ToStringRe_MTE}
 \alias{meanMOP}
-\title{Rescales an MoTBF Function}
+\title{Rescaling MoTBF functions}
 \usage{
 rescaledMoTBFs(fx, data)
 
@@ -25,7 +25,7 @@ meanMOP(fx)
 \arguments{
 \item{fx}{A function of class \code{"motbf"} learned from a scaled data.}
 
-\item{data}{A \code{"numeric"} vector containing the original data without being scaled.}
+\item{data}{A \code{"numeric"} vector containing the original data (non standardizded).}
 
 \item{parameters}{A \code{"numeric"} vector with the coefficients to create the rescaled MoTBF.}
 
@@ -37,7 +37,8 @@ An \code{"motbf"} function of the original data.
 }
 \description{
 A collation of function to reescale an MoTBF function
-to the original limits and scale.
+to the original offset and scale. This is useful when data was
+standardized previously to learning.
 }
 \examples{
 ## 1. EXAMPLE

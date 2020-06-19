@@ -10,10 +10,10 @@ nVariables(P)
 \item{P}{An \code{"motbf"} object or a \code{"jointmotbf"} object.}
 }
 \value{
-A \code{"character"} vector with the names of variables of the function.
+A \code{"character"} vector with the names of the variables in the function.
 }
 \description{
-Compute the number of variables which are in a 'jointmotbf' object.
+Compute the number of variables which are in a \code{jointmotbf} object.
 }
 \examples{
 

@@ -10,7 +10,7 @@
 \alias{nstates}
 \alias{quantileIntervals}
 \alias{scaleData}
-\title{Functions to Manipulate a Dataset}
+\title{Data pre-processing utilities}
 \usage{
 whichDiscrete(dataset, discreteVariables)
 
@@ -31,16 +31,16 @@ scaleData(dataset, scale)
 \arguments{
 \item{dataset}{A dataset of class \code{"data.frame"}. Tha variables of the dataset can be discrete and continuous.}
 
-\item{discreteVariables}{A \code{"character"} array with the name of the discrete variables}
+\item{discreteVariables}{A \code{"character"} array with the names of the discrete variables.}
 
-\item{numIntervals}{Numbers of intervals used to split the domain.}
+\item{numIntervals}{Number of bins used to discretize the continuous variables.}
 
-\item{factor}{By default \code{FALSE}, i.e. The variables are taken as \code{"character"};
-if \code{TRUE}, they would be taken as \code{"factor"}.}
+\item{factor}{A boolean value indicating if the variables should be considered as
+\code{"factor"} or as \code{"character"}. By default it is set to \code{FALSE}.}
 
-\item{binary}{By default \code{FALSE}, i.e. only binary entries are used for continuous variables;
-if \code{TRUE}, binary entries are used to discretize the full data taking into account the states
-the discrete variables.}
+\item{binary}{By default it is set to \code{FALSE}, indicating that only binary entries are 
+used for continuous variables; a \code{TRUE} value means that binary entries are used to 
+discretize the full dataset taking into account the states the discrete variables.}
 
 \item{namevariables}{an array with the names of the varibles.}
 
@@ -50,28 +50,29 @@ the discrete variables.}
 
 \item{X}{A \code{"numeric"} vector with the data values of a continuous variable.}
 
-\item{scale}{A \code{"numeric"} vector if is a singles variable,if not a \code{"list"} containing
-the name of the variable and the scale value.}
+\item{scale}{A \code{"numeric"} vector (when it refers to a single variable) or a \code{"list"} 
+containing the name(s) of the variable(s) and the scale value.}
 }
 \description{
 Collection of functions for discretizing, standardizing, converting factors to 
-characters and other usufull methods to manipulate datasets.
+characters and other usufull methods for pre-processing datasets.
 }
 \details{
 \code{whichDiscrete()} selects the position of the discrete variables.
 
-\code{discreteVariables_as.character()} transforms the values of the discrete variables to character values.
+\code{discreteVariables_as.character()} transforms the values of the discrete variables into character values.
 
-\code{standardizeDataset()} standarizes a data set.
+\code{standardizeDataset()} standardizes all the variables in a data set.
 
-\code{discretizeVariablesEWdis()} discretizes a dataset using intervals with equal width.
+\code{discretizeVariablesEWdis()} discretizes the continuous variables in a dataset using 
+equal width binning.
 
 \code{discreteVariablesStates()} extracts the states of the qualitative variables.
 
-\code{nstates()} computes the length of the states of the discrete variables.
+\code{nstates()} computes the number of different values of the discrete variables.
 
-\code{quantileIntervals()} selects the quantiles of a variable taking into account the number of intervals
-you want to split the domain of the variable.
+\code{quantileIntervals()} gets the quantiles of a variable taking into account the number of intervals
+into which its domain is splitted.
 }
 \examples{
 ## dataset: 2 continuous variables, 1 discrete variable.

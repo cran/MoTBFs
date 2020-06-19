@@ -2,26 +2,30 @@
 % Please edit documentation in R/structuralLearning.R
 \name{LearningHC}
 \alias{LearningHC}
-\title{Learning Hybric Bayesian Networks}
+\title{Score-based hybrid Bayesian Network structure learning}
 \usage{
 LearningHC(dataset, numIntervals = NULL)
 }
 \arguments{
-\item{dataset}{A dataset with discrete and continuous variables. Discrete variables 
-must be of class \code{"factor"}, if not they are transformed into factores.}
+\item{dataset}{A dataset with discrete and continuous variables. If the discrete
+variables are not of class \code{"factor"}, they are automatically converted.}
 
-\item{numIntervals}{A \code{"numeric"} value containing the number of intervals 
-to create a discrete dataset. The method used to split the values is by equal width.
-By default it is \code{NULL} and means the variables are not discretized to get the network.}
+\item{numIntervals}{A \code{"numeric"} value indicating the number of categories 
+used when discretizing a continuous variable, corresponding to intervals of
+equal width. By default it is \code{NULL}, meaning that the continuous variables
+are not discretized.}
 }
 \value{
 The output is a \code{"bn"} object containing the learned graph.
 }
 \description{
-Get a directed acyclic graph using the method \bold{hill climbing}.
-It is a mathematical optimization technique which belongs to the 
-family of local search. It is an iterative algorithm which deals with
-discrete and continuous variables.
+Learn the structure of a hybrid Bayesian network using the \bold{hill climbing}
+local search method.
+}
+\details{
+\code{LearningHC()} automatically converts non-numeric variables into factors
+before calling function \code{hc()} from the \code{bnlearn} package. \code{LearningHC()} can also 
+be used to discretize the dataset, using the equal width method, before calling \code{hc()}.
 }
 \examples{
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/mte.R
 \name{asMTEString}
 \alias{asMTEString}
-\title{Parameters to MTE String}
+\title{Converting MTEs to strings}
 \usage{
 asMTEString(parameters, num = 5)
 }
@@ -16,7 +16,7 @@ in the exponential.}
 A \code{"character"} string with an \code{'mte'} structure.
 }
 \description{
-This function builds a string with the structure of a \code{'mte'} function.
+This function builds a string with the structure of an \code{'mte'} function.
 }
 \examples{
 

@@ -1,31 +1,33 @@
-#' Learning Joint Functions 
+#' Joint MoTBF density learning
 #' 
 #' Two functions for learning joint MoTBFs. The first one, \code{parametersJointMoTBF()},
 #' gets the parameters by solving a quadratic optimization problem, minimizing
-#' the error of the empirical cumulative joint values versus the estimated ones.
-#' Finally it derives these parameters in order to obtain parameters of the joint density function.
+#' the mean squared error between the empirical joint CDF and the estimated CDF.
+#' The density is obtained as the derivative od the estimated CDF.
 #' The second one, \code{jointMoTBF()}, fixes the equation of the joint function using 
-#' the previously learned parameters and converting this \code{"character"} string in an 
+#' the previously learned parameters and converting this \code{"character"} string into an 
 #' object of class \code{"jointmotbf"}.
 #' 
 #' @name jointmotbf.learning
 #' @rdname jointmotbf.learning
 #' @param X A dataset of class \code{"data.frame"}.
-#' @param ranges A \code{"numeric"} matrix by columns with the ranges of the varibles where fitting the function.
-#' @param dimensions A \code{"numeric"} vector with the number of parameters of each varible.
+#' @param ranges A \code{"numeric"} matrix containing the range of the varibles used to fit the function, 
+#' where each column corresponds to a variable. If not specified, the range of each variable is computed from the data.
+#' @param dimensions A \code{"numeric"} vector containing the number of parameters of each varible.
 #' @param object A list with the output of the function \code{parametersJointMoTBF()}.
 #' @return
-#' \code{parametersJointMoTBF()} returns a list with the elements: \bold{Parameters}, which contains the computed 
-#' coefficients of the resulting function; 
-#' \bold{Dimension} which is a \code{"numeric"} vector containing the number 
+#' \code{parametersJointMoTBF()} returns a list with the following elements: 
+#' \bold{Parameters}, which contains the computed coefficients of the resulting function; 
+#' \bold{Dimension}, which is a \code{"numeric"} vector containing the number 
 #' of coefficients used for each variable; 
-#' \bold{Range} contains a \code{"numeric"} matrix with the domain of each variable by columns;
-#' \bold{Iterations} contains a number of iterations needed to solve the problem;
-#' \bold{Time} contains the time that the functions spent to solve the problem.
+#' \bold{Range} contains a \code{"numeric"} matrix with the domain of each variable, by columns;
+#' \bold{Iterations} contains the number of iterations needed to solve the problem;
+#' \bold{Time} contains the execution time.
 #' 
-#' \code{jointMoTBF()} retunrs an object of class \code{"jointmotbf"}; It is a list whose unique visible element
-#' is the mathematical expression, furthermore it contains the other elements of the output of the
-#' \code{parametersJointMoTBF()} function.
+#' \code{jointMoTBF()} returns an object of class \code{"jointmotbf"}, which is a list whose only visible element
+#' is the analytical expression of the learned density. It also contains the other aforementioned elements, 
+#' which can be retrieved using \code{attributes()}
+#' @importFrom Matrix nearPD
 #' @examples
 #
 #' ## 1. EXAMPLE 
@@ -72,9 +74,11 @@
 
 #' @rdname jointmotbf.learning
 #' @export
+# parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL, fitPoints = 10, constraints = 10)
 parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL)
 {
   tm <- Sys.time()
+
   if(is.null(ranges)) ranges <- sapply(X, range)
   if(is.null(dimensions)){
     Fx <- lapply(X, univMoTBF, "MOP")
@@ -95,31 +99,39 @@ parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL)
   dim <- lapply(1:nrow(dim), function(i) dim[i,])
   
   ## Create the grid: depending on the n.record and the n.variables
-  npointsgrid <- 100
-
+  #npointsgrid <- 100
+  # npointsgrid <- max(ceiling((2/(ncol(X)))^2*100), 10)
+  # npointsgrid <- 10
+  fitPoints <- max(ceiling((2/(ncol(X)))^2*100), 10)
   eg <- list()
   for(i in 1: ncol(X)){
-    eg[[i]] <- seq(ranges[1,i], ranges[2,i], length.out = npointsgrid)
+    eg[[i]] <- seq(ranges[1,i], ranges[2,i], length.out = fitPoints)
     
   }
   x <- expand.grid(eg)
   
   ## Cumulative densities
   y <- jointCDF(X,x)
-  
+
   P <- c()
   for(s in 1:length(dim)){
     Xt <- ranges; pos <- coefExpJointCDF(dim[[s]])
     n <- nrow(x); nterms <- length(pos)
     
-    x1 <- c()
+    # x1 <- c()
+    # for(j in 1:ncol(X)){
+    #   xx=rep(1, n)
+    #   for(i in 1:nterms){
+    #     xi <- cbind((x[,j]^pos[[i]][j]))
+    #     xx <- cbind(xx,xi)
+    #   }
+    #   x1[[length(x1)+1]] <- xx
+    # }
+    
+    x1 <- list()
     for(j in 1:ncol(X)){
-      xx=rep(1, n)
-      for(i in 1:nterms){
-        xi <- cbind((x[,j]^pos[[i]][j]))
-        xx <- cbind(xx,xi)
-      }
-      x1[[length(x1)+1]] <- xx
+      pos2 <- c(0,unlist(lapply(pos, function(x){x[j]})))
+      x1[[j]] <- outer(x[,j], pos2, FUN = "^")
     }
     xx <-Reduce("*", x1)
     
@@ -131,8 +143,10 @@ parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL)
     
     ## Constrains
     xNew <- list()
+    constraints = round(60000^(1/ncol(Xt)))
     for( j in 1:ncol(Xt)){
-      xnew <- seq(min(Xt[,j]), max(Xt[,j]), length=round(60000^(1/ncol(Xt))))
+      # xnew <- seq(min(Xt[,j]), max(Xt[,j]), length=round(60000^(1/ncol(Xt))))
+      xnew <- seq(min(Xt[,j]), max(Xt[,j]), length=constraints)
       if(xnew[length(xnew)]!=max(Xt[,j])) xnew <- c(xnew,max(Xt[,j]))
       xNew[[length(xNew)+1]] <- xnew
     }
@@ -164,13 +178,22 @@ parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL)
     B <- c(1,rep(1.0E-5,ncol(ma2)))
     
     tr <- tryCatch(solve.QP(XX, Xy, AA, B, meq=1), error = function(e) NULL)
-    finaltm <- Sys.time() - tm
     if(is.null(tr)==T){
-      return(NULL)
-    }else{    
-      soluc <- tr 
-      parameters <- soluc$solution
-    }
+      message("matrix D in quadratic function has been approximated to the nearest positive definite!")
+      tr <- solve.QP(nearPD(XX)$mat, Xy, AA, B, meq=1)
+      # return(NULL)
+    }   
+    
+    finaltm <- Sys.time() - tm
+    soluc <- tr 
+    parameters <- soluc$solution
+    
+    # if(is.null(tr)==T){
+    #   return(NULL)
+    # }else{    
+    #   soluc <- tr 
+    #   parameters <- soluc$solution
+    # }
     
     ## Parameters PDF
     a <- sapply(pos, prod)
@@ -233,11 +256,11 @@ jointMoTBF <- function(object){
 
 #' Degree Function
 #'
-#' Compute the degree for each term of a cumulative joint function.
+#' Compute the degree for each term of a joint CDF.
 #'
 #' @param dimensions A \code{"numeric"} vector including the number of parameters of each variable.
 #' @return A list with n element. Each element contains a \code{numeric} vector with the degree for 
-#' each variable and each term of the cumulative joint function.
+#' each variable and each term of the joint CDF.
 #' @export
 #' @examples
 #'
@@ -271,62 +294,86 @@ coefExpJointCDF <- function(dimensions)
 }
 
 
-#' Cumulative Joint Distribution
+#' Joint MoTBFs CDFs
 #' 
-#' Functions to compute the multivariate cumulative distribution. It uses a grid data
-#' over the ranges of variables in the dataset to calculate the cumulative values.
+#' Function to compute multivariate CDFs. 
 #' 
 #' @name jointCDF
 #' @rdname jointCDF
-#' @param data The dataset as data.frame class.
-#' @param grid a data frame with the select rows to include in the grid
-#' @param nrows Number of rows.
-#' @details \code{jointCDF()} is the main function which uses the internal
-#' function \code{posGrid()}.
+#' @param df The dataset as an object of class \code{data.frame}.
+#' @param grid a \code{data.frame} with the selected data points where the objective function
+#' will be evaluated when optimizing the parameters.
+#' @return \code{jointCDF()} returns a vector.
 #' @examples
-#' ## 1. EXAMPLE
-#' ## Dataset with 2 variables
-#' X <- data.frame(rnorm(100), rnorm(100))
 #' 
-#' ## Grid dataset
-#' gridX <- sapply(1:ncol(X), function(i) seq(min(X[,i]), max(X[,i]), length=10))
-#' gridPoints <- expand.grid(gridX) ## expand gridX
-#' ncol(gridPoints)
-#' nrow(gridPoints)
+#' ## Create dataset with 2 variables
+#' n = 2
+#' size = 50
+#' df <- as.data.frame(matrix(round(rnorm(size*n),2), ncol = n))
 #' 
-#' ## Joint cumulative values
-#' jointCDF(data = X, grid = gridPoints)
+#' ## Create grid dataset
+#' npointsgrid <- 10
+#' ranges <- sapply(df, range)
+#' eg <- list()
+#' for(i in 1: ncol(df)){
+#'   eg[[i]] <- seq(ranges[1,i], ranges[2,i], length.out = npointsgrid)
+#' }
 #' 
-#' ## 2. EXAMPLE
-#' ## Dataset with 3 variables
-#' X <- data.frame(rnorm(100), rexp(100), rchisq(100, df=2))
-#' 
-#' ## Grid dataset
-#' gridX <- sapply(1:ncol(X), function(i) seq(min(X[,i]), max(X[,i]), length=10))
-#' gridPoints <- expand.grid(gridX) ## expand gridX
-#' ncol(gridPoints)
-#' nrow(gridPoints)
+#' x <- expand.grid(eg)
 #' 
 #' ## Joint cumulative values
-#' jointCDF(data = X, grid = gridPoints)
+#' jointCDF(df = df, grid = x)
+#' 
+#' @rdname jointCDF
+#' @export
 #' 
 
-#' @rdname jointCDF
-#' @export
-jointCDF <- function(data, grid) unlist(lapply(1:nrow(grid), posGrid, data, grid))
-
-#' @rdname jointCDF
-#' @export
-posGrid <- function(nrows, data, grid)
-{
-  p <- lapply(1:ncol(grid), function(i) which(data[,i]<=grid[nrows,i]))
-  pp <- c()
-  for(i in 1:length(p)){
-    pp <- c(pp,p[[i]])
-    if(i!=1) pp <- pp[duplicated(pp, last=T)]
+jointCDF <- function(df, grid){
+  n <- ncol(df)
+  if(ncol(df)>10){
+    apply(grid, MARGIN=1, 
+          FUN = function(grid,df){
+            b = which(colSums(t(df)<=grid)==n)
+            out = length(b)/nrow(df)
+          }, 
+          df=df)
+  }else{
+    apply(grid, MARGIN=1, 
+          FUN = function(grid,df){
+            n <- ncol(df)
+            b = switch(n-1,
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2]&df[,3]<=grid[3]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2] & df[,3]<=grid[3] & df[,4]<=grid[4]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2] & df[,3]<=grid[3] & df[,4]<=grid[4] & df[,5]<=grid[5]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2] & df[,3]<=grid[3] & df[,4]<=grid[4] & df[,5]<=grid[5] & df[,6]<=grid[6]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2] & df[,3]<=grid[3] & df[,4]<=grid[4] & df[,5]<=grid[5] & df[,6]<=grid[6] & df[,7]<=grid[7]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2] & df[,3]<=grid[3] & df[,4]<=grid[4] & df[,5]<=grid[5] & df[,6]<=grid[6] & df[,7]<=grid[7] & df[,8]<=grid[8]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2] & df[,3]<=grid[3] & df[,4]<=grid[4] & df[,5]<=grid[5] & df[,6]<=grid[6] & df[,7]<=grid[7] & df[,8]<=grid[8] & df[,9]<=grid[9]),
+                       which(df[,1]<=grid[1] & df[,2]<=grid[2] & df[,3]<=grid[3] & df[,4]<=grid[4] & df[,5]<=grid[5] & df[,6]<=grid[6] & df[,7]<=grid[7] & df[,8]<=grid[8] & df[,9]<=grid[9] & df[,10]<=grid[10])
+            )
+            out = length(b)/nrow(df)
+          }, 
+          df=df)
   }
-  return(length(pp)/nrow(data))
-}
+} 
+
+# Alternative to jointCDF, slower.
+# jointCDF <- function(data, grid) unlist(lapply(1:nrow(grid), posGrid, data, grid))
+# 
+# posGrid <- function(nrows, data, grid)
+# {
+#   p <- lapply(1:ncol(grid), function(i) which(data[,i]<=grid[nrows,i]))
+#   pp <- c()
+#   for(i in 1:length(p)){
+#     pp <- c(pp,p[[i]])
+#     if(i!=1) pp <- pp[duplicated(pp, last=T)]
+#   }
+#   return(length(pp)/nrow(data))
+# }
+
+
+
 
 
 #' Coerce a \code{"jointmotbf"} Object to a Function
@@ -382,10 +429,9 @@ as.function.jointmotbf <- function(x, ...)
   return(f)  
 }
 
-#' Extract Coefficients  of a \code{"jointmotbf"} Object
+#' Coefficients of a \code{"jointmotbf"} object
 #' 
-#' Extracts the parameters of the learned multivariate mixtures of truncated basis
-#' functions. 
+#' Extracts the parameters of a joint MoTBF density. 
 #' 
 #' @param object An MoTBF function.
 #' @param \dots Other arguments, unnecessary for this function.
@@ -427,10 +473,10 @@ coef.jointmotbf <- function(object, ...) coeffMOP(object)
 
 #' Number of Variables in a Joint Function
 #' 
-#' Compute the number of variables which are in a 'jointmotbf' object.
+#' Compute the number of variables which are in a \code{jointmotbf} object.
 #' 
 #' @param P An \code{"motbf"} object or a \code{"jointmotbf"} object.
-#' @return A \code{"character"} vector with the names of variables of the function.
+#' @return A \code{"character"} vector with the names of the variables in the function.
 #' @export
 #' @examples
 #' 
@@ -486,9 +532,9 @@ nVariables=function(P)
   return(variables)
 }
 
-#' Dimension of Functions
+#' Dimension of MoTBFs
 #' 
-#' Gets the dimension of \code{"motbf"} and \code{"jointmotbf"} functions.
+#' Get the dimension of \code{"motbf"} and \code{"jointmotbf"} densities.
 #' 
 #' @param P An object of class \code{"motbf"} and subclass 'mop' or \code{"jointmotbf"}.
 #' @return Dimension of the function.
@@ -545,16 +591,16 @@ dimensionFunction <- function(P){
   })
 }
 
-#' Integral Joint MoTBF
+#' Integration with MoTBFs
 #' 
 #' Integrate a \code{"jointmotbf"} object over an non defined domain. It is able to
 #' get the integral of a joint function over a set of variables or over all
-#' the variables of the function.
+#' the variables in the function.
 #' 
 #' @param P A \code{"jointmotbf"} object.
-#' @param var A \code{"character"} vector containing the name of the variables where integrating the joint function.
-#' Instead the names it can contain the position of the variables.
-#' By default it's \code{NULL} then all the variables are taken.
+#' @param var A \code{"character"} vector containing the name of the variables that will be integrated out.
+#' Instead of the names, the position of the variables can be given.
+#' By default it's \code{NULL} then all the variables are integrated out.
 #' @return A multiintegral of a joint function of class \code{"jointmotbf"}.
 #' @export
 #' @examples
@@ -677,14 +723,14 @@ integralJointMoTBF <- function(P, var=NULL)
 }
 
 
-#' Evaluate a Joint Function
+#' Evaluation of joint MoTBFs
 #' 
 #' Evaluates a \code{"jointmotbf"} object at a specific point.
 #' 
 #' @param P A \code{"jointmotbf"} object.
-#' @param values A list with the name of the variables equal to the values to be evaluate.
-#' @return If all the variables in the equation are evaluated then the return is a \code{"numeric"} value,
-#' if not an \code{"motbf"} object or a \code{"jointmotbf"} object is returned.
+#' @param values A list with the name of the variables equal to the values to be evaluated.
+#' @return If all the variables in the equation are evaluated then a \code{"numeric"} value
+#' is returned. Otherwise, an \code{"motbf"} object or a \code{"jointmotbf"} object is returned.
 #' @export
 #' @examples
 #' #' ## 1. EXAMPLE
@@ -815,7 +861,7 @@ evalJointFunction <- function(P, values)
   str <- c()
   for(i in 1:length(exp)) str <- paste(str, sign[i], param[i], exp[i], sep="")
   
-  if(all(names(values)==nVar)){
+  if(all(nVar%in%names(values))){
     message("The method 'as.function()' can be used. \n")
     return(eval(parse(text=str)))
   } else{
@@ -827,12 +873,12 @@ evalJointFunction <- function(P, values)
   }  
 }
 
-#'Marginal Joint MoTBF
+#' Marginalization of MoTBFs
 #'
-#'Computes the marginal functions of a \code{"jointmotbf"}
-#'object.
+#' Computes the marginal densities from a \code{"jointmotbf"}
+#' object.
 #'
-#'@param P A joint function of class \code{"jointmotbf"}.
+#'@param P An object of class \code{"jointmotbf"}, i.e., the joint density function.
 #'@param var The \code{"numeric"} position or the \code{"character"} name of the marginal variable.
 #'@return The marginal of a \code{"jointmotbf"} function. The result is an object of class \code{"motbf"}.
 #'@seealso \link{jointMoTBF} and \link{evalJointFunction}
@@ -988,24 +1034,25 @@ marginalJointMoTBF <- function(P, var)
   })
 }
 
-#' Bidimensional Plots for \code{'jointmotbf'} Objects
+#' Bidimensional plots for \code{'jointmotbf'} objects
 #' 
-#' Draws the perpective and the contour plots for joint functions.
+#' PLot the perpective and the contour plots for joint MoTBF functions.
 #' 
 #' @param x An object of class \code{'jointmotbf'}.
-#' @param type A \code{"character"} string: by default it is \code{"contour"}, the alternative one is \code{"perspective"}.
-#' @param ranges A \code{"numeric"} matrix containing the domain of the variables by columns.
+#' @param type A \code{"character"} string, either \emph{contour} or \emph{perspective}. It is set to \code{"contour"} by default.
+#' @param ranges A \code{"numeric"} matrix containing the domain of the variables, by columns, which is used to specify the plotting range.
 #' @param orientation A \code{"numeric"} vector indicating the perpective of the plot in degrees.
-#' By default it is \code{(5,-30)}.
-#' @param ticktype A \code{"character"} string: by default it is \code{"simple"} which draws just an arrow parallel to the axis 
-#' to indicate direction of increase; \code{"detailed"} draws normal ticks.
-#' @param data A dataset of class \code{"data.frame"}. Only two columns are allowed, it means two variables.
-#' It is only necessary to draw the points over the main plot. By defailt it is \code{NULL}.
-#' @param filled A logical argument; it is only used if \code{type = "contour"}
-#' is active; by default is \code{TRUE}  so filled contours are plotted.
-#' @param \dots Further arguments to be passed as for \link{plot}.
+#' By default, it is set to \code{(5,-30)}.
+#' @param data An object of class \code{"data.frame"} containing two columns only.
+#' This argument is used to draw the points over the main plot. By default, it is set to \code{NULL}.
+#' @param filled A logical argument; it is only used if \code{type = "contour"}.
+#' is active. By default, it is \code{TRUE}, so filled contours are plotted.
+#' @param ticktype A \code{"character"} string, either \emph{simple} or \emph{detailed}. By default, it is set to \code{"simple"},
+#'  which draws just an arrow parallel to the axis to indicate direction of increase. 
+#'  In contrast, \code{"detailed"} draws normal ticks. This argument is only used in the \code{"perspective"} plot.
+#' @param \dots Further arguments to be passed to \link{plot}.
 #' @method plot jointmotbf
-#' @return A plot of the joint function.
+#' @return A plot of the joint MoTBF.
 #' @seealso \link{jointMoTBF}
 #' @export
 #' @examples

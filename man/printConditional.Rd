@@ -2,7 +2,7 @@
 % Please edit documentation in R/conditional.R
 \name{printConditional}
 \alias{printConditional}
-\title{Prints Conditional Functions}
+\title{Summary of conditional MoTBF densities}
 \usage{
 printConditional(conditionalFunction)
 }
@@ -14,7 +14,7 @@ and the final \code{"motbf"} density function fitted in each interval.}
 The results  of the conditional function are shown.
 }
 \description{
-Prints the result of an MoTBF conditional function of two variables, i.e. a parent and his child.
+Print the description of an MoTBF demnsity for one variable conditional on another variable.
 }
 \examples{
 ## Data

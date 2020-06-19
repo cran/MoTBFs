@@ -2,7 +2,7 @@
 % Please edit documentation in R/LearningBN.R
 \name{MoTBFs_Learning}
 \alias{MoTBFs_Learning}
-\title{Learning MoTBFs in a Network}
+\title{Learning hybrid BNs with MoTBFs}
 \usage{
 MoTBFs_Learning(
   graph,
@@ -17,35 +17,41 @@ MoTBFs_Learning(
 \arguments{
 \item{graph}{A network of the class \code{"bn"}, \code{"graphNEL"} or \code{"network"}.}
 
-\item{data}{A datase of class \code{"data.frame"}; it can contain continuous and discrete variables.}
+\item{data}{An object of class \code{"data.frame"}; it can contain continuous and discrete variables.}
 
-\item{numIntervals}{A \code{"numeric"} value indicating the maximum number of intervals in which we 
-want to split the domain of the parent variables.}
+\item{numIntervals}{A positive integer indicating the maximum number of intervals 
+for splitting the domain of the continuous parent variables.}
 
-\item{POTENTIAL_TYPE}{A \code{"character"} string specifying the posibles potential
-types, must be one of \code{"MOP"} or \code{"MTE"}.}
+\item{POTENTIAL_TYPE}{A \code{"character"} string, either \emph{MOP} or \emph{MTE}, 
+corresponding to the type of basis function.}
 
-\item{maxParam}{A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-if not, the output is the function which gets the best BIC with at most this number of parameters.}
+\item{maxParam}{A positive integer which indicates the maximum number of coefficients in the function. 
+If specified, the output is the function which gets the best BIC with, at most, this number of parameters.
+By default, it is set to \code{NULL}.}
 
-\item{s}{A \code{"numeric"} coefficient which fixes the confidence of the prior knowledge 
-we are going to introduce. By default it is \code{NULL}, only we must modify it if we want 
-to incorporate prior information to the fits.}
+\item{s}{A \code{"numeric"} value which specifies the expert confidence in the prior knowledge. 
+This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+to synchronize the support of the prior knowledge and the sample.
+By default, it is \code{NULL}, and must be modified only if prior information is to be incorporated to the fits.}
 
-\item{priorData}{Prior dataset with values of the variables we have information apriori about.
-This dataset must be of \code{"data.frame"} class.}
+\item{priorData}{An object of class \code{"data.frame"}, corresponding to the prior information.}
 }
 \value{
 A list of lists. Each list contains two elements
 \item{Child}{A \code{"charater"} string which contains the name of the child variable.}
-\item{functions}{A list with three elements: the name of the parents, a \code{"numeric"} vector
-with the limits of the interval and the fitted function in this interval.}
+\item{functions}{A list of three elements: the name of the parents; a \code{"numeric"} vector
+indicating the interval of the parent; and the fitted function in this interval.}
 }
 \description{
 Learn mixtures of truncated basis functions in a full hybrid network.
 }
 \details{
-If the variable is discrete then it computes the probabilities and the size of each leaf.
+If the variable is discrete then it computes the probabilities and the size of each leaf. 
+Children that have discrete parents have as many functions as configurations of the parents. 
+Children that have continuous parents have as many functions as the number indicated in the 
+argument \code{"numIntervals"} for each parent. Children that have mixed parents, combine both methods.
+The BIC criterion is used to decide the number of splitting points of the parent domains and to choose
+the number of basis functions used.
 }
 \examples{
 

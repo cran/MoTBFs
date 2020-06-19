@@ -2,30 +2,30 @@
 % Please edit documentation in R/priorKnowledge.R
 \name{generateNormalPriorData}
 \alias{generateNormalPriorData}
-\title{Prior Data}
+\title{Prior data generation}
 \usage{
 generateNormalPriorData(graph, data, size, means, deviations = NULL)
 }
 \arguments{
 \item{graph}{A network of the class \code{"bn"}, \code{"graphNEL"} or \code{"network"}.}
 
-\item{data}{A datase of class \code{"data.frame"} containing the continuous variables of the dataset.}
+\item{data}{An object of class \code{"data.frame"} containing the continuous variables in the dataset.}
 
-\item{size}{A \code{"numeric"} value indicating the number of records to generate for each variable in the dataset.}
+\item{size}{A positive integer indicating the number of records to generate for each variable in the dataset.}
 
-\item{means}{A \code{"numeric"} vector with the average of each variable. The names of the vector must be the name
-of the variables of which the information is given a priori by the expert.}
+\item{means}{A \code{"numeric"} vector with the average of the variables whose prior information is available. 
+The names in the vector must be the same as the names of the variables in the data.frame.}
 
-\item{deviations}{A \code{"numeric"} vector with the desviations of each variable. The names of the vector must be the name
-of the variables of which the information is given a priori by the expert. By default it is \code{NULL} and the desviations
-of the given data are taken.}
+\item{deviations}{A \code{"numeric"} vector with the standard deviations of the variables whose prior information is available. 
+The names of the vector must be the same as the names of the variables in the data.frame. 
+If not specified, the standard deviation of each variable is computed from 'data'.}
 }
 \value{
 A normal prior data set of class \code{"data.frame"}.
 }
 \description{
 Generate a prior dataset taking in to account the relationships
-between varibles inside a given network.
+between the varibles in a given network.
 }
 \examples{
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/Inference.R
 \name{sample_MoTBFs}
 \alias{sample_MoTBFs}
-\title{Generate Samples From Conditional MoTBFs}
+\title{Sample generation from conditional MoTBFs}
 \usage{
 sample_MoTBFs(bn, dag, obs = NULL, size, force_size = T)
 }

@@ -13,25 +13,30 @@ univMoTBF(
 )
 }
 \arguments{
-\item{data}{A \code{"numeric"} data vector.}
+\item{data}{A \code{"numeric"} vector.}
 
 \item{POTENTIAL_TYPE}{A \code{"character"} string specifying the potential
-type, must be one of \code{"MOP"} or \code{"MTE"}.}
+type, must be either \code{"MOP"} or \code{"MTE"}.}
 
-\item{evalRange}{A \code{"numeric"} vector with the range where defining
-the function. By default: it is \code{NULL} and the function is defined
-over the data range.}
+\item{evalRange}{A \code{"numeric"} vector that specifies the domain over
+which the model will be fitted. By default, it is \code{NULL} and the function is defined
+over the complete data range.}
 
-\item{nparam}{Number of parameters of the function. By default: it is \code{NULL}
-and the function fits the best MoTBF taking into account the Bayesian information 
-criterion (BIC) to penalize the functions. It evaluates the two next functions,
-if the BIC value doesn't improve then the function with the last best BIC is returned.}
+\item{nparam}{The exact number of basis functions to be used. By default, it is \code{NULL}
+and the best MoTBF is fitted taking into account the Bayesian information
+criterion (BIC) to score and select the functions. It evaluates the next two functions and,
+if the BIC value does not improve, the function with the best BIC score so far is returned.}
 
-\item{maxParam}{A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-if not, the output is the function which gets the best BIC with at most this number of parameters.}
+\item{maxParam}{A \code{"numeric"} value which indicates the maximum number of coefficients in the function. 
+By default, it is \code{NULL}; otherwise, the function which gets the best BIC score
+with at most this number of parameters is returned.}
 }
 \value{
-An \code{"motbf"} function learned from data.
+\code{univMoTBF()} returns an object of class \code{"motbf"}. This object is a list containing several elements, 
+including its mathematical expression and other hidden elements related to the learning task. 
+The processing time is one of the values returned by this function and it can be extracted by $Time. 
+Although the learning process is always the same for a particular data sample, 
+the processing can vary inasmuch as it depends on the CPU.
 }
 \description{
 Function for fitting univariate mixture of truncated basis functions.

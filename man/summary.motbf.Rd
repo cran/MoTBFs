@@ -3,7 +3,7 @@
 \name{summary.motbf}
 \alias{summary.motbf}
 \alias{print.summary.motbf}
-\title{Summary of an \code{"motbf"} Object}
+\title{Summary of an \code{"motbf"} object}
 \usage{
 \method{summary}{motbf}(object, ...)
 
@@ -21,7 +21,7 @@ The summary of an \code{"motbf"} object. It contains a list of
 elements with the most important information of the object.
 }
 \description{
-Summarize an \code{"motbf"} object by describing its main points.
+Summarize an \code{"motbf"} object by describing its main features.
 }
 \examples{
 ## Subclass 'MOP'

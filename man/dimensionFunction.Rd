@@ -2,7 +2,7 @@
 % Please edit documentation in R/joint.R
 \name{dimensionFunction}
 \alias{dimensionFunction}
-\title{Dimension of Functions}
+\title{Dimension of MoTBFs}
 \usage{
 dimensionFunction(P)
 }
@@ -13,7 +13,7 @@ dimensionFunction(P)
 Dimension of the function.
 }
 \description{
-Gets the dimension of \code{"motbf"} and \code{"jointmotbf"} functions.
+Get the dimension of \code{"motbf"} and \code{"jointmotbf"} densities.
 }
 \examples{
 ## 1. EXAMPLE 

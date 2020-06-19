@@ -2,7 +2,7 @@
 % Please edit documentation in R/mop.R
 \name{derivMOP}
 \alias{derivMOP}
-\title{Derivative MOP}
+\title{Derivative of a MOP}
 \usage{
 derivMOP(fx)
 }

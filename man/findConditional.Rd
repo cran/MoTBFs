@@ -2,7 +2,7 @@
 % Please edit documentation in R/Inference.R
 \name{findConditional}
 \alias{findConditional}
-\title{Find Fitted Conditional MoTBFs}
+\title{Find fitted conditional MoTBFs}
 \usage{
 findConditional(node, bn, evi = NULL)
 }

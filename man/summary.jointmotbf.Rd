@@ -3,7 +3,7 @@
 \name{summary.jointmotbf}
 \alias{summary.jointmotbf}
 \alias{print.summary.jointmotbf}
-\title{Summary of a \code{"jointmotbf"} Object}
+\title{Summary of a \code{"jointmotbf"} object}
 \usage{
 \method{summary}{jointmotbf}(object, ...)
 
@@ -18,10 +18,10 @@
 }
 \value{
 The summary of a \code{"jointmotbf"} object. It contains a list of
-elements with the most important information of the object.
+elements with the most important information about the object.
 }
 \description{
-Summarize a \code{"jointmotbf"} object by describing its main points.
+Summarize a \code{"jointmotbf"} object by describing its main features.
 }
 \examples{
 ## 1. EXAMPLE

@@ -4,7 +4,7 @@
 \alias{coef.mop}
 \alias{coeffMOP}
 \alias{coeffPol}
-\title{Extract MOP Coefficients}
+\title{Extract coefficients from MOPs}
 \usage{
 coeffMOP(fx)
 

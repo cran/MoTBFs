@@ -2,20 +2,20 @@
 % Please edit documentation in R/priorKnowledge.R
 \name{getCoefficients}
 \alias{getCoefficients}
-\title{Get the Coefficients}
+\title{Get the coefficients}
 \usage{
 getCoefficients(fPI, rangeNewPriorData, fD, data, domain, coeffversion)
 }
 \arguments{
-\item{fPI}{The fitted function to the prior data of class \code{"motbf"}.}
+\item{fPI}{The function fitted to the prior data, of class \code{"motbf"}.}
 
-\item{rangeNewPriorData}{An array of length two with the new domain of the prior function.}
+\item{rangeNewPriorData}{An array of length 2 with the new domain of the prior function.}
 
-\item{fD}{The fitted function to the original data of class \code{"motbf"}.}
+\item{fD}{The function fitted to the original data, of class \code{"motbf"}.}
 
-\item{data}{A \code{"numeric"} array which contains the values to fit.}
+\item{data}{A \code{"numeric"} array which contains the sample.}
 
-\item{domain}{A \code{"numeric"} array with the limits where defining the data function.}
+\item{domain}{A \code{"numeric"} array with the domain of the data density function.}
 
 \item{coeffversion}{A \code{"numeric"} value between \code{1--4} which contains the used version for computing the coefficients in the linear 
 opinion pool to combine the prior function and the data function. By default \code{coeffversion = "4"} is used, so the combination

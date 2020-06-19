@@ -2,7 +2,7 @@
 % Please edit documentation in R/motbf.R
 \name{plot.motbf}
 \alias{plot.motbf}
-\title{Plots for \code{'motbf'} Objects}
+\title{Plots for \code{'motbf'} objects}
 \usage{
 \method{plot}{motbf}(x, xlim = 0:1, ylim = NULL, type = "l", ...)
 }
@@ -11,7 +11,7 @@
 
 \item{xlim}{The range to be encompassed by the x axis; by default \code{0:1}.}
 
-\item{ylim}{The range}
+\item{ylim}{The range of the y axix.}
 
 \item{type}{As for \link{plot}.}
 

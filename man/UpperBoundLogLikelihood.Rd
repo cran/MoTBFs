@@ -2,7 +2,7 @@
 % Please edit documentation in R/priorKnowledge.R
 \name{UpperBoundLogLikelihood}
 \alias{UpperBoundLogLikelihood}
-\title{Upper Bound Loglikelihood}
+\title{Upper bound of the loglikelihood}
 \usage{
 UpperBoundLogLikelihood(f, data, min, max)
 }
@@ -11,9 +11,9 @@ UpperBoundLogLikelihood(f, data, min, max)
 
 \item{data}{A \code{"numeric"} array which contains the values to evaluate.}
 
-\item{min}{A \code{"numeric"} value giving the lower limit of the function.}
+\item{min}{A \code{"numeric"} value giving the lower limit of the domain.}
 
-\item{max}{A \code{"numeric"} value giving the highter limit of the function.}
+\item{max}{A \code{"numeric"} value giving the upper limit of the domain.}
 }
 \value{
 A \code{"numeric"} value which is the log-likelihood of the evaluated ramdom function.

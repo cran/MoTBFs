@@ -1,32 +1,32 @@
-#' Fitting Exponential Models
+#' Fitting mixtures of truncated exponentials.
 #' 
 #' These functions fit mixtures of truncated exponentials (MTEs). 
 #' Least square optimization is used to  
 #' minimize the quadratic error between the empirical 
-#' cumulative distribution and the estimated one. 
+#' cumulative distribution function and the estimated one. 
 #'  
 #' @name mte.learning
 #' @rdname mte.learning
 #' @param X A \code{"numeric"} data vector.
-#' @param nparam Number of parameters of the function.
-#' @param domain A \code{"numeric"} containing the range where defining the function.
-#' @param maxParam A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-#' if not, the output is the function which gets the best BIC with at most this number of parameters.
+#' @param nparam Number of parameters of the resulting density function.
+#' @param domain A \code{"numeric"} containing the domain if the function to estimate.
+#' @param maxParam A \code{"numeric"} value indicating the maximum number of coefficients in the function. By default it is \code{NULL}; 
+#' otherwise, the output is the function which gets the best BIC with at most this number of parameters.
 #' @return 
 #' \code{mte.lerning()} returns a list of n elements:
 #' \item{Function}{An \code{"motbf"} object of the \code{'mte'} subclass.}
 #' \item{Subclass}{\code{'mte'}.}
 #' \item{Domain}{The range where the function is defined to be a legal density function.}
-#' \item{Iterations}{The number of iterations that the optimization problem needs to minimize
+#' \item{Iterations}{The number of iterations that the optimization problem employed to minimize
 #' the errors.}
-#' \item{Time}{The time which spend the CPU for solving the problem.}
+#' \item{Time}{The CPU time consumed.}
 #' 
-#' \code{bestMTE()} returns a list including the polynomial function with the best BIC score, 
+#' \code{bestMTE()} returns a list including the MTE function with the best BIC score, 
 #' the number of parameters, the best BIC value and an array contained 
 #' the BIC values of the evaluated functions.
 #' @details 
 #' \code{mte.learning()}:
-#' The returned value \code{$Function} is the only visible element which contains the mathematical expression. 
+#' The returned value \code{$Function} is the only visible element which contains the algebraic expression. 
 #' Using \link{attributes} the name of the others elements are shown and also they can be abstract with \code{$}.
 #' The \link{summary} of the function also shows all this elements.
 #'
@@ -36,7 +36,7 @@
 #' Bayesian information criterion (BIC) to penalize the functions. It evaluates the two next functions,
 #' if the BIC doesn't improve then the function with the last best BIC is returned.
 #' 
-#' @seealso \link{univMoTBF} A complete function for learning MOPs which includes extra options.
+#' @seealso \link{univMoTBF} A complete function for learning MoTBFs which includes extra options.
 #' @examples
 #' 
 #' ## 1. EXAMPLE
@@ -202,7 +202,7 @@ bestMTE <- function(X, domain, maxParam=NULL)
       if(!is.null(maxParam)&&(nparam>maxParam)) break
       if(i==4) break
       
-      ## Compute an MTE function with a fix number of parameters
+      ## Compute an MTE function with a fixed number of parameters
       Pp <- mte.learning(X, nparam, domain)
       
       if((is.null(Pp)==T)&&(!is.motbf(bestfx))) {
@@ -228,7 +228,7 @@ bestMTE <- function(X, domain, maxParam=NULL)
       if(!is.null(maxParam)&&(nparam>maxParam)) break
       if(i==4) break
       
-      ## Compute an MTE function with a fix number of parameters
+      ## Compute an MTE function with a fixed number of parameters
       Pp <- mte.learning(X, nparam, domain)
       
       if((is.null(Pp)==T)&&(!is.motbf(bestfx))) {
@@ -278,9 +278,9 @@ bestMTE <- function(X, domain, maxParam=NULL)
 }
 
 
-#' Parameters to MTE String
+#' Converting MTEs to strings
 #' 
-#' This function builds a string with the structure of a \code{'mte'} function.
+#' This function builds a string with the structure of an \code{'mte'} function.
 #' 
 #' @param parameters A \code{"numeric"} vector containing the coefficients.
 #' @param num A \code{"numeric"} value which contains the denominator of the coefficient
@@ -308,18 +308,18 @@ asMTEString  <-  function(parameters, num = 5)
 }
 
 
-#' Extract MTE Coefficients
+#' Extracting the coefficients of an MTE
 #' 
 #' It extracts the parameters of the learned mixtures of truncated exponential models.
 #' 
 #' @name coef.mte
 #' @rdname coef.mte
-#' @param fx An \code{"motbf"} function of subclass \code{'mop'}.
+#' @param fx An \code{"motbf"} function of subclass \code{'mte'}.
 #' @return An array with the parameters of the function.
 #' @details
 #' \code{coeffMOP()} return the coefficients of the terms in the function.
 #' 
-#' \code{coeffPol()} returns the coefficients of the potential of the polynomial basis in the function. 
+#' \code{coeffPol()} returns the coefficients of the potential of the exponential basis in the function. 
 #' @seealso \link{coef.motbf} and \link{univMoTBF}
 #' @examples
 #' 
@@ -406,7 +406,7 @@ coeffExp <- function(fx){
   return(as.numeric(t2))
 }
 
-#' Derivative MTE
+#' Derivating MTEs
 #' 
 #' Compute the derivative of an \code{"motbf"} object with \code{'mte'} subclass.
 #' 
@@ -452,9 +452,10 @@ derivMTE <- function(fx)
   return(P)
 }
 
-#' Integral MTE
+#' Integrating MTEs
 #' 
-#' Method to calculate the non-defined integral of an \code{"motbf"} object of \code{'mte'} subclass.
+#' Method to calculate the non-defined integral of an \code{"motbf"} object of \code{'mte'} 
+#' subclass.
 #' 
 #' @param fx An \code{"motbf"} object of subclass \code{'mte'}.
 #' @return The non-defined integral of the function.

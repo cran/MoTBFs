@@ -1,26 +1,27 @@
-#' Incorporating Prior Knowledge
+#' Incorporating prior knowledge in the estimation process
 #' 
-#' Learns a function using prior information.
+#' Learns a univariate MoTBF function using prior information.
 #' 
-#' @param priorData A \code{"numeric"} array which contains the values of the variable we have information apriori about.
-#' @param data A \code{"numeric"} array which contains the values to fit.
-#' @param s A \code{"numeric"} coefficient which fixes the confidence of the prior knowledge 
-#' we are going to introduce. By default it is \code{NULL}, only we must modify it if we want 
-#' to incorporate prior information to the fits.
-#' @param POTENTIAL_TYPE A \code{"character"} string specifying the posibles potential
-#' types, must be one of \code{"MOP"} or \code{"MTE"}.
-#' @param domain A \code{"numeric"} array which contains the limits to defined the data function.
-#' By default it is the range of the data.
-#' @param coeffversion A \code{"numeric"} value between \code{1--4} which contains the used version for computing the coefficients of the linear opinion pool to
-#' combine the prior function and the data function. By default \code{coeffversion = "4"} is used, so the combination
+#' @param priorData A \code{"numeric"} vector which contains the prior information.
+#' @param data A \code{"numeric"} vector containing the observed data.
+#' @param s A \code{"numeric"} value which specifies the expert confidence in the prior knowledge. 
+#' This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+#' to synchronize the support of the prior knowledge and the sample.
+#' @param POTENTIAL_TYPE A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding to the type of basis function.
+#' @param domain A \code{"numeric"} vector which contains the bounding values to fit the function.
+#' By default, it is the range of the data.
+#' @param coeffversion A \code{"numeric"} value between \code{1--4} which contains the used version for computing 
+#' the coefficients of the linear opinion pool to combine the prior function and the data function. 
+#' By default, \code{coeffversion = "4"} is used, so the combination
 #' depends on the goodness of the model versus another random model.
-#' @param restrictDomain This argument lets us choose if the domain is used joining both domains,
-#' the prior one and the data domain or trimming them. By default \code{TRUE} is used, so 
+#' @param restrictDomain A logical value. This argument allows to choose if the domain is used joining both domains,
+#' the prior one and the data domain or trimming them. By default, \code{TRUE} is used, so 
 #' the domain will be trimmed.
-#' @param maxParam A \code{"numeric"} value which indicates the maximum number of coefficients in the function. By default it is \code{NULL}; 
-#' if not, the output is the function which gets the best BIC with at most this number of parameters.
+#' @param maxParam A positive integer which indicates the maximum number of coefficients in the function. 
+#' If specified, the output is the function which gets the best BIC with, at most, this number of parameters.
+#' By default, it is set to \code{NULL}.
 #' @return A list with the elements
-#' \item{coeffs}{An \code{"numeric"} array with the two coefficients of the linear opinion pool}
+#' \item{coeffs}{An \code{"numeric"} vector with the two coefficients of the linear opinion pool}
 #' \item{posteriorFunction}{The final function after combining.}
 #' \item{priorFunction}{The fit of the prior data.}
 #' \item{dataFunction}{The fit of the original data.}
@@ -105,11 +106,11 @@ learnMoTBFpriorInformation <- function(priorData, data, s, POTENTIAL_TYPE, domai
 #' 
 #' Computes the new domain of two datasets. 
 #' 
-#' @param fPI The fitted function to the prior data of class \code{"motbf"}.
-#' @param priorData A \code{"numeric"} array with the values we want to include as prior information.
-#' @param N A \code{"numeric"} value which is the size of the data.
-#' @param domain A \code{"numeric"} array with the limits where defining the data function.
-#' @param s A \code{"numeric"} value which is the confident of the expert in his information. It is between 0 and the data size.
+#' @param fPI The function fitted to the prior data, of class \code{"motbf"}.
+#' @param priorData A \code{"numeric"} array with the values to be included as prior information.
+#' @param N A \code{"numeric"} value equal to the data size.
+#' @param domain A \code{"numeric"} array with the domain of the data density.
+#' @param s A \code{"numeric"} value which is the expert's confidence on the prior information. It is a number between 0 and the data size.
 #' @param POTENTIAL_TYPE A \code{"character"} string giving the potential of the model, i.e. \code{"MOP"} if the basis functions are polynomials,
 #' or \code{"MTE"} if they are exponentials.
 #' @return A \code{"numeric"} array which contains the new domain of the prior function.
@@ -190,15 +191,15 @@ newRangePriorData <- function(fPI, priorData, N, domain, s, POTENTIAL_TYPE)
   }
 }
 
-#' Get the Coefficients
+#' Get the coefficients
 #' 
 #' Compute the coefficients for the linear opinion pool
 #' 
-#' @param fPI The fitted function to the prior data of class \code{"motbf"}.
-#' @param rangeNewPriorData An array of length two with the new domain of the prior function.
-#' @param fD The fitted function to the original data of class \code{"motbf"}.
-#' @param data A \code{"numeric"} array which contains the values to fit.
-#' @param domain A \code{"numeric"} array with the limits where defining the data function.
+#' @param fPI The function fitted to the prior data, of class \code{"motbf"}.
+#' @param rangeNewPriorData An array of length 2 with the new domain of the prior function.
+#' @param fD The function fitted to the original data, of class \code{"motbf"}.
+#' @param data A \code{"numeric"} array which contains the sample.
+#' @param domain A \code{"numeric"} array with the domain of the data density function.
 #' @param coeffversion A \code{"numeric"} value between \code{1--4} which contains the used version for computing the coefficients in the linear 
 #' opinion pool to combine the prior function and the data function. By default \code{coeffversion = "4"} is used, so the combination
 #' depends on the goodness of the model versus another random positive MoTBF model.
@@ -277,8 +278,7 @@ return(c(coef1, coef2))
 
 #' Ramdom MoTBF
 #' 
-#' Get an MoTBF function ensuring positives values without being
-#' a normalized function.
+#' Generates a non normalized (i.e. not integrating to 1) positive MoTBF function.
 #' 
 #' @param degree A \code{"numeric"} value containing the degree of the random function.
 #' @param POTENTIAL_TYPE A \code{"character"} string specifying the posibles potential
@@ -306,15 +306,15 @@ getNonNormalisedRandomMoTBF <- function(degree, POTENTIAL_TYPE="MOP")
   return(pol)
 }
 
-#' Upper Bound Loglikelihood
+#' Upper bound of the loglikelihood
 #' 
 #' Computes an upper bound of the expected loglikelihood of a dataset given a randomly 
 #' generated MoTBF density.
 #' 
 #' @param f A function to evaluate of class \code{"character"}, \code{"motbf"} or others.
 #' @param data A \code{"numeric"} array which contains the values to evaluate.
-#' @param min A \code{"numeric"} value giving the lower limit of the function.
-#' @param max A \code{"numeric"} value giving the highter limit of the function.
+#' @param min A \code{"numeric"} value giving the lower limit of the domain.
+#' @param max A \code{"numeric"} value giving the upper limit of the domain.
 #' @return A \code{"numeric"} value which is the log-likelihood of the evaluated ramdom function.
 #' @seealso \link{getNonNormalisedRandomMoTBF}
 #' @export
@@ -335,7 +335,7 @@ UpperBoundLogLikelihood <- function(f,data, min, max){
   return(sum(log(prob))-n*log(k))
 }
 
-#' Multivariate Normal Sample
+#' Multivariate Normal sampling
 #' 
 #' Generate a multivariate normal data vector taking into account the real data and the 
 #' relationships with other variables in the dataset.
@@ -389,19 +389,19 @@ rnormMultiv <- function(n, dataParents, dataChild)
   return(Z) 
 }
 
-#' Prior Data
+#' Prior data generation
 #' 
 #' Generate a prior dataset taking in to account the relationships
-#' between varibles inside a given network.
+#' between the varibles in a given network.
 #' 
 #' @param graph A network of the class \code{"bn"}, \code{"graphNEL"} or \code{"network"}.
-#' @param data A datase of class \code{"data.frame"} containing the continuous variables of the dataset.
-#' @param size A \code{"numeric"} value indicating the number of records to generate for each variable in the dataset.
-#' @param means A \code{"numeric"} vector with the average of each variable. The names of the vector must be the name
-#' of the variables of which the information is given a priori by the expert.
-#' @param deviations A \code{"numeric"} vector with the desviations of each variable. The names of the vector must be the name
-#' of the variables of which the information is given a priori by the expert. By default it is \code{NULL} and the desviations
-#' of the given data are taken.
+#' @param data An object of class \code{"data.frame"} containing the continuous variables in the dataset.
+#' @param size A positive integer indicating the number of records to generate for each variable in the dataset.
+#' @param means A \code{"numeric"} vector with the average of the variables whose prior information is available. 
+#' The names in the vector must be the same as the names of the variables in the data.frame.
+#' @param deviations A \code{"numeric"} vector with the standard deviations of the variables whose prior information is available. 
+#' The names of the vector must be the same as the names of the variables in the data.frame. 
+#' If not specified, the standard deviation of each variable is computed from 'data'.
 #' @seealso \link{rnormMultiv}
 #' @return A normal prior data set of class \code{"data.frame"}.
 #' @export
@@ -435,17 +435,24 @@ rnormMultiv <- function(n, dataParents, dataChild)
 #' 
 generateNormalPriorData <- function(graph, data, size, means, deviations=NULL)
 {
+  vdag <- names(graph$nodes)
+  vdf <- colnames(data)
+  
+  orden <- match(vdag, vdf)
+  
+  means <- means[orden]
+  
   if(is.null(deviations)){
     #options(warn=-1)
     suppressWarnings({
-    for(i in 1:length(means)){
-      if(is.na(means[i])) deviations[i] <- NA
-      else deviations[i] <- sd(data[,i])
-    }
-    #deviations <- sapply(data, sd)
+      for(i in 1:length(means)){
+        if(is.na(means[i])) deviations[i] <- NA
+        else deviations[i] <- sd(data[,i])
+      }
+      #deviations <- sapply(data, sd)
     })
   }
-  columnsNames <- colnames(data); XX=c()
+  columnsNames <- colnames(data)[orden]; XX=c()
   for(i in 1:length(columnsNames)){ 
     if(is.na(means[i])||is.na(deviations[i])) X <- NA
     else X <- rnorm(size, means[i], deviations[i])
@@ -480,8 +487,11 @@ generateNormalPriorData <- function(graph, data, size, means, deviations=NULL)
     }
     YY <- XX   
   }
+  YY <- YY[,match(vdf, vdag)]
+  
   pos <- which(sapply(YY[1,], is.na))
   if(length(pos)!=0) YY <- YY[,-pos, drop = F]
+  
   return(as.data.frame(YY))
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{preprocessedData}
 \alias{preprocessedData}
-\title{Remove Missing Values in a Dataset by Rows}
+\title{Data cleaning}
 \usage{
 preprocessedData(data, strangeElements)
 }

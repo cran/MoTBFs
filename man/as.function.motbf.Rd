@@ -2,7 +2,7 @@
 % Please edit documentation in R/motbf.R
 \name{as.function.motbf}
 \alias{as.function.motbf}
-\title{Coerce an \code{"motbf"} Object to a Function}
+\title{Coerce an \code{"motbf"} object to a Function}
 \usage{
 \method{as.function}{motbf}(x, ...)
 }

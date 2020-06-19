@@ -4,7 +4,7 @@
 \alias{jointmotbf.learning}
 \alias{parametersJointMoTBF}
 \alias{jointMoTBF}
-\title{Learning Joint Functions}
+\title{Joint MoTBF density learning}
 \usage{
 parametersJointMoTBF(X, ranges = NULL, dimensions = NULL)
 
@@ -13,32 +13,33 @@ jointMoTBF(object)
 \arguments{
 \item{X}{A dataset of class \code{"data.frame"}.}
 
-\item{ranges}{A \code{"numeric"} matrix by columns with the ranges of the varibles where fitting the function.}
+\item{ranges}{A \code{"numeric"} matrix containing the range of the varibles used to fit the function, 
+where each column corresponds to a variable. If not specified, the range of each variable is computed from the data.}
 
-\item{dimensions}{A \code{"numeric"} vector with the number of parameters of each varible.}
+\item{dimensions}{A \code{"numeric"} vector containing the number of parameters of each varible.}
 
 \item{object}{A list with the output of the function \code{parametersJointMoTBF()}.}
 }
 \value{
-\code{parametersJointMoTBF()} returns a list with the elements: \bold{Parameters}, which contains the computed 
-coefficients of the resulting function; 
-\bold{Dimension} which is a \code{"numeric"} vector containing the number 
+\code{parametersJointMoTBF()} returns a list with the following elements: 
+\bold{Parameters}, which contains the computed coefficients of the resulting function; 
+\bold{Dimension}, which is a \code{"numeric"} vector containing the number 
 of coefficients used for each variable; 
-\bold{Range} contains a \code{"numeric"} matrix with the domain of each variable by columns;
-\bold{Iterations} contains a number of iterations needed to solve the problem;
-\bold{Time} contains the time that the functions spent to solve the problem.
+\bold{Range} contains a \code{"numeric"} matrix with the domain of each variable, by columns;
+\bold{Iterations} contains the number of iterations needed to solve the problem;
+\bold{Time} contains the execution time.
 
-\code{jointMoTBF()} retunrs an object of class \code{"jointmotbf"}; It is a list whose unique visible element
-is the mathematical expression, furthermore it contains the other elements of the output of the
-\code{parametersJointMoTBF()} function.
+\code{jointMoTBF()} returns an object of class \code{"jointmotbf"}, which is a list whose only visible element
+is the analytical expression of the learned density. It also contains the other aforementioned elements, 
+which can be retrieved using \code{attributes()}
 }
 \description{
 Two functions for learning joint MoTBFs. The first one, \code{parametersJointMoTBF()},
 gets the parameters by solving a quadratic optimization problem, minimizing
-the error of the empirical cumulative joint values versus the estimated ones.
-Finally it derives these parameters in order to obtain parameters of the joint density function.
+the mean squared error between the empirical joint CDF and the estimated CDF.
+The density is obtained as the derivative od the estimated CDF.
 The second one, \code{jointMoTBF()}, fixes the equation of the joint function using 
-the previously learned parameters and converting this \code{"character"} string in an 
+the previously learned parameters and converting this \code{"character"} string into an 
 object of class \code{"jointmotbf"}.
 }
 \examples{

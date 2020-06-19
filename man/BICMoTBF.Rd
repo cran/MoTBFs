@@ -2,7 +2,7 @@
 % Please edit documentation in R/motbf.R
 \name{BICMoTBF}
 \alias{BICMoTBF}
-\title{Computing the BIC Score of an MoTBF Function}
+\title{Computing the BIC score of an MoTBF function}
 \usage{
 BICMoTBF(Px, X)
 }
@@ -12,12 +12,12 @@ BICMoTBF(Px, X)
 \item{X}{A \code{"numeric"} vector with the data to evaluate.}
 }
 \value{
-A \code{"numeric"} value containing the BIC score.
+A \code{"numeric"} value corresponding to the BIC score.
 }
 \description{
 Computes the Bayesian information criterion value (BIC) of a 
-mixture of truncated basis function. The BIC score is the log likelihood 
-penalizes by the number of parameters of the function and the number of
+mixture of truncated basis functions. The BIC score is the log likelihood 
+penalized by the number of parameters of the function and the number of
 records of the evaluated data.
 }
 \examples{

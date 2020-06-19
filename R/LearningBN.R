@@ -1,25 +1,31 @@
-#' Learning MoTBFs in a Network
+#' Learning hybrid BNs with MoTBFs
 #'
 #' Learn mixtures of truncated basis functions in a full hybrid network.
 #' 
 #' @param graph A network of the class \code{"bn"}, \code{"graphNEL"} or \code{"network"}.
-#' @param data A datase of class \code{"data.frame"}; it can contain continuous and discrete variables.
-#' @param numIntervals A \code{"numeric"} value indicating the maximum number of intervals in which we 
-#' want to split the domain of the parent variables.
-#' @param POTENTIAL_TYPE A \code{"character"} string specifying the posibles potential
-#' types, must be one of \code{"MOP"} or \code{"MTE"}.
-#' @param maxParam A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-#' if not, the output is the function which gets the best BIC with at most this number of parameters.
-#' @param s A \code{"numeric"} coefficient which fixes the confidence of the prior knowledge 
-#' we are going to introduce. By default it is \code{NULL}, only we must modify it if we want 
-#' to incorporate prior information to the fits.
-#' @param priorData Prior dataset with values of the variables we have information apriori about.
-#' This dataset must be of \code{"data.frame"} class.
+#' @param data An object of class \code{"data.frame"}; it can contain continuous and discrete variables.
+#' @param numIntervals A positive integer indicating the maximum number of intervals 
+#' for splitting the domain of the continuous parent variables.
+#' @param POTENTIAL_TYPE A \code{"character"} string, either \emph{MOP} or \emph{MTE}, 
+#' corresponding to the type of basis function.
+#' @param maxParam A positive integer which indicates the maximum number of coefficients in the function. 
+#' If specified, the output is the function which gets the best BIC with, at most, this number of parameters.
+#' By default, it is set to \code{NULL}.
+#' @param s A \code{"numeric"} value which specifies the expert confidence in the prior knowledge. 
+#' This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+#' to synchronize the support of the prior knowledge and the sample.
+#' By default, it is \code{NULL}, and must be modified only if prior information is to be incorporated to the fits.
+#' @param priorData An object of class \code{"data.frame"}, corresponding to the prior information.
 #' @return A list of lists. Each list contains two elements
 #' \item{Child}{A \code{"charater"} string which contains the name of the child variable.}
-#' \item{functions}{A list with three elements: the name of the parents, a \code{"numeric"} vector
-#' with the limits of the interval and the fitted function in this interval.}
-#' @details If the variable is discrete then it computes the probabilities and the size of each leaf.
+#' \item{functions}{A list of three elements: the name of the parents; a \code{"numeric"} vector
+#' indicating the interval of the parent; and the fitted function in this interval.}
+#' @details If the variable is discrete then it computes the probabilities and the size of each leaf. 
+#' Children that have discrete parents have as many functions as configurations of the parents. 
+#' Children that have continuous parents have as many functions as the number indicated in the 
+#' argument \code{"numIntervals"} for each parent. Children that have mixed parents, combine both methods.
+#' The BIC criterion is used to decide the number of splitting points of the parent domains and to choose
+#' the number of basis functions used.
 #' @seealso \link{printBN} and \link{ecoli}
 #' @export
 #' @examples
@@ -99,9 +105,9 @@ MoTBFs_Learning <- function(graph, data, numIntervals, POTENTIAL_TYPE, maxParam=
   return(MoTBFs) 
 }
 
-#' Prints BN Results
+#' BN printing
 #' 
-#' Prints the results of a hybrid Bayesian network
+#' Prints the content of a hybrid Bayesian network
 #' 
 #' @param MoTBF.BN The output of the method \code{MoTBFs_Learning()}.
 #' @return The results of the fitted functions in the full network.
@@ -144,15 +150,15 @@ printBN <- function(MoTBF.BN)
   }
 }
 
-#' BIC of an MoTBF BN
+#' BIC of a hybrid BN
 #' 
-#' Compute the Bic score and the loglikelihood from the fitted MoTBFs functions 
-#' of a hybrid Bayesian network.
+#' Compute the BIC score and the loglikelihood from the fitted MoTBFs functions 
+#' in a hybrid Bayesian network.
 #' 
 #' @name goodnessMoTBFBN
 #' @rdname goodnessMoTBFBN
 #' @param MoTBF.BN The output of the 'MoTBF_Learning' method.
-#' @param data The dataset of class "data frame".
+#' @param data The dataset of class \code{data.frame}.
 #' @return A numeric value giving the log-likelihood of the BN.
 #' @seealso \link{MoTBFs_Learning}
 #' @examples

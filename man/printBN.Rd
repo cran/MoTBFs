@@ -2,7 +2,7 @@
 % Please edit documentation in R/LearningBN.R
 \name{printBN}
 \alias{printBN}
-\title{Prints BN Results}
+\title{BN printing}
 \usage{
 printBN(MoTBF.BN)
 }
@@ -13,7 +13,7 @@ printBN(MoTBF.BN)
 The results of the fitted functions in the full network.
 }
 \description{
-Prints the results of a hybrid Bayesian network
+Prints the content of a hybrid Bayesian network
 }
 \examples{
 

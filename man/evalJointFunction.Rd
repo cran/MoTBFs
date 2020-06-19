@@ -2,18 +2,18 @@
 % Please edit documentation in R/joint.R
 \name{evalJointFunction}
 \alias{evalJointFunction}
-\title{Evaluate a Joint Function}
+\title{Evaluation of joint MoTBFs}
 \usage{
 evalJointFunction(P, values)
 }
 \arguments{
 \item{P}{A \code{"jointmotbf"} object.}
 
-\item{values}{A list with the name of the variables equal to the values to be evaluate.}
+\item{values}{A list with the name of the variables equal to the values to be evaluated.}
 }
 \value{
-If all the variables in the equation are evaluated then the return is a \code{"numeric"} value,
-if not an \code{"motbf"} object or a \code{"jointmotbf"} object is returned.
+If all the variables in the equation are evaluated then a \code{"numeric"} value
+is returned. Otherwise, an \code{"motbf"} object or a \code{"jointmotbf"} object is returned.
 }
 \description{
 Evaluates a \code{"jointmotbf"} object at a specific point.

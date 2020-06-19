@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiscreteLearning.R
 \name{probDiscreteVariable}
 \alias{probDiscreteVariable}
-\title{Probabilities Discrete Variables}
+\title{Probability distribution of discrete variables}
 \usage{
 probDiscreteVariable(stateNames, Variable)
 }
@@ -17,7 +17,7 @@ A list of  \code{"numeric"} arrays:
 \item{sizeDataLeaf}{Number of records in each leaf of the discrete tree.}
 }
 \description{
-Computes the probabilities of discrete variables.
+Compute the probabilities of a discrete variable from a dataset.
 }
 \examples{
 ## Discrete Variable

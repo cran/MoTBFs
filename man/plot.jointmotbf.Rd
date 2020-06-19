@@ -2,7 +2,7 @@
 % Please edit documentation in R/joint.R
 \name{plot.jointmotbf}
 \alias{plot.jointmotbf}
-\title{Bidimensional Plots for \code{'jointmotbf'} Objects}
+\title{Bidimensional plots for \code{'jointmotbf'} objects}
 \usage{
 \method{plot}{jointmotbf}(
   x,
@@ -18,29 +18,30 @@
 \arguments{
 \item{x}{An object of class \code{'jointmotbf'}.}
 
-\item{type}{A \code{"character"} string: by default it is \code{"contour"}, the alternative one is \code{"perspective"}.}
+\item{type}{A \code{"character"} string, either \emph{contour} or \emph{perspective}. It is set to \code{"contour"} by default.}
 
-\item{ranges}{A \code{"numeric"} matrix containing the domain of the variables by columns.}
+\item{ranges}{A \code{"numeric"} matrix containing the domain of the variables, by columns, which is used to specify the plotting range.}
 
 \item{orientation}{A \code{"numeric"} vector indicating the perpective of the plot in degrees.
-By default it is \code{(5,-30)}.}
+By default, it is set to \code{(5,-30)}.}
 
-\item{data}{A dataset of class \code{"data.frame"}. Only two columns are allowed, it means two variables.
-It is only necessary to draw the points over the main plot. By defailt it is \code{NULL}.}
+\item{data}{An object of class \code{"data.frame"} containing two columns only.
+This argument is used to draw the points over the main plot. By default, it is set to \code{NULL}.}
 
-\item{filled}{A logical argument; it is only used if \code{type = "contour"}
-is active; by default is \code{TRUE}  so filled contours are plotted.}
+\item{filled}{A logical argument; it is only used if \code{type = "contour"}.
+is active. By default, it is \code{TRUE}, so filled contours are plotted.}
 
-\item{ticktype}{A \code{"character"} string: by default it is \code{"simple"} which draws just an arrow parallel to the axis 
-to indicate direction of increase; \code{"detailed"} draws normal ticks.}
+\item{ticktype}{A \code{"character"} string, either \emph{simple} or \emph{detailed}. By default, it is set to \code{"simple"},
+which draws just an arrow parallel to the axis to indicate direction of increase. 
+In contrast, \code{"detailed"} draws normal ticks. This argument is only used in the \code{"perspective"} plot.}
 
-\item{\dots}{Further arguments to be passed as for \link{plot}.}
+\item{\dots}{Further arguments to be passed to \link{plot}.}
 }
 \value{
-A plot of the joint function.
+A plot of the joint MoTBF.
 }
 \description{
-Draws the perpective and the contour plots for joint functions.
+PLot the perpective and the contour plots for joint MoTBF functions.
 }
 \examples{
 ## 1 .EXAMPLE

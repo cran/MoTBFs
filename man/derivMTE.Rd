@@ -2,7 +2,7 @@
 % Please edit documentation in R/mte.R
 \name{derivMTE}
 \alias{derivMTE}
-\title{Derivative MTE}
+\title{Derivating MTEs}
 \usage{
 derivMTE(fx)
 }

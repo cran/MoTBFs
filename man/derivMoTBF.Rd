@@ -2,18 +2,19 @@
 % Please edit documentation in R/motbf.R
 \name{derivMoTBF}
 \alias{derivMoTBF}
-\title{Derivative MoTBF}
+\title{Derivating MoTBFs}
 \usage{
 derivMoTBF(fx)
 }
 \arguments{
-\item{fx}{An object of \code{"motbf"} class.}
+\item{fx}{An object of class \code{"motbf"}.}
 }
 \value{
-The derivative which is also an \code{"motbf"} function.
+The derivative of the MoTBF function, which is also 
+an object of class \code{"motbf"}.
 }
 \description{
-Compute derivatives of \code{"motbf"} objects.
+Compute the derivative of a one-dimensional mixture of truncated basis function.
 }
 \examples{
 

@@ -3,7 +3,9 @@
 \name{ecoli}
 \alias{ecoli}
 \title{Data set Ecoli: Protein Localization Sites}
-\format{A data frame with 336 rows, 8 variables and the class.}
+\format{
+A data frame with 336 rows, 8 variables and the class.
+}
 \source{
 \url{http://archive.ics.uci.edu/ml/datasets/Ecoli}
 }

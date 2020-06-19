@@ -7,7 +7,7 @@
 \alias{select}
 \alias{learn.tree.Intervals}
 \alias{BICscoreMoTBF}
-\title{Learning Conditional Functions}
+\title{Learning conditional MoTBF densities}
 \usage{
 conditionalMethod(
   data,
@@ -63,52 +63,54 @@ learn.tree.Intervals(
 BICscoreMoTBF(conditionalfunction, data, nameParents, nameChild)
 }
 \arguments{
-\item{data}{A dataset of class \code{"data.frame"}.}
+\item{data}{An object of class \code{"data.frame"}.}
 
-\item{nameParents}{A \code{"character"} vector with the names of the parent variables.}
+\item{nameParents}{A \code{"character"} vector containing the names of the parent variables.}
 
-\item{nameChild}{The name of the child variable as a \code{"character"} string.}
+\item{nameChild}{A \code{"character"} string containing the name of the child variable.}
 
-\item{numIntervals}{A \code{"numeric"} value indicating the maximum number of intervals in which we 
-want to split the domain of the parent variables.}
+\item{numIntervals}{A positive integer indicating the maximum number of intervals 
+for splitting the domain of the parent variables.}
 
-\item{POTENTIAL_TYPE}{A \code{"character"} string specifying the posibles potential
-types, must be one of \code{"MOP"} or \code{"MTE"}. You can specify just the initial letter.}
+\item{POTENTIAL_TYPE}{A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding 
+to the type of basis function.}
 
-\item{maxParam}{A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-if not, the output is the function which gets the best BIC with at most this number of parameters.}
+\item{maxParam}{A positive integer which indicates the maximum number of coefficients in the 
+function. If specified, the output is the function which gets the best BIC with, at most, 
+this number of parameters. By default, it is set to \code{NULL}.}
 
-\item{s}{A \code{"numeric"} coefficient which fixes the confidence of the prior knowledge 
-we are going to introduce. By default it is \code{NULL}, only we must modify it if we want 
-to incorporate prior information to the fits.}
+\item{s}{A \code{"numeric"} value indicating the expert's confidence in the prior knowledge. 
+This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+to synchronize the support of the prior knowledge and the sample.
+By default, it is \code{NULL}, and must be modified only if prior information is to be 
+incorporated in the learning process.}
 
-\item{priorData}{Prior dataset with values of the variables we have information apriori about.
-This dataset must be of \code{"data.frame"} class.}
+\item{priorData}{An object of class \code{"data.frame"}, corresponding to the prior information.}
 
-\item{domainChild}{An \code{"numeric"} array with the range of the child variable.}
+\item{domainChild}{A \code{"numeric"} vector with the range of the child variable.}
 
-\item{domainParents}{A matrix of class \code{"matrix"} with the range of the parent 
-variables or an \code{"numeric"} array if there is a only one parent.}
+\item{domainParents}{An object of class \code{"matrix"} with the range of the parent 
+variables, or a \code{"numeric"} vector if there is only one parent.}
 
-\item{mm}{One of the inputs and the output of the recursive function \code{"conditional"}.}
+\item{mm}{One of the inputs and the output of the recursive internal function \code{"conditional"}.}
 
-\item{conditionalfunction}{The output of the function \code{learn.tree.Intervals}.}
+\item{conditionalfunction}{The output of the internal function \code{learn.tree.Intervals}.}
 }
 \value{
 The main function \code{conditionalMethod} returns a list with the name of the parents, 
-the different intervals and  the fitted functions.
+the different intervals and the fitted densities
 }
 \description{
-Collection of functions for learning conditional MoTBFs,
+Collection of functions used for learning conditional MoTBFs,
 computing the internal BIC, selecting the parents that get 
-the best BIC value, and other internal functions needed to get the 
-final conditionals.
+the best BIC value, and other internal functions required to learn the
+conditional densities.
 }
 \details{
-The main function \code{conditionalMethod} fits truncated functions for a variable which depends
-on others variables. The domain of the parent variables is splitted
+The main function, \code{conditionalMethod()}, fits truncated basis functions for the conditioned variable 
+for each configuration of splits of the parent variables. The domain of the parent variables is splitted
 in different intervals and univariate functions are fitted in these 
-ranges. The rest of the described functions are internal ones of the main function.
+ranges. The remaining above described functions are internal to the main function.
 }
 \examples{
 ## Dataset

@@ -3,7 +3,9 @@
 \name{thyroid}
 \alias{thyroid}
 \title{Data set Thyroid Disease (thyroid0387)}
-\format{A data frame with 7200 rows, 21 variables and the class.}
+\format{
+A data frame with 7200 rows, 21 variables and the class.
+}
 \source{
 \url{http://archive.ics.uci.edu/ml/datasets/Thyroid+Disease}
 }

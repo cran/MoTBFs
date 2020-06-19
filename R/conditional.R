@@ -1,38 +1,40 @@
-#' Learning Conditional Functions
+#' Learning conditional MoTBF densities
 #' 
-#' Collection of functions for learning conditional MoTBFs,
+#' Collection of functions used for learning conditional MoTBFs,
 #' computing the internal BIC, selecting the parents that get 
-#' the best BIC value, and other internal functions needed to get the 
-#' final conditionals.
+#' the best BIC value, and other internal functions required to learn the
+#' conditional densities.
 #' 
 #' @name conditionalmotbf.learning
 #' @rdname conditionalmotbf.learning
 #' 
-#' @param data A dataset of class \code{"data.frame"}.
-#' @param nameParents A \code{"character"} vector with the names of the parent variables.
-#' @param nameChild The name of the child variable as a \code{"character"} string.
-#' @param domainChild An \code{"numeric"} array with the range of the child variable.
-#' @param domainParents A matrix of class \code{"matrix"} with the range of the parent 
-#' variables or an \code{"numeric"} array if there is a only one parent.
-#' @param numIntervals A \code{"numeric"} value indicating the maximum number of intervals in which we 
-#' want to split the domain of the parent variables.
-#' @param POTENTIAL_TYPE A \code{"character"} string specifying the posibles potential
-#' types, must be one of \code{"MOP"} or \code{"MTE"}. You can specify just the initial letter.
-#' @param maxParam A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-#' if not, the output is the function which gets the best BIC with at most this number of parameters.
-#' @param s A \code{"numeric"} coefficient which fixes the confidence of the prior knowledge 
-#' we are going to introduce. By default it is \code{NULL}, only we must modify it if we want 
-#' to incorporate prior information to the fits.
-#' @param priorData Prior dataset with values of the variables we have information apriori about.
-#' This dataset must be of \code{"data.frame"} class.
-#' @param conditionalfunction The output of the function \code{learn.tree.Intervals}.
-#' @param mm One of the inputs and the output of the recursive function \code{"conditional"}.
+#' @param data An object of class \code{"data.frame"}.
+#' @param nameParents A \code{"character"} vector containing the names of the parent variables.
+#' @param nameChild A \code{"character"} string containing the name of the child variable.
+#' @param domainChild A \code{"numeric"} vector with the range of the child variable.
+#' @param domainParents An object of class \code{"matrix"} with the range of the parent 
+#' variables, or a \code{"numeric"} vector if there is only one parent.
+#' @param numIntervals A positive integer indicating the maximum number of intervals 
+#' for splitting the domain of the parent variables.
+#' @param POTENTIAL_TYPE A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding 
+#' to the type of basis function.
+#' @param maxParam A positive integer which indicates the maximum number of coefficients in the 
+#' function. If specified, the output is the function which gets the best BIC with, at most, 
+#' this number of parameters. By default, it is set to \code{NULL}.
+#' @param s A \code{"numeric"} value indicating the expert's confidence in the prior knowledge. 
+#' This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+#' to synchronize the support of the prior knowledge and the sample.
+#' By default, it is \code{NULL}, and must be modified only if prior information is to be 
+#' incorporated in the learning process.
+#' @param priorData An object of class \code{"data.frame"}, corresponding to the prior information.
+#' @param conditionalfunction The output of the internal function \code{learn.tree.Intervals}.
+#' @param mm One of the inputs and the output of the recursive internal function \code{"conditional"}.
 #' @return The main function \code{conditionalMethod} returns a list with the name of the parents, 
-#' the different intervals and  the fitted functions.
-#' @details The main function \code{conditionalMethod} fits truncated functions for a variable which depends
-#' on others variables. The domain of the parent variables is splitted
+#' the different intervals and the fitted densities
+#' @details The main function, \code{conditionalMethod()}, fits truncated basis functions for the conditioned variable 
+#' for each configuration of splits of the parent variables. The domain of the parent variables is splitted
 #' in different intervals and univariate functions are fitted in these 
-#' ranges. The rest of the described functions are internal ones of the main function.
+#' ranges. The remaining above described functions are internal to the main function.
 #' @seealso \link{printConditional}
 #' @examples
 #' ## Dataset
@@ -420,13 +422,13 @@ BICscoreMoTBF <- function(conditionalfunction, data, nameParents, nameChild)
 }
 
 
-#' BIC for Multiple Functions
+#' BIC score for multiple functions
 #' 
-#' Compute the BIC score for more than one function
+#' Compute the BIC score using more than one probability functions.
 #' 
-#' @param Px A list with 'n' elements. Each element contains a \code{"motbf"} function.
-#' @param X A list with 'n' elements. Each one contains a \code{"numeric"} vector with the 
-#' values of the data set which correspond to the diferent functions.
+#' @param Px A list of objects of class \code{"motbf"}.
+#' @param X A list with as many \code{"numeric"} vectors as densities in \code{Px},
+#' used to compute the BIC score for each density.
 #' @return The \code{"numeric"} BIC value.
 #' @seealso \link{univMoTBF}
 #' @export
@@ -452,19 +454,19 @@ BICMultiFunctions <- function(Px, X){
   return(BiC)
 }
 
-#' Plots for Conditional Functions
+#' Plot Conditional Functions
 #' 
-#' Get the graphical result of an MoTBF conditional function of two variables, i.e. a parent and his child.
+#' Plot conditional MoTBF densities.
 #' 
-#' @param conditionalFunction the output of the conditionalMethod. A list with the the interval of the parent
-#' and the final MoTBF density function.
-#' @param data The dataset used.
-#' @param nameChild Name of the child variable in the conditional function. By default is \code{NULL}.
-#' @param points Logical value. If \code{TRUE} the points of the data are overplotted.
-#' @param color By default \code{NULL}, a selection of colors of the color palette of \R is used.
-#' @details If the number of parents is bigger than one, then the message 
-#' "It is not possible plotting the conditional function." is shown.
-#' @return A plot of the conditional function.
+#' @param conditionalFunction the output of function \link{conditionalMethod}. 
+#' A list containing the the interval of the parent and the final conditional density (MTE or MOP).
+#' @param data An object of class \code{data.frame}, corresponding to the dataset used to fit the conditional density.
+#' @param nameChild A \code{character} string, corresponding to the name of the child variable in the conditional density. By default, it is \code{NULL}.
+#' @param points A logical value. If \code{TRUE}, the sample points are overlaid.
+#' @param color If not specified, a default palette is used. 
+#' @details If the number of parents is greater than one, then the error message 
+#' "It is not possible to plot the conditional function." is reported.
+#' @return A plot of the conditional density function.
 #' @seealso \link{conditionalMethod}
 #' @export
 #' @examples
@@ -533,13 +535,13 @@ plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FA
       par(mfrow=c(1,1))
     }
   }else{
-    (stop("It is not possible plotting the conditional function."))
+    (stop("It is not possible to plot the conditional function."))
   }
 }
 
-#' Prints Conditional Functions
+#' Summary of conditional MoTBF densities
 #' 
-#' Prints the result of an MoTBF conditional function of two variables, i.e. a parent and his child.
+#' Print the description of an MoTBF demnsity for one variable conditional on another variable.
 #' 
 #' @param conditionalFunction the output of the function \code{conditionalMethod}. A list with the interval of the parent
 #' and the final \code{"motbf"} density function fitted in each interval.

@@ -4,19 +4,24 @@
 #' Least square optimization is used to minimize the quadratic 
 #' error between the empirical cumulative distribution and the estimated one. 
 #' 
-#' @param data A \code{"numeric"} data vector.
+#' @param data A \code{"numeric"} vector.
 #' @param POTENTIAL_TYPE A \code{"character"} string specifying the potential
-#' type, must be one of \code{"MOP"} or \code{"MTE"}.
-#' @param evalRange A \code{"numeric"} vector with the range where defining
-#' the function. By default: it is \code{NULL} and the function is defined
-#' over the data range.
-#' @param nparam Number of parameters of the function. By default: it is \code{NULL}
-#' and the function fits the best MoTBF taking into account the Bayesian information 
-#' criterion (BIC) to penalize the functions. It evaluates the two next functions,
-#' if the BIC value doesn't improve then the function with the last best BIC is returned.
-#' @param maxParam A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-#' if not, the output is the function which gets the best BIC with at most this number of parameters.
-#' @return An \code{"motbf"} function learned from data.
+#' type, must be either \code{"MOP"} or \code{"MTE"}.
+#' @param evalRange A \code{"numeric"} vector that specifies the domain over
+#' which the model will be fitted. By default, it is \code{NULL} and the function is defined
+#' over the complete data range.
+#' @param nparam The exact number of basis functions to be used. By default, it is \code{NULL}
+#' and the best MoTBF is fitted taking into account the Bayesian information
+#' criterion (BIC) to score and select the functions. It evaluates the next two functions and,
+#' if the BIC value does not improve, the function with the best BIC score so far is returned.
+#' @param maxParam A \code{"numeric"} value which indicates the maximum number of coefficients in the function. 
+#' By default, it is \code{NULL}; otherwise, the function which gets the best BIC score
+#' with at most this number of parameters is returned.
+#' @return \code{univMoTBF()} returns an object of class \code{"motbf"}. This object is a list containing several elements, 
+#' including its mathematical expression and other hidden elements related to the learning task. 
+#' The processing time is one of the values returned by this function and it can be extracted by $Time. 
+#' Although the learning process is always the same for a particular data sample, 
+#' the processing can vary inasmuch as it depends on the CPU.
 #' @export
 #' @examples
 #' ## 1. EXAMPLE
@@ -87,16 +92,16 @@ univMoTBF <- function(data, POTENTIAL_TYPE, evalRange=NULL, nparam=NULL,  maxPar
 }
 
 
-#'Computing the BIC Score of an MoTBF Function
+#'Computing the BIC score of an MoTBF function
 #'
 #'Computes the Bayesian information criterion value (BIC) of a 
-#'mixture of truncated basis function. The BIC score is the log likelihood 
-#'penalizes by the number of parameters of the function and the number of
+#'mixture of truncated basis functions. The BIC score is the log likelihood 
+#'penalized by the number of parameters of the function and the number of
 #'records of the evaluated data.
 #'
 #'@param Px A function of class \code{"motbf"}.
 #'@param X A \code{"numeric"} vector with the data to evaluate.
-#'@return A \code{"numeric"} value containing the BIC score.
+#'@return A \code{"numeric"} value corresponding to the BIC score.
 #'@seealso \link{univMoTBF}
 #'@export
 #'@examples
@@ -125,13 +130,13 @@ BICMoTBF <- function(Px, X){
 }
 
 
-#' Extract MoTBF Coefficients
+#' Extract the coefficients of an MoTBF
 #' 
 #' Extracts the parameters of the learned mixtures of truncated basis
 #' functions. 
 #' 
-#' @param object An MoTBF function.
-#' @param \dots other arguments
+#' @param object An object of class \code{motbf}.
+#' @param \dots other arguments.
 #' @return A numeric vector with the parameters of the function.
 #' @seealso \link{univMoTBF}, \link{coeffMOP} and \link{coeffMTE}
 #' @export
@@ -223,12 +228,13 @@ subclass <- function(fx)
 }
 
 
-#' Derivative MoTBF
+#' Derivating MoTBFs
 #' 
-#' Compute derivatives of \code{"motbf"} objects.
+#' Compute the derivative of a one-dimensional mixture of truncated basis function.
 #' 
-#' @param fx An object of \code{"motbf"} class.
-#' @return The derivative which is also an \code{"motbf"} function.
+#' @param fx An object of class \code{"motbf"}.
+#' @return The derivative of the MoTBF function, which is also 
+#' an object of class \code{"motbf"}.
 #' @seealso \link{univMoTBF}, \link{derivMOP} and \link{derivMTE}
 #' @export
 #' @examples
@@ -265,19 +271,20 @@ derivMoTBF <- function(fx)
 }
 
 
-#' Integral MoTBF
+#' Integrating MoTBFs
 #' 
-#' Gets the integral of a one dimensional mixture of truncated basis function 
+#' Compute the integral of a one-dimensional mixture of truncated basis function 
 #' over a bounded or unbounded interval.
 #' 
-#' @param fx An \code{"motbf"} function.
-#' @param min The lower limit of integration. By default it is NULL.
-#' @param max The higther limit of the interval. By default it is NULL.
+#' @param fx An object of class \code{"motbf"}.
+#' @param min The lower integration limit. By default it is NULL.
+#' @param max The upper integration limit. By default it is NULL.
 #' @details If the limits of the interval, min and max are NULL, then the output is
-#' the expression of the non-defined integral. If only min contains a numeric value,
-#' then the expression of the integral is evaluated in this point.
-#' @return The non-defined integral of the MoTBF function that is also an \code{"motbf"}
-#' function or the defined integral that is a \code{"numeric"} value.
+#' the expression of the indefinite integral. If only 'min' contains a numeric value,
+#' then the expression of the integral is evaluated at this point.
+#' @return \code{integralMoTBF()} returns either the indefinite integral of the MoTBF 
+#' function, which is also an object of class \code{"motbf"}, or the definite integral, 
+#' wich is a \code{"numeric"} value.
 #' @seealso \link{univMoTBF}, \link{integralMOP} and \link{integralMTE}
 #' @export
 #' @examples
@@ -327,7 +334,7 @@ integralMoTBF <- function(fx, min=NULL, max=NULL)
   } 
 }
 
-#' Coerce an \code{"motbf"} Object to a Function
+#' Coerce an \code{"motbf"} object to a Function
 #'
 #' Takes an \code{"motbf"} object and contructs an \R function to evaluate it at points.
 #' 
@@ -370,13 +377,13 @@ as.function.motbf <- function(x, ...)
   } 
 }
 
-#' Plots for \code{'motbf'} Objects
+#' Plots for \code{'motbf'} objects
 #'
 #' Draws an \code{'motbf'} function.
 #' 
 #' @param x An object of class \code{'motbf'}.
 #' @param xlim The range to be encompassed by the x axis; by default \code{0:1}.
-#' @param ylim The range
+#' @param ylim The range of the y axix.
 #' @param type As for \link{plot}.
 #' @param \dots Further arguments to be passed as for \link{plot}.
 #' @method plot motbf

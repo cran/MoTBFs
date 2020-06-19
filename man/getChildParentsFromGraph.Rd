@@ -2,24 +2,23 @@
 % Please edit documentation in R/structuralLearning.R
 \name{getChildParentsFromGraph}
 \alias{getChildParentsFromGraph}
-\title{Get Relationships in a Network}
+\title{Get the list of relations in a graph}
 \usage{
 getChildParentsFromGraph(graph, nameVars = NULL)
 }
 \arguments{
-\item{graph}{A structural network of the class \code{"graphNEL"},
+\item{graph}{A directed acyclic graph of the class \code{"graphNEL"},
 \code{"network"} or \code{"bn"}.}
 
-\item{nameVars}{A character array giving the names of the variables in the graph. By default it's NULL,
-only put it when a graph of class \code{"network"} is used.}
+\item{nameVars}{A character array containing the names of the variables in the graph. 
+This parameter is only used when \code{graph} is of class \code{"network"}.}
 }
 \value{
-A list of elements. Each element contains a vector with the name of a child 
-and their parents.
+A list where each element is a vector containing the name of a variable 
+and its parents in the graph.
 }
 \description{
-Extract the relationship between the variables of a dataset using
-the obtained network
+Compute the parents of each variable in the graph.
 }
 \examples{
 

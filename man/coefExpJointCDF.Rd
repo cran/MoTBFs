@@ -11,10 +11,10 @@ coefExpJointCDF(dimensions)
 }
 \value{
 A list with n element. Each element contains a \code{numeric} vector with the degree for 
-each variable and each term of the cumulative joint function.
+each variable and each term of the joint CDF.
 }
 \description{
-Compute the degree for each term of a cumulative joint function.
+Compute the degree for each term of a joint CDF.
 }
 \examples{
 

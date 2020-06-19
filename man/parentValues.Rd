@@ -2,7 +2,7 @@
 % Please edit documentation in R/Inference.R
 \name{parentValues}
 \alias{parentValues}
-\title{Value of Parent Nodes}
+\title{Value of parent nodes}
 \usage{
 parentValues(node, bn, obs, rdf)
 }

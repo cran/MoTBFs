@@ -2,7 +2,7 @@
 % Please edit documentation in R/priorKnowledge.R
 \name{learnMoTBFpriorInformation}
 \alias{learnMoTBFpriorInformation}
-\title{Incorporating Prior Knowledge}
+\title{Incorporating prior knowledge in the estimation process}
 \usage{
 learnMoTBFpriorInformation(
   priorData,
@@ -16,41 +16,42 @@ learnMoTBFpriorInformation(
 )
 }
 \arguments{
-\item{priorData}{A \code{"numeric"} array which contains the values of the variable we have information apriori about.}
+\item{priorData}{A \code{"numeric"} vector which contains the prior information.}
 
-\item{data}{A \code{"numeric"} array which contains the values to fit.}
+\item{data}{A \code{"numeric"} vector containing the observed data.}
 
-\item{s}{A \code{"numeric"} coefficient which fixes the confidence of the prior knowledge 
-we are going to introduce. By default it is \code{NULL}, only we must modify it if we want 
-to incorporate prior information to the fits.}
+\item{s}{A \code{"numeric"} value which specifies the expert confidence in the prior knowledge. 
+This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+to synchronize the support of the prior knowledge and the sample.}
 
-\item{POTENTIAL_TYPE}{A \code{"character"} string specifying the posibles potential
-types, must be one of \code{"MOP"} or \code{"MTE"}.}
+\item{POTENTIAL_TYPE}{A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding to the type of basis function.}
 
-\item{domain}{A \code{"numeric"} array which contains the limits to defined the data function.
-By default it is the range of the data.}
+\item{domain}{A \code{"numeric"} vector which contains the bounding values to fit the function.
+By default, it is the range of the data.}
 
-\item{coeffversion}{A \code{"numeric"} value between \code{1--4} which contains the used version for computing the coefficients of the linear opinion pool to
-combine the prior function and the data function. By default \code{coeffversion = "4"} is used, so the combination
+\item{coeffversion}{A \code{"numeric"} value between \code{1--4} which contains the used version for computing 
+the coefficients of the linear opinion pool to combine the prior function and the data function. 
+By default, \code{coeffversion = "4"} is used, so the combination
 depends on the goodness of the model versus another random model.}
 
-\item{restrictDomain}{This argument lets us choose if the domain is used joining both domains,
-the prior one and the data domain or trimming them. By default \code{TRUE} is used, so 
+\item{restrictDomain}{A logical value. This argument allows to choose if the domain is used joining both domains,
+the prior one and the data domain or trimming them. By default, \code{TRUE} is used, so 
 the domain will be trimmed.}
 
-\item{maxParam}{A \code{"numeric"} value which indicates the maximum number of coefficients in the function. By default it is \code{NULL}; 
-if not, the output is the function which gets the best BIC with at most this number of parameters.}
+\item{maxParam}{A positive integer which indicates the maximum number of coefficients in the function. 
+If specified, the output is the function which gets the best BIC with, at most, this number of parameters.
+By default, it is set to \code{NULL}.}
 }
 \value{
 A list with the elements
-\item{coeffs}{An \code{"numeric"} array with the two coefficients of the linear opinion pool}
+\item{coeffs}{An \code{"numeric"} vector with the two coefficients of the linear opinion pool}
 \item{posteriorFunction}{The final function after combining.}
 \item{priorFunction}{The fit of the prior data.}
 \item{dataFunction}{The fit of the original data.}
 \item{rangeNewPriorData}{A \code{"numeric"} vector which contains the final domain where the functions are defined.}
 }
 \description{
-Learns a function using prior information.
+Learns a univariate MoTBF function using prior information.
 }
 \examples{
 

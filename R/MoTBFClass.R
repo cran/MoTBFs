@@ -1,11 +1,11 @@
 #' Class \code{"motbf"}
 #' 
-#' Defines an object of class \code{"motbf"} and other basis functions for manipulating 
+#' Defines an object of class \code{"motbf"} and other basic functions for manipulating 
 #' \code{"motbf"} objects.
 #' 
 #' @name Class-MoTBF
 #' @rdname Class-MoTBF
-#' @param x Preferably, a list containing, an \code{'mte'} or \code{'mop'} univariate expression
+#' @param x Preferably, a list containing an \code{'mte'} or \code{'mop'} univariate expression
 #' and other posibles elements like a \code{"numeric"} vector with the domain of the variable, 
 #' the number of iterations needed to solve the optimization problem, among others.
 #' Any \R object can be entered, but the utility of this function is not to transform
@@ -61,9 +61,9 @@ as.list.motbf <- function(x, ...) as.list(x[[1]])
 #'@export
 is.motbf <- function(x, class="motbf") is(x, class)
 
-#' Summary of an \code{"motbf"} Object
+#' Summary of an \code{"motbf"} object
 #' 
-#' Summarize an \code{"motbf"} object by describing its main points.
+#' Summarize an \code{"motbf"} object by describing its main features.
 #' 
 #' @name summary.motbf
 #' @rdname summary.motbf
@@ -133,18 +133,18 @@ print.summary.motbf <- function(x, ...)
 
 #' Class \code{"jointmotbf"}
 #' 
-#' Defines an object of class \code{"jointmotbf"} and other basis functions for 
+#' Defines an object of class \code{"jointmotbf"} and other basic functions for 
 #' manipulating \code{"jointmotbf"} objects.
 #' 
 #' @name Class-JointMoTBF
 #' @rdname Class-JointMoTBF
-#' @param x Preferably, a list containing, a joint expression
+#' @param x Preferably, a list containing an expression
 #' and other posibles elements like a \code{"numeric"} matrix with the domain of the variables, 
 #' the dimension of the variables, the number of iterations needed to solve the optimization problem,
 #' among others. Any \R object can be entered, but the utility of this function is not to transform
 #' objects of other classes into objects of class \code{"jointmotbf"}.
 #' @param class By default is \code{"jointmotbf"}.
-#' @param ... Additional arguments, not needed for these methods.
+#' @param ... Additional arguments, not needed by these methods.
 #' @seealso \link{jointMoTBF}
 #' @examples
 #' ## n.parameters is the product of the dimensions
@@ -187,9 +187,9 @@ as.list.jointmotbf <- function(x, ...) as.list(x[[1]])
 #' @export
 is.jointmotbf <- function(x, class="jointmotbf") is(x, class)
 
-#' Summary of a \code{"jointmotbf"} Object
+#' Summary of a \code{"jointmotbf"} object
 #' 
-#' Summarize a \code{"jointmotbf"} object by describing its main points.
+#' Summarize a \code{"jointmotbf"} object by describing its main features.
 #' 
 #' @name summary.jointmotbf
 #' @rdname summary.jointmotbf
@@ -197,7 +197,7 @@ is.jointmotbf <- function(x, class="jointmotbf") is(x, class)
 #' @param x An object of class \code{"summary.jointmotbf"}.
 #' @param ... further arguments passed to or from other methods.
 #' @return The summary of a \code{"jointmotbf"} object. It contains a list of
-#' elements with the most important information of the object.
+#' elements with the most important information about the object.
 #' @seealso \link{parametersJointMoTBF} and \link{jointMoTBF}
 #' @examples
 #' ## 1. EXAMPLE

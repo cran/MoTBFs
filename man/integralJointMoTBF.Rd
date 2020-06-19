@@ -2,16 +2,16 @@
 % Please edit documentation in R/joint.R
 \name{integralJointMoTBF}
 \alias{integralJointMoTBF}
-\title{Integral Joint MoTBF}
+\title{Integration with MoTBFs}
 \usage{
 integralJointMoTBF(P, var = NULL)
 }
 \arguments{
 \item{P}{A \code{"jointmotbf"} object.}
 
-\item{var}{A \code{"character"} vector containing the name of the variables where integrating the joint function.
-Instead the names it can contain the position of the variables.
-By default it's \code{NULL} then all the variables are taken.}
+\item{var}{A \code{"character"} vector containing the name of the variables that will be integrated out.
+Instead of the names, the position of the variables can be given.
+By default it's \code{NULL} then all the variables are integrated out.}
 }
 \value{
 A multiintegral of a joint function of class \code{"jointmotbf"}.
@@ -19,7 +19,7 @@ A multiintegral of a joint function of class \code{"jointmotbf"}.
 \description{
 Integrate a \code{"jointmotbf"} object over an non defined domain. It is able to
 get the integral of a joint function over a set of variables or over all
-the variables of the function.
+the variables in the function.
 }
 \examples{
 ## 1. EXAMPLE

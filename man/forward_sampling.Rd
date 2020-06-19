@@ -4,7 +4,7 @@
 \alias{forward_sampling}
 \title{Forward Sampling}
 \usage{
-forward_sampling(bn, dag, target, evi, size, force_size = T, ...)
+forward_sampling(bn, dag, target, evi, size, ...)
 }
 \arguments{
 \item{bn}{A list of lists obtained from the function \link{MoTBFs_Learning}.}
@@ -15,9 +15,7 @@ forward_sampling(bn, dag, target, evi, size, force_size = T, ...)
 
 \item{evi}{A \code{data.frame} containing the observed variables.}
 
-\item{size}{A non-negative integer giving the number of instances to be generated.}
-
-\item{force_size}{\code{logical} indicating if the sample must be of the size indicated. As a default, it is set to TRUE.}
+\item{size}{A positive integer giving the number of instances to be generated.}
 
 \item{...}{Optional arguments passed on to the \code{\link{univMoTBF}} function. \code{evalRange}, \code{nparam} and \code{maxParam} can be specified. \code{POTENTIAL_TYPE} is taken from the 'bn' object.}
 }

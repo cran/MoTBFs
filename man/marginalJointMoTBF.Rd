@@ -2,12 +2,12 @@
 % Please edit documentation in R/joint.R
 \name{marginalJointMoTBF}
 \alias{marginalJointMoTBF}
-\title{Marginal Joint MoTBF}
+\title{Marginalization of MoTBFs}
 \usage{
 marginalJointMoTBF(P, var)
 }
 \arguments{
-\item{P}{A joint function of class \code{"jointmotbf"}.}
+\item{P}{An object of class \code{"jointmotbf"}, i.e., the joint density function.}
 
 \item{var}{The \code{"numeric"} position or the \code{"character"} name of the marginal variable.}
 }
@@ -15,7 +15,7 @@ marginalJointMoTBF(P, var)
 The marginal of a \code{"jointmotbf"} function. The result is an object of class \code{"motbf"}.
 }
 \description{
-Computes the marginal functions of a \code{"jointmotbf"}
+Computes the marginal densities from a \code{"jointmotbf"}
 object.
 }
 \examples{

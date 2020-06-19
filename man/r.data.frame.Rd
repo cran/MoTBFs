@@ -2,7 +2,7 @@
 % Please edit documentation in R/Inference.R
 \name{r.data.frame}
 \alias{r.data.frame}
-\title{Initialize Data Frame}
+\title{Data frame initialization for forward sampling}
 \usage{
 r.data.frame(bn, dag)
 }

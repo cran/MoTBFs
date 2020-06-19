@@ -20,7 +20,7 @@ motbf(x = 0)
 is.motbf(x, class = "motbf")
 }
 \arguments{
-\item{x}{Preferably, a list containing, an \code{'mte'} or \code{'mop'} univariate expression
+\item{x}{Preferably, a list containing an \code{'mte'} or \code{'mop'} univariate expression
 and other posibles elements like a \code{"numeric"} vector with the domain of the variable, 
 the number of iterations needed to solve the optimization problem, among others.
 Any \R object can be entered, but the utility of this function is not to transform
@@ -31,7 +31,7 @@ objects of other classes into objects of class \code{"motbf"}.}
 \item{class}{By default is \code{"motbf"}.}
 }
 \description{
-Defines an object of class \code{"motbf"} and other basis functions for manipulating 
+Defines an object of class \code{"motbf"} and other basic functions for manipulating 
 \code{"motbf"} objects.
 }
 \examples{

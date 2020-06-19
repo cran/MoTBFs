@@ -3,7 +3,7 @@
 #' This function allows to check whether a node is discrete or not
 #' @param node A character (name of node) or numeric (index of node in the bn list) input. 
 #' @param bn A list of lists obtained from \link{MoTBFs_Learning}.
-#' @return \code{is.discrete} returns TRUE or FALSE depending on whether the node is discrete or not.
+#' @return \code{is.discrete} returns \code{TRUE} or \code{FALSE} depending on whether the node is discrete or not.
 #' @export
 #' @examples  
 #' 
@@ -52,7 +52,7 @@ is.discrete <- function(node, bn) {
 
 #' Get the states of all discrete nodes from a MoTFB-BN
 #' 
-#' This function returns the states of all discrete node from a list obtained from \link{MoTBFs_Learning}.
+#' This function returns the states of all discrete nodes from a list obtained from \link{MoTBFs_Learning}.
 #' @param bn A list of lists obtained from \link{MoTBFs_Learning}.
 #' @param dag A network of class \code{"bn"}.
 #' @return \code{discreteStatesFromBN} returns a list of length equal to the number of discrete nodes in the network. Each element of the list corresponds to a node and contains a character vector indicating the states of the node.
@@ -109,9 +109,9 @@ discreteStatesFromBN <- function(bn, dag){
 #' Root nodes
 #' 
 #' \code{is.root} checks whether a node has parents or not.
-#' @param node A character string indicating the node's name.
+#' @param node A character string indicating the name of the node.
 #' @param dag An object of class \code{"bn"}.
-#' @return \code{is.root} returns TRUE or FALSE depending on whether the node is root or not.  
+#' @return \code{is.root} returns \code{TRUE} or \code{FALSE} depending on whether the node is root or not.  
 #' @importFrom bnlearn root.nodes
 #' @export
 #' @examples 
@@ -143,7 +143,7 @@ is.root <- function(node, dag){
 }
 
 
-#' Initialize Data Frame
+#' Data frame initialization for forward sampling
 #' 
 #' The function \code{r.data.frame()} initializes a data frame with as many columns as nodes in the MoTBF-network. It also asings each column its data type, i.e., numeric or character. In the case of character columns, the states of the variable are extracted from the \code{"bn"} argument and included as levels.
 #' @param bn A list of lists obtained from the function \link{MoTBFs_Learning}.
@@ -228,7 +228,7 @@ is.observed <- function(node, evi){
 }
 
 
-#' Value of Parent Nodes
+#' Value of parent nodes
 #' 
 #' This function returns a \code{data.frame} of dimension '1xn' containing the values of the 'n' parents of a 'node' of interest. 
 #' Use this function if you have a random sample and an observed sample with information about the parents.
@@ -293,7 +293,7 @@ parentValues <- function(node, bn, obs, rdf){
 }
   
 
-#' Find Fitted Conditional MoTBFs
+#' Find fitted conditional MoTBFs
 #' 
 #' This function returns the conditional probability function of a node given an MoTBF-bayesian network and the value of its parents.
 #' @param node A \code{character} string, representing the tardet variable.
@@ -342,7 +342,7 @@ findConditional <- function(node, bn, evi = NULL){
     }
     # NODOS HIJOS
   }else{
-  ## Check the evidence set
+    ## Check the evidence set
     # if the evidence set is empty
     if(is.null(evi)){
       stop("The evidence set of the parents is not defined")
@@ -356,25 +356,58 @@ findConditional <- function(node, bn, evi = NULL){
     # buscar la funcion correspondiente segun valor de los padres
     j = 0
     acotado = NULL
+    case_p = NULL
+    located_parent = NULL
+    update = F
     for(k in 1:length(node_par)){
       int_fx = F
+      i = 0
       while (int_fx == F) {
         j = j+1
+        i = i+1
         if(j > length(cases)){
           acotado = "descartar"
           break
         }
-        p <- node_par[k]
         
-        parent_value <- evi[1,p]
+        if(k == 1){
+          p <- node_par[k]
+          
+          # casos (listas) en las que p es el padre
+          case_p <- which(lapply(cases, `[[`, "parent") == p)
+        }
         
-        # casos (listas) en las que p es el padre
-        case_p <- which(lapply(cases, `[[`, "parent") == p)
+        ## My workaround when the parents change order in the conditional distribution list
+        if(update == T){
+          orden_par <- unlist(unique(lapply(cases, `[[`, "parent")[acotado[1]:acotado[2]]))
+          if(!is.null(located_parent)){
+            orden_par <- orden_par[-which(orden_par %in% located_parent)]
+          }
+          
+          update = F
+          node_par <- c(rep(NA, abs(length(orden_par)-length(node_par))), orden_par)
+          
+          p <- node_par[k]
+          
+          # casos (listas) en las que p es el padre
+          case_p <- which(lapply(cases, `[[`, "parent") == p)
+        }
+        
+        if(!is.null(acotado)){
+          case_p <- case_p[which(case_p >= acotado[1])]
+        }
+        
+        
+        if(!is.null(case_p)){
+          j = case_p[i]
+        }
         
         # si 'p' no es el padre del caso 'j', saltar iteracion
         if(cases[[j]]$parent != p){
           next
         }
+        
+        parent_value <- evi[1,p]
         
         if(!is.discrete(p, bn)){
           lower_int <- cases[[j]]$interval[1]
@@ -385,9 +418,14 @@ findConditional <- function(node, bn, evi = NULL){
             if(is.null(acotado) & length(node_par)>1){
               if(j == max(case_p)){
                 acotado <- c(j, length(cases))
+                update = T
               }else{
                 acotado <- c(j, case_p[which(case_p == j)+1])
+                update = T
               }
+            }else if(!is.null(acotado) & length(node_par)>1){
+              acotado[1] <- j
+              update = T
             }
           }
         }else{
@@ -396,11 +434,16 @@ findConditional <- function(node, bn, evi = NULL){
             if(is.null(acotado)  & length(node_par)>1){
               if(j == max(case_p)){
                 acotado <- c(j, length(cases))
+                update = T
               }else{
                 acotado <- c(j, case_p[which(case_p == j)+1])
+                update = T
               }
             }
           }
+        }
+        if(update==T){
+          located_parent <- c(located_parent, p)
         }
       }
     }
@@ -469,7 +512,7 @@ motbf_type <- function(bn){
 
 
 
-#' Generate Samples From Conditional MoTBFs
+#' Sample generation from conditional MoTBFs
 #' 
 #' This function generates a sample from conditional MoTBFs.
 #' @param bn A list of lists obtained from the function \link{MoTBFs_Learning}.
@@ -549,7 +592,7 @@ sample_MoTBFs<- function(bn, dag, obs = NULL, size, force_size = T){
         
       }else{
         # caso continuo
-        if(length(fx)==1){
+        if(length(fx)==1| is.null(fx)){
           rdf[s,] <- NA
           
           break
@@ -583,8 +626,7 @@ sample_MoTBFs<- function(bn, dag, obs = NULL, size, force_size = T){
 #' @param dag An object of class \code{"bn"}, representing the directed acyclic graph.
 #' @param target A character string equal to the name of the variable of interest.
 #' @param evi A \code{data.frame} containing the observed variables.
-#' @param size A non-negative integer giving the number of instances to be generated.
-#' @param force_size \code{logical} indicating if the sample must be of the size indicated. As a default, it is set to TRUE.
+#' @param size A positive integer giving the number of instances to be generated.
 #' @param ... Optional arguments passed on to the \code{\link{univMoTBF}} function. \code{evalRange}, \code{nparam} and \code{maxParam} can be specified. \code{POTENTIAL_TYPE} is taken from the 'bn' object.
 #' 
 #' @references Henrion, M. (1988). Propagating uncertainty in Bayesian networks by probabilistic logic sampling. In Machine Intelligence and Pattern Recognition (Vol. 5, pp. 149-163). North-Holland.
@@ -609,7 +651,7 @@ sample_MoTBFs<- function(bn, dag, obs = NULL, size, force_size = T){
 #' ## Get the conditional distribution of 'node' and the generated sample
 #'   forward_sampling(bn, dag, target = node, evi = obs, size = 10, maxParam = 15)
 #'   
-forward_sampling <- function(bn, dag, target, evi, size, force_size = T,...){
+forward_sampling <- function(bn, dag, target, evi, size, ...){
   
   start_time <- Sys.time()
   

@@ -1,12 +1,13 @@
-#' Rescales an MoTBF Function
+#' Rescaling MoTBF functions
 #' 
 #' A collation of function to reescale an MoTBF function
-#' to the original limits and scale.
+#' to the original offset and scale. This is useful when data was
+#' standardized previously to learning.
 #' 
 #' @name rescaledFunctions
 #' @rdname rescaledFunctions
 #' @param fx A function of class \code{"motbf"} learned from a scaled data.
-#' @param data A \code{"numeric"} vector containing the original data without being scaled.
+#' @param data A \code{"numeric"} vector containing the original data (non standardizded).
 #' @param parameters A \code{"numeric"} vector with the coefficients to create the rescaled MoTBF.
 #' @param num A \code{"numeric"} value which contains the denominator of the coefficient
 #' in the exponential. By default it is 5.

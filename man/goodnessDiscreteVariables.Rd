@@ -4,7 +4,7 @@
 \alias{goodnessDiscreteVariables}
 \alias{getlogLikelihoodDiscreteBN}
 \alias{getBICDiscreteBN}
-\title{Goodness of discrete probabilities}
+\title{BIC scxore and log-likelihood}
 \usage{
 getlogLikelihoodDiscreteBN(discreteBN)
 
@@ -14,13 +14,13 @@ getBICDiscreteBN(discreteBN, sameData = FALSE)
 \item{discreteBN}{A list of multiples lists. Each list contains two entries,
 the probabilities and the size of the data which is in each leaf of the discrete tree.}
 
-\item{sameData}{A logical argument; if \code{FALSE} means differents datasets had been used for the learnings.}
+\item{sameData}{A logical argument; \code{FALSE} means that different datasets were used for learning.}
 }
 \value{
-The loglikelihood and the BIC of the discrete network.
+The loglikelihood and the BIC score of the discrete network.
 }
 \description{
-Get the loglikelihood and the BIC for discrete models, i.e discrete Bayesian Networks.
+Compute the loglikelihood and the BIC score for discrete models, i.e multinomial Bayesian Networks.
 }
 \examples{
 ## 1. EXAMPLE 

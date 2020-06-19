@@ -2,7 +2,7 @@
 % Please edit documentation in R/mop.R
 \name{integralMOP}
 \alias{integralMOP}
-\title{Integral MOP}
+\title{Integration of MOPs}
 \usage{
 integralMOP(fx)
 }

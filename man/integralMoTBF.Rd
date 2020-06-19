@@ -2,29 +2,30 @@
 % Please edit documentation in R/motbf.R
 \name{integralMoTBF}
 \alias{integralMoTBF}
-\title{Integral MoTBF}
+\title{Integrating MoTBFs}
 \usage{
 integralMoTBF(fx, min = NULL, max = NULL)
 }
 \arguments{
-\item{fx}{An \code{"motbf"} function.}
+\item{fx}{An object of class \code{"motbf"}.}
 
-\item{min}{The lower limit of integration. By default it is NULL.}
+\item{min}{The lower integration limit. By default it is NULL.}
 
-\item{max}{The higther limit of the interval. By default it is NULL.}
+\item{max}{The upper integration limit. By default it is NULL.}
 }
 \value{
-The non-defined integral of the MoTBF function that is also an \code{"motbf"}
-function or the defined integral that is a \code{"numeric"} value.
+\code{integralMoTBF()} returns either the indefinite integral of the MoTBF 
+function, which is also an object of class \code{"motbf"}, or the definite integral, 
+wich is a \code{"numeric"} value.
 }
 \description{
-Gets the integral of a one dimensional mixture of truncated basis function 
+Compute the integral of a one-dimensional mixture of truncated basis function 
 over a bounded or unbounded interval.
 }
 \details{
 If the limits of the interval, min and max are NULL, then the output is
-the expression of the non-defined integral. If only min contains a numeric value,
-then the expression of the integral is evaluated in this point.
+the expression of the indefinite integral. If only 'min' contains a numeric value,
+then the expression of the integral is evaluated at this point.
 }
 \examples{
 

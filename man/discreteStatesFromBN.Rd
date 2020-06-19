@@ -15,7 +15,7 @@ discreteStatesFromBN(bn, dag)
 \code{discreteStatesFromBN} returns a list of length equal to the number of discrete nodes in the network. Each element of the list corresponds to a node and contains a character vector indicating the states of the node.
 }
 \description{
-This function returns the states of all discrete node from a list obtained from \link{MoTBFs_Learning}.
+This function returns the states of all discrete nodes from a list obtained from \link{MoTBFs_Learning}.
 }
 \examples{
 

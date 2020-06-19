@@ -2,53 +2,40 @@
 % Please edit documentation in R/joint.R
 \name{jointCDF}
 \alias{jointCDF}
-\alias{posGrid}
-\title{Cumulative Joint Distribution}
+\title{Joint MoTBFs CDFs}
 \usage{
-jointCDF(data, grid)
-
-posGrid(nrows, data, grid)
+jointCDF(df, grid)
 }
 \arguments{
-\item{data}{The dataset as data.frame class.}
+\item{df}{The dataset as an object of class \code{data.frame}.}
 
-\item{grid}{a data frame with the select rows to include in the grid}
-
-\item{nrows}{Number of rows.}
+\item{grid}{a \code{data.frame} with the selected data points where the objective function
+will be evaluated when optimizing the parameters.}
+}
+\value{
+\code{jointCDF()} returns a vector.
 }
 \description{
-Functions to compute the multivariate cumulative distribution. It uses a grid data
-over the ranges of variables in the dataset to calculate the cumulative values.
-}
-\details{
-\code{jointCDF()} is the main function which uses the internal
-function \code{posGrid()}.
+Function to compute multivariate CDFs.
 }
 \examples{
-## 1. EXAMPLE
-## Dataset with 2 variables
-X <- data.frame(rnorm(100), rnorm(100))
 
-## Grid dataset
-gridX <- sapply(1:ncol(X), function(i) seq(min(X[,i]), max(X[,i]), length=10))
-gridPoints <- expand.grid(gridX) ## expand gridX
-ncol(gridPoints)
-nrow(gridPoints)
+## Create dataset with 2 variables
+n = 2
+size = 50
+df <- as.data.frame(matrix(round(rnorm(size*n),2), ncol = n))
 
-## Joint cumulative values
-jointCDF(data = X, grid = gridPoints)
+## Create grid dataset
+npointsgrid <- 10
+ranges <- sapply(df, range)
+eg <- list()
+for(i in 1: ncol(df)){
+  eg[[i]] <- seq(ranges[1,i], ranges[2,i], length.out = npointsgrid)
+}
 
-## 2. EXAMPLE
-## Dataset with 3 variables
-X <- data.frame(rnorm(100), rexp(100), rchisq(100, df=2))
-
-## Grid dataset
-gridX <- sapply(1:ncol(X), function(i) seq(min(X[,i]), max(X[,i]), length=10))
-gridPoints <- expand.grid(gridX) ## expand gridX
-ncol(gridPoints)
-nrow(gridPoints)
+x <- expand.grid(eg)
 
 ## Joint cumulative values
-jointCDF(data = X, grid = gridPoints)
+jointCDF(df = df, grid = x)
 
 }

@@ -4,7 +4,7 @@
 \alias{goodnessMoTBFBN}
 \alias{logLikelihood.MoTBFBN}
 \alias{BiC.MoTBFBN}
-\title{BIC of an MoTBF BN}
+\title{BIC of a hybrid BN}
 \usage{
 logLikelihood.MoTBFBN(MoTBF.BN, data)
 
@@ -13,14 +13,14 @@ BiC.MoTBFBN(MoTBF.BN, data)
 \arguments{
 \item{MoTBF.BN}{The output of the 'MoTBF_Learning' method.}
 
-\item{data}{The dataset of class "data frame".}
+\item{data}{The dataset of class \code{data.frame}.}
 }
 \value{
 A numeric value giving the log-likelihood of the BN.
 }
 \description{
-Compute the Bic score and the loglikelihood from the fitted MoTBFs functions 
-of a hybrid Bayesian network.
+Compute the BIC score and the loglikelihood from the fitted MoTBFs functions 
+in a hybrid Bayesian network.
 }
 \examples{
 

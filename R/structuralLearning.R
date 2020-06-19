@@ -1,15 +1,17 @@
-#' Learning Hybric Bayesian Networks
+#' Score-based hybrid Bayesian Network structure learning
 #' 
-#' Get a directed acyclic graph using the method \bold{hill climbing}.
-#' It is a mathematical optimization technique which belongs to the 
-#' family of local search. It is an iterative algorithm which deals with
-#' discrete and continuous variables. 
+#' Learn the structure of a hybrid Bayesian network using the \bold{hill climbing}
+#' local search method. 
 #' 
-#' @param dataset A dataset with discrete and continuous variables. Discrete variables 
-#' must be of class \code{"factor"}, if not they are transformed into factores. 
-#' @param numIntervals A \code{"numeric"} value containing the number of intervals 
-#' to create a discrete dataset. The method used to split the values is by equal width.
-#' By default it is \code{NULL} and means the variables are not discretized to get the network.
+#' @param dataset A dataset with discrete and continuous variables. If the discrete  
+#' variables are not of class \code{"factor"}, they are automatically converted. 
+#' @param numIntervals A \code{"numeric"} value indicating the number of categories 
+#' used when discretizing a continuous variable, corresponding to intervals of
+#' equal width. By default it is \code{NULL}, meaning that the continuous variables
+#' are not discretized.
+#' @details \code{LearningHC()} automatically converts non-numeric variables into factors
+#' before calling function \code{hc()} from the \code{bnlearn} package. \code{LearningHC()} can also 
+#' be used to discretize the dataset, using the equal width method, before calling \code{hc()}.
 #' @return The output is a \code{"bn"} object containing the learned graph.
 #' @seealso \link{hc}
 #' @importFrom bnlearn hc
@@ -51,17 +53,16 @@ LearningHC <- function(dataset, numIntervals=NULL)
   return(dag)
 }
 
-#' Get Relationships in a Network
+#' Get the list of relations in a graph
 #' 
-#' Extract the relationship between the variables of a dataset using
-#' the obtained network
+#' Compute the parents of each variable in the graph.
 #' 
-#' @param graph A structural network of the class \code{"graphNEL"},
+#' @param graph A directed acyclic graph of the class \code{"graphNEL"},
 #' \code{"network"} or \code{"bn"}.
-#' @param nameVars A character array giving the names of the variables in the graph. By default it's NULL,
-#' only put it when a graph of class \code{"network"} is used.
-#' @return A list of elements. Each element contains a vector with the name of a child 
-#' and their parents.
+#' @param nameVars A character array containing the names of the variables in the graph. 
+#' This parameter is only used when \code{graph} is of class \code{"network"}.
+#' @return A list where each element is a vector containing the name of a variable 
+#' and its parents in the graph.
 #' @export
 #' @examples
 #' 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiscreteLearning.R
 \name{printDiscreteBN}
 \alias{printDiscreteBN}
-\title{Prints Discrete Learnings}
+\title{Printing discrete Bayesian networks}
 \usage{
 printDiscreteBN(BN)
 }
@@ -10,8 +10,8 @@ printDiscreteBN(BN)
 \item{BN}{A discrete learning.}
 }
 \value{
-The results are shown by screen.
+The results are shown on the screen.
 }
 \description{
-Shows the results of univariate and conditional learning of a discrete BN.
+Prints the univariate and conditional distributions of a discrete BN.
 }

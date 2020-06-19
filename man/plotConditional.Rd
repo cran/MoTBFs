@@ -2,7 +2,7 @@
 % Please edit documentation in R/conditional.R
 \name{plotConditional}
 \alias{plotConditional}
-\title{Plots for Conditional Functions}
+\title{Plot Conditional Functions}
 \usage{
 plotConditional(
   conditionalFunction,
@@ -13,26 +13,26 @@ plotConditional(
 )
 }
 \arguments{
-\item{conditionalFunction}{the output of the conditionalMethod. A list with the the interval of the parent
-and the final MoTBF density function.}
+\item{conditionalFunction}{the output of function \link{conditionalMethod}. 
+A list containing the the interval of the parent and the final conditional density (MTE or MOP).}
 
-\item{data}{The dataset used.}
+\item{data}{An object of class \code{data.frame}, corresponding to the dataset used to fit the conditional density.}
 
-\item{nameChild}{Name of the child variable in the conditional function. By default is \code{NULL}.}
+\item{nameChild}{A \code{character} string, corresponding to the name of the child variable in the conditional density. By default, it is \code{NULL}.}
 
-\item{points}{Logical value. If \code{TRUE} the points of the data are overplotted.}
+\item{points}{A logical value. If \code{TRUE}, the sample points are overlaid.}
 
-\item{color}{By default \code{NULL}, a selection of colors of the color palette of \R is used.}
+\item{color}{If not specified, a default palette is used.}
 }
 \value{
-A plot of the conditional function.
+A plot of the conditional density function.
 }
 \description{
-Get the graphical result of an MoTBF conditional function of two variables, i.e. a parent and his child.
+Plot conditional MoTBF densities.
 }
 \details{
-If the number of parents is bigger than one, then the message 
-"It is not possible plotting the conditional function." is shown.
+If the number of parents is greater than one, then the error message 
+"It is not possible to plot the conditional function." is reported.
 }
 \examples{
 ## Data

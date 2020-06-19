@@ -2,21 +2,21 @@
 % Please edit documentation in R/conditional.R
 \name{BICMultiFunctions}
 \alias{BICMultiFunctions}
-\title{BIC for Multiple Functions}
+\title{BIC score for multiple functions}
 \usage{
 BICMultiFunctions(Px, X)
 }
 \arguments{
-\item{Px}{A list with 'n' elements. Each element contains a \code{"motbf"} function.}
+\item{Px}{A list of objects of class \code{"motbf"}.}
 
-\item{X}{A list with 'n' elements. Each one contains a \code{"numeric"} vector with the 
-values of the data set which correspond to the diferent functions.}
+\item{X}{A list with as many \code{"numeric"} vectors as densities in \code{Px},
+used to compute the BIC score for each density.}
 }
 \value{
 The \code{"numeric"} BIC value.
 }
 \description{
-Compute the BIC score for more than one function
+Compute the BIC score using more than one probability functions.
 }
 \examples{
 ## Data

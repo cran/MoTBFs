@@ -1,4 +1,4 @@
-#' Fitting Polynomial Models
+#' Fitting mixtures of polynomials
 #' 
 #' These functions fit mixtures of polynomials (MOPs).  
 #' Least square optimization is used to  
@@ -9,32 +9,33 @@
 #' @rdname mop.learning
 #' @param X A \code{"numeric"} data vector.
 #' @param nparam Number of parameters of the function.
-#' @param domain A \code{"numeric"} containing the range where defining the function.
-#' @param maxParam A \code{"numeric"} value which indicate the maximum number of coefficients in the function. By default it is \code{NULL}; 
-#' if not, the output is the function which gets the best BIC with at most this number of parameters.
+#' @param domain A \code{"numeric"} containing the interval over which the function is defined.
+#' @param maxParam A \code{"numeric"} value indicating the maximum number of coefficients in the function. By default it is \code{NULL},
+#' which means that the number of parameter is not limited. The output is the function which gets 
+#' the best BIC (with at most\code{maxParam} parameters if not NULL).
 #' @return 
 #' \code{mop.lerning()} returns a list of n elements:
 #' \item{Function}{An \code{"motbf"} object of the \code{'mop'} subclass.}
 #' \item{Subclass}{\code{'mop'}.}
 #' \item{Domain}{The range where the function is defined to be a legal density function.}
-#' \item{Iterations}{The number of iterations that the optimization problem needs to minimize
+#' \item{Iterations}{The number of iterations that the optimization problem takes to minimize
 #' the errors.}
-#' \item{Time}{The time which spend the CPU for solving the problem.}
+#' \item{Time}{The CPU time employed.}
 #' 
 #' \code{bestMOP()} returns a list including the polynomial function with the best BIC score, 
-#' the number of parameters, the best BIC value and an array contained 
+#' the number of parameters and an array with 
 #' the BIC values of the evaluated functions.
 #' @details 
 #' \code{mop.learning()}:
-#' The returned value \code{$Function} is the only visible element which contains the mathematical expression. 
-#' Using \link{attributes} the name of the others elements are shown and also they can be abstract with \code{$}.
-#' The \link{summary} of the function also shows all this elements.
+#' The returned value \code{$Function} is the only visible element which contains the algebraic expression. 
+#' Using \link{attributes} the name of the others elements are shown and also they can be extracted with \code{$}.
+#' The \link{summary} of the function also shows all these elements.
 #'
 #' \code{bestMOP()}:
 #' The first returned value \code{$bestPx} contains the output of the \code{mop.learning()} function
 #' with the number of parameters which gets the best BIC values, taking into account the  
-#' Bayesian information criterion (BIC) to penalize the functions. It evaluates the two next functions,
-#' if the BIC doesn't improve then the function with the last best BIC is returned.
+#' BIC score to penalize the functions. It evaluates the two next functions,
+#' if the BIC score does not improve then the function with the last best BIC is returned.
 #' 
 #' @seealso \link{univMoTBF} A complete function for learning MOPs which includes extra options.
 #' @importFrom quadprog solve.QP
@@ -274,7 +275,7 @@ asMOPString <- function(parameters)
 }
 
 
-#' Extract MOP Coefficients
+#' Extract coefficients from MOPs
 #' 
 #' It extracts the parameters of the learned mixtures of polynomial models.
 #' 
@@ -311,7 +312,7 @@ asMOPString <- function(parameters)
 coeffMOP <- function(fx)
 {
   fx <- noquote(as.character(fx))
-  var <- nVariables(fx)
+  #var <- nVariables(fx)
   mu <- tryCatch(meanMOP(fx), error = function(e) NA) 
   if(!is.na(mu)){
     fx <-strsplit(fx, split=mu)[[1]]
@@ -371,7 +372,7 @@ coeffPol <- function(fx)
 }
 
 
-#' Derivative MOP
+#' Derivative of a MOP
 #' 
 #' Compute the derivative of an \code{"motbf"} object with \code{'mop'} subclass.
 #' 
@@ -420,7 +421,7 @@ derivMOP <- function(fx)
   return(str)  
 }
 
-#' Integral MOP
+#' Integration of MOPs
 #' 
 #' Method to calculate the non-defined integral of an \code{"motbf"} object of \code{'mte'} subclass.
 #' 

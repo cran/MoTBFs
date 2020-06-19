@@ -16,8 +16,7 @@ types, must be one of \code{"MOP"} or \code{"MTE"}.}
 A \code{"numeric"} vector of length 2 giving the coefficients.
 }
 \description{
-Get an MoTBF function ensuring positives values without being
-a normalized function.
+Generates a non normalized (i.e. not integrating to 1) positive MoTBF function.
 }
 \examples{
 

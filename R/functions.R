@@ -1,39 +1,40 @@
-#' Functions to Manipulate a Dataset
+#' Data pre-processing utilities
 #' 
 #' Collection of functions for discretizing, standardizing, converting factors to 
-#' characters and other usufull methods to manipulate datasets.
+#' characters and other usufull methods for pre-processing datasets.
 #' 
 #' @name dataMining
 #' @rdname dataMining
 #' @param dataset A dataset of class \code{"data.frame"}. Tha variables of the dataset can be discrete and continuous.
-#' @param discreteVariables A \code{"character"} array with the name of the discrete variables
-#' @param numIntervals Numbers of intervals used to split the domain.
-#' @param factor By default \code{FALSE}, i.e. The variables are taken as \code{"character"};
-#' if \code{TRUE}, they would be taken as \code{"factor"}.
-#' @param binary By default \code{FALSE}, i.e. only binary entries are used for continuous variables;
-#' if \code{TRUE}, binary entries are used to discretize the full data taking into account the states
-#' the discrete variables.
+#' @param discreteVariables A \code{"character"} array with the names of the discrete variables.
+#' @param numIntervals Number of bins used to discretize the continuous variables.
+#' @param factor A boolean value indicating if the variables should be considered as
+#' \code{"factor"} or as \code{"character"}. By default it is set to \code{FALSE}.
+#' @param binary By default it is set to \code{FALSE}, indicating that only binary entries are 
+#' used for continuous variables; a \code{TRUE} value means that binary entries are used to 
+#' discretize the full dataset taking into account the states the discrete variables.
 #' @param discreteData A discretized dataset of class \code{"data.frame"}.
 #' @param DiscreteVariablesStates The output of the function \code{discreteVariablesStates}.
 #' @param namevariables an array with the names of the varibles.
-#' @param scale A \code{"numeric"} vector if is a singles variable,if not a \code{"list"} containing
-#' the name of the variable and the scale value.
+#' @param scale A \code{"numeric"} vector (when it refers to a single variable) or a \code{"list"} 
+#' containing the name(s) of the variable(s) and the scale value.
 #' @param X A \code{"numeric"} vector with the data values of a continuous variable.
 #' @details
 #' \code{whichDiscrete()} selects the position of the discrete variables.
 #' 
-#' \code{discreteVariables_as.character()} transforms the values of the discrete variables to character values.
+#' \code{discreteVariables_as.character()} transforms the values of the discrete variables into character values.
 #' 
-#' \code{standardizeDataset()} standarizes a data set.
+#' \code{standardizeDataset()} standardizes all the variables in a data set.
 #' 
-#' \code{discretizeVariablesEWdis()} discretizes a dataset using intervals with equal width.
+#' \code{discretizeVariablesEWdis()} discretizes the continuous variables in a dataset using 
+#' equal width binning.
 #' 
 #' \code{discreteVariablesStates()} extracts the states of the qualitative variables.
 #' 
-#' \code{nstates()} computes the length of the states of the discrete variables.
+#' \code{nstates()} computes the number of different values of the discrete variables.
 #' 
-#' \code{quantileIntervals()} selects the quantiles of a variable taking into account the number of intervals
-#' you want to split the domain of the variable.
+#' \code{quantileIntervals()} gets the quantiles of a variable taking into account the number of intervals
+#' into which its domain is splitted.
 #' @examples
 #' ## dataset: 2 continuous variables, 1 discrete variable.
 #' data <- data.frame(X = rnorm(100),Y = rexp(100,1/2), Z = as.factor(rep(c("s","a"), 50)))
@@ -138,23 +139,22 @@ scaleData <- function(dataset, scale)
   }   
 }
 
-#' Subset a Dataset
+#' Dataset subsetting
 #'
-#' Collection of functions for subsetting a dataset by entries, by variables, 
-#' and for splitting it in a training dataset and in a test dataset.
+#' Collection of functions for subsetting a \code{"data.frame"} by rows or columns, and
+#' to create training and test partitions.
 #' 
 #' @name subsetData
 #' @rdname subsetData
-#' @param data A dataset of class \code{"data.frame"}.
-#' @param percentage_test The percentage to be data test. Between 0 and 1.
-#' @param discreteVariables A \code{"character"} array with the name of the discrete variables.
-#' @param nameX The name of the child variable in the conditional method.
-#' @param nameY The name of the parent variables in the conditional method.
-#' @param nameVariable Name of the variable to filter.
-#' @param min The lower value of the interval for filter.
-#' @param max The higher value of the interval for filter.
-#' @return A list of datasets for \code{TrainingandTestData()} or a subset of the original
-#' dataset for the others two functions.
+#' @param data A dataset of class \code{data.frame}.
+#' @param percentage_test The proportion of data that goes to the test set (between 0 and 1).
+#' @param discreteVariables A \code{character} vector with the name of the discrete variables.
+#' @param nameX A \code{character} vector with the name of the child variable in the conditional method.
+#' @param nameY A \code{character} vector with the name of the parent variables in the conditional method.
+#' @param nameVariable A \code{character} vector with the name of the variable to be filtered.
+#' @param min,max Boundary values to filter out.
+#' @return \code{TrainingandTestData()} returns a list of 2 elements containing the train and test datasets. 
+#' \code{newData()} and \code{splitdata()} return a subset of variables or observations, respectively.
 #' @examples
 #' \donttest{
 #' ## Dataset
@@ -227,7 +227,7 @@ splitdata <- function(data, nameVariable, min, max){
   return(subset(data,((parent>=min)&(parent<=max))))
 }
 
-#' Remove Missing Values in a Dataset by Rows
+#' Data cleaning
 #' 
 #' Delete rows of a dataset wich contains anomalous values.
 #' 
@@ -250,7 +250,7 @@ preprocessedData <- function(data, strangeElements)
 #' takes place.
 #' 
 #' @param envir The currently active environment; by default It is the gloval environment.
-#' @param n Number of repetitions to do the garbage collection; by default \code{n = 2}.
+#' @param n Number of garbage collection repetitions; by default \code{n = 2}.
 #' @export
 #' @examples
 #' ## Run to clean the environment

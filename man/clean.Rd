@@ -9,7 +9,7 @@ clean(envir = globalenv(), n = 2)
 \arguments{
 \item{envir}{The currently active environment; by default It is the gloval environment.}
 
-\item{n}{Number of repetitions to do the garbage collection; by default \code{n = 2}.}
+\item{n}{Number of garbage collection repetitions; by default \code{n = 2}.}
 }
 \description{
 Clean the memory. Delete all the objects in memory and a garbage collection

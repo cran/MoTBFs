@@ -7,15 +7,15 @@
 newRangePriorData(fPI, priorData, N, domain, s, POTENTIAL_TYPE)
 }
 \arguments{
-\item{fPI}{The fitted function to the prior data of class \code{"motbf"}.}
+\item{fPI}{The function fitted to the prior data, of class \code{"motbf"}.}
 
-\item{priorData}{A \code{"numeric"} array with the values we want to include as prior information.}
+\item{priorData}{A \code{"numeric"} array with the values to be included as prior information.}
 
-\item{N}{A \code{"numeric"} value which is the size of the data.}
+\item{N}{A \code{"numeric"} value equal to the data size.}
 
-\item{domain}{A \code{"numeric"} array with the limits where defining the data function.}
+\item{domain}{A \code{"numeric"} array with the domain of the data density.}
 
-\item{s}{A \code{"numeric"} value which is the confident of the expert in his information. It is between 0 and the data size.}
+\item{s}{A \code{"numeric"} value which is the expert's confidence on the prior information. It is a number between 0 and the data size.}
 
 \item{POTENTIAL_TYPE}{A \code{"character"} string giving the potential of the model, i.e. \code{"MOP"} if the basis functions are polynomials,
 or \code{"MTE"} if they are exponentials.}

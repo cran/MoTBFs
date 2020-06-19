@@ -12,7 +12,7 @@ is.discrete(node, bn)
 \item{bn}{A list of lists obtained from \link{MoTBFs_Learning}.}
 }
 \value{
-\code{is.discrete} returns TRUE or FALSE depending on whether the node is discrete or not.
+\code{is.discrete} returns \code{TRUE} or \code{FALSE} depending on whether the node is discrete or not.
 }
 \description{
 This function allows to check whether a node is discrete or not

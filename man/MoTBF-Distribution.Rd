@@ -4,33 +4,34 @@
 \alias{MoTBF-Distribution}
 \alias{rMoTBF}
 \alias{inversionMethod}
-\title{Random Generation for MoTBFs}
+\title{Random generation for MoTBF distributions}
 \usage{
 rMoTBF(size, fx, domain = NULL)
 
 inversionMethod(size, fx, domain = NULL, data = NULL)
 }
 \arguments{
-\item{size}{A \code{"numeric"} value indicating the number of records to generate.}
+\item{size}{A non-negative integer indicating the number of records to generate.}
 
 \item{fx}{An object of class \code{"motbf"}.}
 
-\item{domain}{A \code{"numeric"} vector with two values indicating the range where generating
-the data sample. By default it is \code{NULL} and the range is taken of the function, \code{fx}.}
+\item{domain}{A \code{"numeric"} vector indicating the lower and upper limits to sample from.
+If not specified, the range is taken from the object \code{fx}.}
 
-\item{data}{A \code{"numeric"} vector which contains the data which we want to compare with the generated 
-function. By default it is \code{NULL}, if not the empirical cumulative distribution is plotted and the 
-Kolmogorov Smirnov test is used to compare the generated sample and the data.}
+\item{data}{A \code{"numeric"} vector to be compared with the simulated sample. 
+By default, it is \code{NULL}; otherwise, the empirical cumulative distributions of both 
+the data and the simulated sample are plotted and the Kolmogorov Smirnov test 
+is used to test whether or not both samples can be considered to be drawn from the same distribution.}
 }
 \value{
-\code{rMoTBF()} returns a \code{"numeric"} vector containing the simulated values. \code{inversionMethod()} 
-returns a list with the simulated values and the results of the test, it also shows a plot with the \bold{cdf}
-of the original data and the generated one by screen.
+\code{rMoTBF()} returns a \code{"numeric"} vector containing the simulated values. 
+\code{inversionMethod()} returns a list with the simulated values and the results 
+of the two-sample Kolmogorov-Smirnov test, as well as the plot of the CDFs of the 
+original and simulated data.
 }
 \description{
 Random generation for mixtures of truncated basis functions defined in a specific domain.
-The inversion method is used. It is a technique to get random samples from a 
-probability distribution.
+The inverse transform method is used.
 }
 \examples{
 

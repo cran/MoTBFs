@@ -2,7 +2,7 @@
 % Please edit documentation in R/priorKnowledge.R
 \name{rnormMultiv}
 \alias{rnormMultiv}
-\title{Multivariate Normal Sample}
+\title{Multivariate Normal sampling}
 \usage{
 rnormMultiv(n, dataParents, dataChild)
 }

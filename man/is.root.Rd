@@ -7,12 +7,12 @@
 is.root(node, dag)
 }
 \arguments{
-\item{node}{A character string indicating the node's name.}
+\item{node}{A character string indicating the name of the node.}
 
 \item{dag}{An object of class \code{"bn"}.}
 }
 \value{
-\code{is.root} returns TRUE or FALSE depending on whether the node is root or not.
+\code{is.root} returns \code{TRUE} or \code{FALSE} depending on whether the node is root or not.
 }
 \description{
 \code{is.root} checks whether a node has parents or not.

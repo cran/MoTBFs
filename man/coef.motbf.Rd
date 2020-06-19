@@ -2,14 +2,14 @@
 % Please edit documentation in R/motbf.R
 \name{coef.motbf}
 \alias{coef.motbf}
-\title{Extract MoTBF Coefficients}
+\title{Extract the coefficients of an MoTBF}
 \usage{
 \method{coef}{motbf}(object, ...)
 }
 \arguments{
-\item{object}{An MoTBF function.}
+\item{object}{An object of class \code{motbf}.}
 
-\item{\dots}{other arguments}
+\item{\dots}{other arguments.}
 }
 \value{
 A numeric vector with the parameters of the function.

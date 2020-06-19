@@ -2,7 +2,7 @@
 % Please edit documentation in R/mte.R
 \name{integralMTE}
 \alias{integralMTE}
-\title{Integral MTE}
+\title{Integrating MTEs}
 \usage{
 integralMTE(fx)
 }
@@ -13,7 +13,8 @@ integralMTE(fx)
 The non-defined integral of the function.
 }
 \description{
-Method to calculate the non-defined integral of an \code{"motbf"} object of \code{'mte'} subclass.
+Method to calculate the non-defined integral of an \code{"motbf"} object of \code{'mte'} 
+subclass.
 }
 \examples{
 
