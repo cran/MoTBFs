@@ -9,7 +9,8 @@ plotConditional(
   data,
   nameChild = NULL,
   points = FALSE,
-  color = NULL
+  color = NULL,
+  ...
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ A list containing the the interval of the parent and the final conditional densi
 \item{points}{A logical value. If \code{TRUE}, the sample points are overlaid.}
 
 \item{color}{If not specified, a default palette is used.}
+
+\item{...}{Additional graphical parameters passed to filled.contour().}
 }
 \value{
 A plot of the conditional density function.

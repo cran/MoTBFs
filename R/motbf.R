@@ -111,7 +111,7 @@ univMoTBF <- function(data, POTENTIAL_TYPE, evalRange=NULL, nparam=NULL,  maxPar
 #'
 #'## Data test
 #'Xtest <- rexp(1000)
-#'Xtest <- Xtest[Xtest>=min(X) && Xtest<=max(X)]
+#'Xtest <- Xtest[Xtest>=min(X) & Xtest<=max(X)]
 #'
 #'## Learning
 #'f1 <- univMoTBF(X, POTENTIAL_TYPE = "MOP", nparam = 10); f1

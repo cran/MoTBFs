@@ -464,6 +464,7 @@ BICMultiFunctions <- function(Px, X){
 #' @param nameChild A \code{character} string, corresponding to the name of the child variable in the conditional density. By default, it is \code{NULL}.
 #' @param points A logical value. If \code{TRUE}, the sample points are overlaid.
 #' @param color If not specified, a default palette is used. 
+#' @param ... Additional graphical parameters passed to filled.contour().
 #' @details If the number of parents is greater than one, then the error message 
 #' "It is not possible to plot the conditional function." is reported.
 #' @return A plot of the conditional density function.
@@ -486,7 +487,7 @@ BICMultiFunctions <- function(Px, X){
 #' plotConditional(conditionalFunction=P, data=data)
 #' plotConditional(conditionalFunction=P, data=data, points=TRUE)
 #' 
-plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FALSE, color=NULL)
+plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FALSE, color=NULL,...)
 {
   opar <- par(no.readonly =TRUE)       
   on.exit(par(opar)) 
@@ -525,7 +526,8 @@ plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FA
 
     filled.contour(x = ygrid, y = xgrid, z = t(d), nlevels = nlevels,
                    levels = levels, col = color(nlevels),                           
-                   plot.title = {title(xlab = nameParent, ylab = nameChild)},     
+                   plot.title = {title(xlab = nameParent, ylab = nameChild, cex.lab = 2)},
+                   ...
     )
     if(points){
       mar.orig <- par("mar")

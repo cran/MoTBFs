@@ -82,11 +82,22 @@ LearningHC <- function(dataset, numIntervals=NULL)
 #' plot(dag2)
 #' getChildParentsFromGraph(dag2)
 #' 
-getChildParentsFromGraph <- function(graph, nameVars=NULL)
-{
-  if(class(graph)=="graphNEL") type <- 1
-  if(class(graph)=="network")  type <- 2
-  if(class(graph)=="bn")       type <- 3
+getChildParentsFromGraph <- function(graph, nameVars=NULL){
+  graphClass = class(graph)
+  
+  if("graphNEL" %in% graphClass){
+    type <- 1
+  }else if("network" %in% graphClass){
+    type <- 2
+  }else if("bn" %in% graphClass){
+    type <- 3
+  }else{
+    stop('Graph class not supported')
+  }
+  # if(class(graph)=="graphNEL") type <- 1
+  # if(class(graph)=="network")  type <- 2
+  # if(class(graph)=="bn")       type <- 3
+  
   switch(type, 
          
 ## type <- 1 

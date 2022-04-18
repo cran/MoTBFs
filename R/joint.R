@@ -1119,13 +1119,14 @@ plot.jointmotbf <- function(x, type="contour", ranges=NULL, orientation=c(5,-30)
     
     ## Recode facet z-values into color indices
     facetcol <- cut(zfacet, nbcol)
-    persp(X, Y, Z, col = color[facetcol], phi = orientation[1], theta = orientation[2], ticktype=ticktype) 
+    persp(X, Y, Z, col = color[facetcol], phi = orientation[1], theta = orientation[2], ticktype=ticktype,
+          xlab = varname[1], ylab = varname[2], zlab = '',...) 
   }
   if(type == "contour"){
     if(!filled){
-      if(!is.null(data)) plot(data, xlab = "", ylab = "", xlim=ranges[,1], ylim=ranges[,2])
+      if(!is.null(data)) plot(data, xlab = varname[1], ylab = varname[2], xlim=ranges[,1], ylim=ranges[,2],...)
       if(is.null(data)) plot(NULL, xlim=ranges[,1], ylim=ranges[,2], xlab="", ylab="")
-      contour(X,Y,Z, col=terrain.colors(15), add=T)
+      contour(X,Y,Z, col=terrain.colors(15), xlab = varname[1], ylab = varname[2], add=T)
       abline(h =round(ranges[,1])[1]:round(ranges[,1])[2] , v =round(ranges[,2])[1]:round(ranges[,2])[2],
              col = "gray", lty = 2, lwd = 0.1)   
     }
@@ -1139,8 +1140,9 @@ plot.jointmotbf <- function(x, type="contour", ranges=NULL, orientation=c(5,-30)
       filled.contour(X,Y,Z,nlevels=nlevels,levels=levels,
                      las=1,
                      col=color(nlevels),                           
-                     #col=rainbow(nlevels, alpha=0.8),                           
-                     plot.title = {title(xlab = varname[1], ylab = varname[2])},
+                     #col=rainbow(nlevels, alpha=0.8),  
+                     
+                     plot.title = {title(xlab = varname[1], ylab = varname[2], cex.lab = 1.5)},...
       )
       if(!is.null(data)){
         mar.orig <- par("mar")
