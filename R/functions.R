@@ -57,8 +57,6 @@
 #' ## Continuous variables
 #' quantileIntervals(X = data[,1], numIntervals = 4)
 #' quantileIntervals(X = data[,2], numIntervals = 10)
-
-#' @rdname dataMining
 #' @export
 whichDiscrete <- function(dataset, discreteVariables) which(colnames(dataset)%in%discreteVariables)
 
@@ -173,8 +171,6 @@ scaleData <- function(dataset, scale)
 #' newData(data, nameX = "X", nameY = "Z")
 #' splitdata(data, nameVariable = "X", min = 2, max= 3)
 #' }
-
-#' @rdname subsetData
 #' @export
 TrainingandTestData <- function(data, percentage_test, discreteVariables=NULL)
 {

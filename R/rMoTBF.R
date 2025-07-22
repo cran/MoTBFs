@@ -54,8 +54,6 @@
 #' plot(f, xlim = f$Domain)
 #' hist(Y, prob = TRUE, add = TRUE)
 #' 
-
-#' @rdname MoTBF-Distribution
 #' @export
 rMoTBF <- function(size, fx, domain = NULL)
 {

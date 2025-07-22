@@ -46,5 +46,5 @@ plot(dag2)
 
 }
 \seealso{
-\link{hc}
+\link[bnlearn]{hc}
 }

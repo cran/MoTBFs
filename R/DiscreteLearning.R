@@ -84,9 +84,6 @@ probDiscreteVariable <- function(stateNames, Variable)
 #' 
 #' ## BIC
 #' getBICDiscreteBN(P, sameData = TRUE)
-
-
-#' @rdname goodnessDiscreteVariables
 #' @export
 getlogLikelihoodDiscreteBN <- function(discreteBN){
   loglike <- 0

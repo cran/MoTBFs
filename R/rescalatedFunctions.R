@@ -44,8 +44,6 @@
 #' plot(origF, xlim = range(X), col=2)
 #' hist(X, prob = TRUE, add = TRUE)
 #' 
-
-#' @rdname rescaledFunctions
 #' @export
 rescaledMoTBFs <- function(fx, data)
 {

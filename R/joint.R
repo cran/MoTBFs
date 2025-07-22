@@ -70,9 +70,6 @@
 #' attributes(P)
 #' class(P)
 #' }
-
-
-#' @rdname jointmotbf.learning
 #' @export
 # parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL, fitPoints = 10, constraints = 10)
 parametersJointMoTBF=function(X, ranges=NULL, dimensions=NULL)
@@ -323,8 +320,6 @@ coefExpJointCDF <- function(dimensions)
 #' 
 #' ## Joint cumulative values
 #' jointCDF(df = df, grid = x)
-#' 
-#' @rdname jointCDF
 #' @export
 #' 
 

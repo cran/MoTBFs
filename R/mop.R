@@ -78,8 +78,6 @@
 #' attributes(fMOP$bestPx)
 #' hist(data, prob=TRUE, main="")
 #' plot(fMOP$bestPx, col=2, xlim=range(data), add=TRUE)
-
-#' @rdname mop.learning
 #' @export
 mop.learning <- function(X, nparam, domain)
 {
@@ -305,9 +303,6 @@ asMOPString <- function(parameters)
 #' plot(fx2, xlim=range(data), col="red", add=TRUE)
 #' coeffMOP(fx2) ## coef(fx2)
 #' coeffPol(fx2)
-
-
-#' @rdname coef.mop
 #' @export
 coeffMOP <- function(fx)
 {

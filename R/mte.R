@@ -70,8 +70,6 @@
 #' attributes(fMTE$bestPx)
 #' hist(data, prob=TRUE, main="")
 #' plot(fMTE$bestPx, col=2, xlim=range(data), add=TRUE)
-
-#' @rdname mte.learning
 #' @export
 mte.learning <- function(X, nparam, domain)
 {
@@ -339,8 +337,6 @@ asMTEString  <-  function(parameters, num = 5)
 #' coeffMTE(fx2) ## coef(fx2)
 #' coeffExp(fx2)
 #'  
-
-#' @rdname coef.mte
 #' @export
 coeffMTE <- function(fx)
 {

@@ -200,8 +200,6 @@ coef.motbf <- function(object, ...)
 #' P <- univMoTBF(X, POTENTIAL_TYPE="MTE")
 #' is.mte(P)
 #' subclass(P)
-
-#' @rdname Subclass-MoTBF
 #' @export
 is.mte <- function(fx)
 {

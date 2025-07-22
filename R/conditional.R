@@ -86,8 +86,6 @@
 
 #' ###############################################################################
 #' ###############################################################################
-
-#' @rdname conditionalmotbf.learning
 #' @export
 conditionalMethod <- function(data, nameParents, nameChild, numIntervals, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL)
 {

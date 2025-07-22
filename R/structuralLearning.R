@@ -13,7 +13,7 @@
 #' before calling function \code{hc()} from the \code{bnlearn} package. \code{LearningHC()} can also 
 #' be used to discretize the dataset, using the equal width method, before calling \code{hc()}.
 #' @return The output is a \code{"bn"} object containing the learned graph.
-#' @seealso \link{hc}
+#' @seealso \link[bnlearn]{hc}
 #' @importFrom bnlearn hc
 #' @export
 #' @examples

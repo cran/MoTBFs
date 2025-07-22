@@ -2,9 +2,20 @@ Package: MoTBFs
 Type: Package
 Title: Learning Hybrid Bayesian Networks using Mixtures of Truncated
         Basis Functions
-Version: 1.4.1
-Author: Inmaculada Pérez-Bernabé, Antonio Salmerón, Thomas D. Nielsen, Ana D. Maldonado
-Maintainer: Ana D. Maldonado <ana.d.maldonado@ual.es>
+Version: 1.4.2
+Authors@R: c(person(given = "Inmaculada",
+                      family = "Pérez-Bernabé",
+                      role = "aut"),
+               person(given = "Antonio",
+                      family = "Salmerón",
+                      role = "aut"),
+               person(given = c("Thomas D."),
+                      family = "Nielsen",
+                      role = "aut"),
+               person(given = c("Ana D."),
+                      family = "Maldonado",
+                      role = c("aut", "cre"),
+                      email = "ana.d.maldonado@ual.es"))
 Description: Learning, manipulation and  evaluation of mixtures of  truncated basis  functions 
   (MoTBFs),  which include mixtures of  polynomials (MOPs) and  mixtures of truncated 
   exponentials (MTEs). MoTBFs are a flexible framework for modelling hybrid Bayesian
@@ -19,6 +30,11 @@ Encoding: UTF-8
 License: LGPL-3
 NeedsCompilation: yes
 Repository: CRAN
-Packaged: 2022-04-18 13:15:36 UTC; amaldonado
-Date/Publication: 2022-04-18 16:34:30 UTC
-RoxygenNote: 7.1.2
+Packaged: 2025-07-22 09:47:58 UTC; amaldonado
+Date/Publication: 2025-07-22 11:01:49 UTC
+RoxygenNote: 7.2.3
+Author: Inmaculada Pérez-Bernabé [aut],
+  Antonio Salmerón [aut],
+  Thomas D. Nielsen [aut],
+  Ana D. Maldonado [aut, cre]
+Maintainer: Ana D. Maldonado <ana.d.maldonado@ual.es>

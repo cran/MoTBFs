@@ -188,9 +188,6 @@ printBN <- function(MoTBF.BN)
 #' logLikelihood.MoTBFBN(P2, data) ##BIC$LogLikelihood
 #' BIC <- BiC.MoTBFBN(P2, data)
 #' BIC$BIC 
-
-
-#' @rdname goodnessMoTBFBN
 #' @export
 logLikelihood.MoTBFBN <- function(MoTBF.BN, data)
 {

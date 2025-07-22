@@ -33,9 +33,6 @@
 #' as.list(fMTE)
 #' is(fMTE) 
 #' is.motbf(fMTE)
-
-
-#' @rdname Class-MoTBF
 #' @export
 motbf <- function(x=0)
 {
@@ -93,8 +90,6 @@ is.motbf <- function(x, class="motbf") is(x, class)
 #' sP$Function
 #' sP$Subclass
 #' sP$Iterations
-
-#' @rdname summary.motbf
 #' @method summary motbf
 #' @export
 summary.motbf <- function(object, ...)
@@ -159,9 +154,6 @@ print.summary.motbf <- function(x, ...)
 #' as.list(jointF)
 #' is(jointF)
 #' is.jointmotbf(jointF)
-
-
-#' @rdname Class-JointMoTBF
 #' @export
 jointmotbf <- function(x = 0)
 {
@@ -233,8 +225,6 @@ is.jointmotbf <- function(x, class="jointmotbf") is(x, class)
 #' }
 #' ##############################################################################
 #' ##############################################################################
-
-#' @rdname summary.jointmotbf
 #' @method summary jointmotbf
 #' @export
 summary.jointmotbf <- function(object, ...)

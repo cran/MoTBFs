@@ -37,5 +37,4 @@ x <- expand.grid(eg)
 
 ## Joint cumulative values
 jointCDF(df = df, grid = x)
-
 }
