@@ -10,7 +10,7 @@ derivMoTBF(fx)
 \item{fx}{An object of class \code{"motbf"}.}
 }
 \value{
-The derivative of the MoTBF function, which is also 
+The derivative of the MoTBF function, which is also
 an object of class \code{"motbf"}.
 }
 \description{

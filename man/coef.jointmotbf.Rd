@@ -7,7 +7,7 @@
 \method{coef}{jointmotbf}(object, ...)
 }
 \arguments{
-\item{object}{An MoTBF function.}
+\item{object}{An object of class \code{"jointmotbf"}.}
 
 \item{\dots}{Other arguments, unnecessary for this function.}
 }
@@ -23,30 +23,13 @@ data <- data.frame(X1 = rnorm(100), X2 = rnorm(100))
 
 ## Joint function
 dim <-c(2,4)
-param <- parametersJointMoTBF(data, dimensions = dim)
-P <- jointMoTBF(param)
+P <- jointmotbf.fit(data, dimensions = dim)
 P$Time
 
 ## Coefficients
 coef(P)
 
-#############################################################################
-## MORE EXAMPLES ############################################################
-#############################################################################
-\donttest{
-## Generate a dataset
-data <- data.frame(X1 = rnorm(100), X2 = rnorm(100), X3 = rnorm(100))
- 
-## Joint function
-dim <-c(2,4,3)
-param <- parametersJointMoTBF(data, dimensions = dim)
-P <- jointMoTBF(param)
-P$Time
-
-## Coefficients
-coef(P)
-}
 }
 \seealso{
-\link{parametersJointMoTBF} and \link{jointMoTBF}
+\link{jointmotbf.fit}
 }

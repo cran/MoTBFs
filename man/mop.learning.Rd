@@ -17,7 +17,7 @@ bestMOP(X, domain, maxParam = NULL)
 \item{domain}{A \code{"numeric"} containing the interval over which the function is defined.}
 
 \item{maxParam}{A \code{"numeric"} value indicating the maximum number of coefficients in the function. By default it is \code{NULL},
-which means that the number of parameter is not limited. The output is the function which gets 
+which means that the number of parameter is not limited. The output is the function which gets
 the best BIC (with at most\code{maxParam} parameters if not NULL).}
 }
 \value{
@@ -29,25 +29,25 @@ the best BIC (with at most\code{maxParam} parameters if not NULL).}
 the errors.}
 \item{Time}{The CPU time employed.}
 
-\code{bestMOP()} returns a list including the polynomial function with the best BIC score, 
-the number of parameters and an array with 
+\code{bestMOP()} returns a list including the polynomial function with the best BIC score,
+the number of parameters and an array with
 the BIC values of the evaluated functions.
 }
 \description{
-These functions fit mixtures of polynomials (MOPs).  
-Least square optimization is used to  
-minimize the quadratic error between the empirical 
+These functions fit mixtures of polynomials (MOPs).
+Least square optimization is used to
+minimize the quadratic error between the empirical
 cumulative distribution and the estimated one.
 }
 \details{
 \code{mop.learning()}:
-The returned value \code{$Function} is the only visible element which contains the algebraic expression. 
+The returned value \code{$Function} is the only visible element which contains the algebraic expression.
 Using \link{attributes} the name of the others elements are shown and also they can be extracted with \code{$}.
 The \link{summary} of the function also shows all these elements.
 
 \code{bestMOP()}:
 The first returned value \code{$bestPx} contains the output of the \code{mop.learning()} function
-with the number of parameters which gets the best BIC values, taking into account the  
+with the number of parameters which gets the best BIC values, taking into account the
 BIC score to penalize the functions. It evaluates the two next functions,
 if the BIC score does not improve then the function with the last best BIC is returned.
 }

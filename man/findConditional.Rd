@@ -2,7 +2,7 @@
 % Please edit documentation in R/Inference.R
 \name{findConditional}
 \alias{findConditional}
-\title{Find fitted conditional MoTBFs}
+\title{Find Fitted Conditional MoTBFs}
 \usage{
 findConditional(node, bn, evi = NULL)
 }
@@ -11,7 +11,7 @@ findConditional(node, bn, evi = NULL)
 
 \item{bn}{A list of lists obtained from \link{MoTBFs_Learning}, containing the conditional functions.}
 
-\item{evi}{A \code{data.frame} of dimension '1xn' that contains the values of the 'n' parents of the target node. 
+\item{evi}{A \code{data.frame} of dimension '1xn' that contains the values of the 'n' parents of the target node.
 This argument can be \code{NULL} if \code{"node"} is a root node.}
 }
 \value{

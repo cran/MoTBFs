@@ -5,7 +5,7 @@
 #' @param priorData A \code{"numeric"} vector which contains the prior information.
 #' @param data A \code{"numeric"} vector containing the observed data.
 #' @param s A \code{"numeric"} value which specifies the expert confidence in the prior knowledge. 
-#' This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+#' This argument takes values on the interval \eqn{[0, N]}, where \eqn{N} is the sample size, and is used
 #' to synchronize the support of the prior knowledge and the sample.
 #' @param POTENTIAL_TYPE A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding to the type of basis function.
 #' @param domain A \code{"numeric"} vector which contains the bounding values to fit the function.
@@ -20,7 +20,9 @@
 #' @param maxParam A positive integer which indicates the maximum number of coefficients in the function. 
 #' If specified, the output is the function which gets the best BIC with, at most, this number of parameters.
 #' By default, it is set to \code{NULL}.
-#' @return A list with the elements
+#' @param returnAll A logical value indicating whether to return all prior, data and posterior functions (TRUE) or only the posterior (FALSE).
+#' @param scale A \code{"logical"} value indicating whether to standardize the numeric variables to have mean 0 and standard deviation 1.
+#' @return If returnAll = TRUE, the function returns a list with the elements
 #' \item{coeffs}{An \code{"numeric"} vector with the two coefficients of the linear opinion pool}
 #' \item{posteriorFunction}{The final function after combining.}
 #' \item{priorFunction}{The fit of the prior data.}
@@ -44,7 +46,7 @@
 #' type <- "MOP" 
 #' confident <- 3 ## confident <- 1,2,...,length(X)
 #' f <- learnMoTBFpriorInformation(priorData = priordata, data = X, s = confident,
-#' POTENTIAL_TYPE = type)
+#' POTENTIAL_TYPE = type, returnAll = TRUE)
 #' attributes(f)
 #' 
 #' ## Log-likelihood
@@ -52,54 +54,150 @@
 #' sum(log(as.function(f$posteriorFunction)(testData))) ## best loglikelihood
 #' 
 #'
-learnMoTBFpriorInformation <- function(priorData, data, s, POTENTIAL_TYPE, domain=range(data), coeffversion=4, restrictDomain=TRUE, maxParam=NULL)
-{  
+# learnMoTBFpriorInformation <- function(priorData, data, s, POTENTIAL_TYPE, 
+#                                        domain=range(data), coeffversion=4, restrictDomain=TRUE, maxParam=NULL,
+#                                        returnAll = FALSE)
+# {  
+#   ## Learning prior function
+#   fPI <- univMoTBF(priorData,POTENTIAL_TYPE, range(priorData, domain))
+#   
+#   ## Computing the new domain
+#   if (is.null(restrictDomain)||(restrictDomain==FALSE)) rangeNewPriorData <- range(priorData)
+#   else rangeNewPriorData <- newRangePriorData(fPI,priorData, length(data), domain, s, POTENTIAL_TYPE)
+#   
+#   ## Normalizing the prior function
+#   iP <- integrate(as.function(fPI), min(domain, rangeNewPriorData), max(domain, rangeNewPriorData))$value
+#   if(POTENTIAL_TYPE=="MOP"){
+#     f=coef(fPI)/iP
+#     fPI <- asMOPString(f)
+#     fPI <- motbf(fPI)
+#   } else {
+#     f <- coef(fPI)/iP
+#     fPI <- asMTEString(f)
+#     fPI <- motbf(fPI)
+#   }
+#   
+#   ## Learning data function
+#   fD <- univMoTBF(data,POTENTIAL_TYPE, range(rangeNewPriorData, domain), maxParam=maxParam)
+#   
+#   ## Learning posterior function
+#   coeffs <- getCoefficients(fPI, rangeNewPriorData, fD, data, domain, coeffversion)
+#   
+#   if(coeffs[1]==0){
+#     fX <- fD
+#   } else if (coeffs[2]==0){
+#     fX <- fPI
+#   } else {
+#     fPI1 <- coef(fPI); fD1=coef(fD)
+#     maxLength <- max(length(fPI1), length(fD1))
+#     if(length(fD1)<maxLength){
+#       fD1 <- c(fD1, rep(0, maxLength-length(fD1)))
+#     } else {
+#       fPI1 <- c(fPI1, rep(0,maxLength-length(fPI1)))
+#     }  
+#     fX <- fPI1*coeffs[1]+fD1*coeffs[2]
+#     
+#     if(POTENTIAL_TYPE=="MOP") fX <- asMOPString(fX) else fX <- asMTEString(fX)
+#     # fX <- motbf(fX)  
+#   }
+#   
+#   if(returnAll ==TRUE){
+#     fX <- motbf(fX)
+#     return(list(coeffs=coeffs, posteriorFunction=fX,
+#                 priorFunction=fPI, dataFunction=fD,
+#                 domain=range(domain, rangeNewPriorData)))
+#   }else{
+#     P = list(Function = fX, Subclass = POTENTIAL_TYPE, Domain =range(domain, rangeNewPriorData))
+#     P <- motbf(P)
+#     return(P)
+#   }
+#   
+#   
+#   
+# }
+
+learnMoTBFpriorInformation <- function(priorData, data, s, POTENTIAL_TYPE, 
+                                       domain=range(data), coeffversion=4, 
+                                       restrictDomain=TRUE, maxParam=NULL,
+                                       returnAll = FALSE, scale = TRUE){  
+  #browser()
+  Time <- Sys.time()
   ## Learning prior function
-  fPI <- univMoTBF(priorData,POTENTIAL_TYPE, range(priorData, domain))
+  fPrior <- univMoTBF(priorData,POTENTIAL_TYPE, range(priorData, domain),scale = scale)
   
   ## Computing the new domain
-  if (is.null(restrictDomain)||(restrictDomain==FALSE)) rangeNewPriorData <- range(priorData)
-  else rangeNewPriorData <- newRangePriorData(fPI,priorData, length(data), domain, s, POTENTIAL_TYPE)
-  
-  ## Normalizing the prior function
-  iP <- integrate(as.function(fPI), min(domain, rangeNewPriorData), max(domain, rangeNewPriorData))$value
-  if(POTENTIAL_TYPE=="MOP"){
-    f=coef(fPI)/iP
-    fPI <- asMOPString(f)
-    fPI <- motbf(fPI)
-  } else {
-    f <- coef(fPI)/iP
-    fPI <- asMTEString(f)
-    fPI <- motbf(fPI)
+  if(is.null(restrictDomain)||(restrictDomain==FALSE)){
+    rangeNewPriorData <- range(priorData)
+  }else{
+    rangeNewPriorData <- newRangePriorData(fPrior,priorData, length(data), 
+                                           domain, s, POTENTIAL_TYPE)
   }
+  # Domain posteriori function
+  domainPost <- c(min(domain, rangeNewPriorData), 
+                  max(domain, rangeNewPriorData))
+  ## Normalizing the prior function
+  # Constant for normalizing
+  constant <- integrate.motbf(fPrior,domainPost[1],domainPost[2])
+  
+  
+  # Compute the new coefficients of density function
+  coefPrior <- coef(fPrior)/constant
+  fPrior$Function <- do.call(paste0("as",POTENTIAL_TYPE,"String"), 
+                             list(coefPrior))
+  fPrior$Domain <- domainPost
+  attr(fPrior,"mean") = mean(priorData[priorData>=domainPost[1]&priorData<=domainPost[2]])
+  attr(fPrior,"sd") = sd(priorData[priorData>=domainPost[1]&priorData<=domainPost[2]])
   
   ## Learning data function
-  fD <- univMoTBF(data,POTENTIAL_TYPE, range(rangeNewPriorData, domain), maxParam=maxParam)
+  fData <- univMoTBF(data,POTENTIAL_TYPE, domainPost,maxParam=maxParam, scale = scale)
   
   ## Learning posterior function
-  coeffs <- getCoefficients(fPI, rangeNewPriorData, fD, data, domain, coeffversion)
+  coeffs <- getCoefficients(fPrior, rangeNewPriorData, fData, data, 
+                            domain, coeffversion)
   
   if(coeffs[1]==0){
-      fX <- fD
+      fPost <- fData
   } else if (coeffs[2]==0){
-      fX <- fPI
+      fPost <- fPrior
   } else {
-    fPI1 <- coef(fPI); fD1=coef(fD)
-    maxLength <- max(length(fPI1), length(fD1))
-    if(length(fD1)<maxLength){
-      fD1 <- c(fD1, rep(0, maxLength-length(fD1)))
-    } else {
-      fPI1 <- c(fPI1, rep(0,maxLength-length(fPI1)))
-    }  
-    fX <- fPI1*coeffs[1]+fD1*coeffs[2]
-      
-    if(POTENTIAL_TYPE=="MOP") fX <- asMOPString(fX) else fX <- asMTEString(fX)
-    fX <- motbf(fX)  
+    # Get coefficients of densities
+    coefPrior <- coef(fPrior);
+    coefData <- coef(fData)
+    
+    # Complete vector of coefficients to have the same dimensions
+    maxLength <- max(length(coefPrior),length(coefData))
+    if(length(coefPrior)<maxLength){
+      coefPrior=c(coefPrior,rep(0,maxLength-length(coefPrior)))
+    }else{
+      coefData=c(coefData,rep(0,maxLength-length(coefData)))
+    }
+    
+    # Compute posterior density
+    coefPost <- coefPrior*coeffs[1]+coefData*coeffs[2]
+    Time <- Sys.time()-Time
+    fPost <- list("Function" = do.call(paste0("as",POTENTIAL_TYPE,"String"), 
+                                       list(coefPost)),
+                  "Subclass" = tolower(POTENTIAL_TYPE),
+                  "Domain" = domainPost,
+                  "Time" = Time)
+    # Add attribute mean
+    attr(fPost,"mean") <- attr(fPrior,"mean")*coeffs[1]+attr(fData,"mean")*coeffs[2]
+    # Estimate variance of posterior distribution
+    varPost <- coeffs[1]*attr(fPrior,"sd")^2+coeffs[2]*attr(fData,"sd")^2+
+      coeffs[1]*coeffs[2]*(attr(fPrior,"mean")-attr(fData,"mean"))^2
+    attr(fPost,"sd") <- sqrt(varPost)
+    fPost <- do.call(paste0("new_",tolower(POTENTIAL_TYPE)), list(fPost))
+    
   }
   
-  return(list(coeffs=coeffs, posteriorFunction=fX, 
-              priorFunction=fPI, dataFunction=fD, 
-              domain=range(domain, rangeNewPriorData)))
+
+  if(returnAll ==TRUE){
+    return(list(coeffs=coeffs, posteriorFunction=fPost,
+                priorFunction=fPrior, dataFunction=fData,
+                domain=range(domain, rangeNewPriorData)))
+  }else{
+    return(fPost)
+  }
 }
 
 #' Redefining the Domain
@@ -154,13 +252,13 @@ newRangePriorData <- function(fPI, priorData, N, domain, s, POTENTIAL_TYPE)
       if(diffmin!=0){
         coeff1 <- coeff*diffmin/(diffmax + diffmin)
         fx <- coef(fPI)
-        CDF <- integralMoTBF(fPI)
+        CDF <- integrate.motbf(fPI)
         min1 <- as.function(CDF)(min(domain, priorData))
         int <- integrate(as.function(fPI), min(priorData, domain), min(domain))$value
         y1 <- int*coeff1
         if(-min1-y1>=0) sign = "+" else sign = ""
         CDF1 <- noquote(paste(CDF,sign,-min1-y1 , sep=""))
-        CDF1 <- motbf(CDF1)
+        CDF1 <- new_univmotbf(CDF1)
         q1 <- uniroot(as.function(CDF1), range(domain, priorData))$root
       }else {
         q1 <- min(priorData)
@@ -169,13 +267,13 @@ newRangePriorData <- function(fPI, priorData, N, domain, s, POTENTIAL_TYPE)
       ## Right tail
       if(diffmax!=0){
         coeff2 <- coeff*diffmax/(diffmax + diffmin)
-        CDF <- integralMoTBF(fPI)
+        CDF <- integrate.motbf(fPI)
         min2 <- as.function(CDF)(min(domain, priorData))
         int <- integrate(as.function(fPI), min(domain, priorData), max(domain))$value
         y2 <- (1-int)*coeff2
         if(-min2-(1-y2)>=0) sign = "+" else sign = ""
         CDF1 <- noquote(paste(CDF,sign,-min2-(1-y2), sep=""))
-        CDF1 <- motbf(CDF1)
+        CDF1 <- new_univmotbf(CDF1)
         q2 <- uniroot(as.function(CDF1), range(priorData, domain))$root
       } else {
         q2 <- max(priorData)
@@ -224,7 +322,7 @@ newRangePriorData <- function(fPI, priorData, N, domain, s, POTENTIAL_TYPE)
 #' confident <- 5
 #' type <- "MOP"
 #' f <- learnMoTBFpriorInformation(priorData = priordata, data = X, s = confident,
-#' POTENTIAL_TYPE = type)
+#' POTENTIAL_TYPE = type, returnAll = TRUE)
 #' attributes(f)
 #'  
 #' ## Coefficients: linear opinion pool
@@ -297,11 +395,11 @@ getNonNormalisedRandomMoTBF <- function(degree, POTENTIAL_TYPE="MOP")
   if(POTENTIAL_TYPE=="MOP"){
     for(i in 1:((degree/2)+1)) parameters <- c(parameters,0.5,0)
     pol <- asMOPString(parameters)
-    pol <- motbf(pol)
+    pol <- new_univmotbf(pol)
   } else {
     parameters <- rep(0.5, degree/2+1)
     pol <- asMTEString(parameters)
-    pol <- motbf(pol)
+    pol <- new_univmotbf(pol)
   }
   return(pol)
 }
@@ -490,7 +588,7 @@ generateNormalPriorData <- function(graph, data, size, means, deviations=NULL)
   YY <- YY[,match(vdf, vdag)]
   
   pos <- which(sapply(YY[1,], is.na))
-  if(length(pos)!=0) YY <- YY[,-pos, drop = F]
+  if(length(pos)!=0) YY <- YY[,-pos, drop = FALSE]
   
   return(as.data.frame(YY))
 }

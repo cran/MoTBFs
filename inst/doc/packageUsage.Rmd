@@ -1,0 +1,661 @@
+---
+title: "Workflow of the MoTBFs package"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Workflow of the MoTBFs package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MoTBFs)
+```
+
+The **MoTBFs** package is designed using *S3* objects. The
+package implements functions for learning univariate, multidimensional,
+and conditional distributions, and provides support for parameter
+learning in hybrid Bayesian networks. In addition, it includes functions
+for incorporating prior knowledge when there is lack of data and for
+carrying out probabilistic inference. Moreover, two classes are
+incorporated in the package, `motbf` for defining univariate mixtures of
+truncated basis functions and `jointmotbf` for specifying
+multidimensional MoTBFs.
+
+The functionality of the **MoTBFs** package is illustrated through an
+analysis carried out on a real world dataset. More precisely, we use the
+ecoli dataset [[1](#ref-Lichman:2013)], which is provided along with the package. The
+dataset contains information about *Escherichia coli* and consists of
+*n*=336 records, 8 input variables, and 1 output variable (the class).
+It is a bacterium of the genus *Escherichia* that is commonly found in
+the lower intestine of warm-blooded organisms. This dataset can be
+downloaded from <http://archive.ics.uci.edu/ml/datasets/Ecoli>.
+
+## How to install MoTBFs
+
+The MoTBFs can be installed from CRAN, using the usual
+`install.packages()` function.
+
+``` {r, eval = FALSE}
+## Install and load the MoTBFs package
+ install.packages("MoTBFs")
+ library("MoTBFs")
+```
+
+
+``` {r}
+## Load ecoli dataset
+ data("ecoli", package = "MoTBFs")
+```
+
+## The example dataset
+
+The `ecoli` dataset is a data frame with 336 rows corresponding to
+proteins and 9 columns corresponding to variables. The dataset contains
+4 discrete variables, stored as characters, and 5 continuous variables.
+The variables provide measurements of the cells used for predicting the
+localization site of proteins. The first variable, `Sequence.Name`,
+which is the accession number for the SWISS-PROT database, and the
+output variable `class` will not be used in this running example, and we
+will therefore remove them from the data frame. The discrete variables
+`lip` and `chg` are binary attributes, where character numbers are used
+as states; `"0.48"` and `"1"`, and `"0.5"` and `"1"`, respectively.
+
+``` {r}
+## Drop the first and last variables of the ecoli dataset 
+  data <- ecoli[,-c(1,9)]
+```
+
+
+## Split the dataset into train and test
+
+For validation purposes, the dataset is split into a training and a test
+set using the `TrainingandTestData()` function.
+
+
+``` {r, eval = TRUE}
+## Split the dataset into train and test subsets
+  set.seed(2)
+  dataTT <- TrainingandTestData(data, percentage_test = 0.2)
+  trainingData <- dataTT$Training
+  testData <- dataTT$Test
+```
+
+
+The seed value determines the partitioning of the data into training and
+test, and is therefore key to reproducing the experiments. From now on,
+we will carry out all the analyses on the training data, leaving the
+test dataset for estimating the predictive capabilities of the learned
+models.
+
+
+## Learn the directed acyclic graph
+
+Our illustrative example basically consists of fitting MoTBF densities
+to a previously learned Bayesian network structure over the variables in
+the dataset. The structure can, for instance, be obtained, using the
+function `hc()` from the **bnlearn** package. This function returns a
+directed acyclic graph obtained from the dataset using a local search
+method. For the sake of simplicity, we have included the function
+`LearningHC()` in our package, which automatically converts into factors
+those columns that are non-numeric, before calling the function `hc()`
+in **bnlearn**. `LearningHC()` can also be used to discretize the
+dataset before calling `hc()`, but we are not using this functionality
+in the running example.
+
+``` {r}
+## Learn the structure of the Bayesian network using the training data
+  dag <- LearningHC(trainingData)
+  dag
+```
+
+We can visualize the network structure using the `plot()` generic function or the `graphviz.plot()` function of `bnlearn` package.
+
+```{r, message=FALSE, eval = requireNamespace("Rgraphviz", quietly = TRUE)}
+# Visualize the network structure in topological order
+bnlearn::graphviz.plot(dag)
+```
+
+
+Before describing how to learn the MoTBF distributions associated with
+the network structure, we first present the basic functionality for
+learning different types of MoTBF representations, i.e., univariate,
+conditional, and joint MoTBF densities.
+
+
+## Univariate MoTBFs densities
+
+We illustrate the learning of a univariate MoTBF density by considering
+the continuous variable `mcg`.
+
+``` {r}
+## Learn the density of variable mcg, using MTEs or MOP as basis functions
+ f1 <- univMoTBF(trainingData[,1], POTENTIAL_TYPE = "MTE", nparam = 13)
+ f2 <- univMoTBF(trainingData[,1], POTENTIAL_TYPE = "MOP", nparam = 11)
+```
+
+
+The function takes two mandatory arguments, `data` and `POTENTIAL_TYPE`,
+where the latter can either be `"MOP"` or `"MTE"` if polynomial or
+exponential basis functions should be used, respectively. `univMoTBF()`
+also accepts optional arguments: it is possible to specify the domain
+over which the model will be fitted, `evalRange`, the exact number of
+basis functions to be used, `nparam`, and the maximum number of
+parameters in the function, `maxParam`, which selects the best fit using
+the log-likelihood score. If `nparam` or `maxParam` are not given, then
+the Bayesian information criterion (BIC) [[2](#ref-Sch78)] is used for scoring and
+function selection: it evaluates the two next functions and if the BIC
+value does not improve then the function with the best BIC score so far
+is returned.
+
+The mathematical expression of the univariate density is shown via
+`print()`, whereas other hidden elements related to the learning task
+can be obtained using `summary()`.
+
+```{r}
+print(f2)
+
+summary(f2)
+```
+
+
+The object returned by `univMoTBF()` is a list of classes `"univmotbf"`, `"motbf"`, and either `"mop"` or `"mte"`, depending on the basis functions used. The object returned contais several
+elements, including its mathematical expression and other hidden
+elements related to the learning task. 
+
+The learned densities can be plotted using the generic function
+`plot()`. The next figure shows the the model fits, provided by
+`univMoTBF()`, with blue dashed line for MOPs and red solid line for
+MTEs overlaying the histogram of the training data of the `mcg`
+variable.
+
+``` {r,fig.align='center', fig.asp=1.1, out.width='80%'}
+## Plot the densities f1 and f2 over the histogram of variable mcg
+  hist(trainingData[,1], prob = TRUE , main = "", xlab = "X")
+  plot(f1, xlim = range(trainingData[,1]), col = "red", add = TRUE, lwd = 3)
+  plot(f2, xlim = range(trainingData[,1]), col = "blue", add = TRUE, lwd = 3, lty = 2)
+  legend("topleft", legend = c("MTE", "MOP"),col = c("red", "blue"), lty = 1:2, lwd = 3, inset = c(0, -0.5), xpd = TRUE)
+```
+
+
+
+To evaluate the predictive ability of the models we use the generic
+method `as.function()` developed for the `"motbf"` class to get the
+log-likelihood as well as `BICMoTBF()` to obtain the BIC score.
+
+``` {r}
+## Compute log-likelihood of the fitted densities
+  sum(log(as.function(f1)(testData[,1])))
+
+  sum(log(as.function(f2)(testData[,1])))
+
+## Compute BIC score of the fitted densities  
+  BICMoTBF(f1,testData[,1])
+
+  BICMoTBF(f2,testData[,1])
+
+```
+
+
+An alternative way to visually check the goodness of fit of the
+estimated models is to simulate a data sample from the learned functions
+and compare it with the training data. For doing this, we use the
+inverse transform method, a technique for generating random samples from
+a specific probability distribution based on evaluating the inverse of
+the CDF on a uniform random number, yielding a value for the random
+variable being sampled. This is done by function `rMoTBF()`. For the
+sake of reproducibility, we fix the seed for the random numbers to be
+used by the `rMoTBF()` function, which is set to 5 in this example. In
+the next code snippet, the previous function fitted with a polynomial
+basis, `f2`, will be used.
+
+
+
+``` {r}
+## Simulate data from the estimated density f2
+  set.seed(5)
+  X <- rMoTBF(size = 400, fx = f2)
+  
+## Test whether or not the simulated sample and the observed data come from the same distribution
+  ks.test(trainingData[,1], X)
+```
+
+
+
+In this example the two-sample Kolmogorov-Smirnov test is used. The
+*p*-value is notably above 0.05, so there is no evidence to reject the
+null hypothesis that both samples are drawn from the same population.
+
+<!-- We can compare the training data of variable `mcg` and the sample simulated from the distribution learned from the same data, using the `hist()` function. Moreover, we can compare the empirical cumulative distribution of the training and simulated data. -->
+
+We can plot the histogram and the empirical cumulative distribution of
+both the training data of variable `mcg` and the sample simulated from
+the distribution learned from the same data, in order to compare both
+distributions.
+
+``` {r}
+## Compare the histogram of both distributions
+ hist(trainingData[,1], prob = TRUE, col = "#FFC107", density = 10, angle = -45, main = "")
+ hist(X, prob = TRUE, col = "#0C7BDC", main = "", ylim = c(0,2.2), cex.lab=1.5, cex.axis=1.5, density = 10,add = T)
+ legend('topleft', legend = c("Training data", "Simulated data"), fill = c("#FFC107", "#0C7BDC"), density = 20, angle = c(-45, 45), inset = c(0, -0.5), xpd = TRUE)
+```
+
+``` {r}
+## Compare the the CDF of both distributions
+ plot(ecdf(trainingData[,1]), cex = 0, lwd = 3 , cex.lab = 1.5, cex.axis = 1.5, main = "")
+ plot(integrate.motbf(f2), xlim = range(trainingData[,1]), col ="red", lwd = 3, add = TRUE)
+ legend('topleft', legend = c("Training data", "Simulated data"), col = c("black", "red"), lwd = 3, inset = c(0, -0.5), xpd = TRUE)
+```
+
+We can also manipulate the distributions with a collection of methods
+for objects of class `"motbf"`. Here is an example of the use of three of them,
+`coef()`, `integrate.motbf()`, and `derivMoTBF()`.
+
+
+
+``` {r}
+## Compute the derivative and integral of the fitted density
+
+  # Coefficients of the fitted density
+  coef(f2)
+
+
+  # Indefinite integral of the fitted density
+  integrate.motbf(f2)
+
+  
+  # Definite integral of the fitted density
+  integrate.motbf(f2, lower = min(trainingData[,1]), upper = max(trainingData[,1]))
+
+  
+  # Derivarive of the fited density
+  derivMoTBF(f2)
+```
+
+
+
+## Joint MoTBFs densities
+
+The learning process for multidimensional variables is similar to the
+previous one. The function `jointmotbf.fit()` is used to solve the
+quadratic optimization problem and returns the analytical expression of
+the joint density. The returned object is of class `"jointmotbf"` and `"motbf"`.
+The expression is the only visible element, while
+the others can be retrieved using `attributes()`. In this example only
+two variables are used, `mcg` and `alm1`, in order to be able to plot
+the results.
+
+
+``` {r}
+## Learn joint distributions
+  P = jointmotbf.fit(X = trainingData[,c("mcg", "alm1")], dimensions = c(5,5))
+  
+  attributes(P)
+
+```
+
+
+The function `print()` can be used to obtain an expression of the
+learned joint density, while `summary()` yields a more thorough excerpt
+of the `"jointmotbf"` object.
+
+```{r}
+print(P)
+
+summary(P)
+```
+
+
+The processing time, `P$Time`, can vary depending on the CPU, 
+but the learning outcome will always be the same for a specific data sample.
+
+The generic function `plot()` can be used for objects of class `"jointmotbf"`.
+This function accepts optional arguments such as `type`, where one can
+choose between `"perspective"` and `"contour"`, `ranges`, used to
+specify the plotting range, `orientation`, which indicates the
+orientation of the perspective graph, and `filled` for getting a filled
+contour plot.
+
+
+``` {r}
+## Plot the joint distribution of 2 variables
+ par(mar=c(2,3,2,2))
+ 
+ # Filled contour
+ plot(P, data = trainingData[,c(1,6)])
+ 
+ # Simple contour
+ plot(P, data = trainingData[,c(1,6)], filled = FALSE, cex.lab = 2, cex.axis = 1.85, lwd = 1.5) 
+  
+ # Perspective
+ plot(P, type = "perspective", data = trainingData[,c(1,6)], orientation=c(25,25), cex.lab = 2,xaxs = "i") 
+```
+
+The `marginal.jointmotbf()` function computes the marginals of joint
+densities. In this example we have two variables, so there are two
+marginal densities. The marginal variable can be specify by the index or name.
+
+```{r}
+marginal.jointmotbf(P, var = "mcg")
+marginal.jointmotbf(P, var = 2)
+```
+
+## Conditional MoTBFs densities
+
+The next step in our analysis is learning conditional densities, which
+is implemented by the function `conditionalMethod()`. Five of its
+arguments are compulsory: `data`, the dataset; `nameParents`, a
+character vector indicating the name of the parents; `nameChild`, a
+character string containing the name of the child; `numIntervals`, the
+maximum number of intervals for splitting the domain of the parent
+variables; `POTENTIAL_TYPE`, the type of basis function. Other arguments
+are optional, like `maxParam`, indicating the maximum number of
+parameters for each function, and `s`, the expert’s relative confidence
+in any prior knowledge, and `priorData` if prior knowledge is
+incorporated in the analysis.
+
+We will do the conditional analysis for only two variables in order to
+be able to make a 2-dimensional plot of the obtained results. For
+example, taking into account the relationship found by the dag, we
+consider the child variable `gvh` with parent variable `mcg`.
+
+
+``` {r}
+## Learn conditional distributions
+P <- conditionalMethod(trainingData, nameParents = "mcg", nameChild = "gvh",
+                         numIntervals = 5, POTENTIAL_TYPE ="MOP", scale = FALSE)
+printConditional(P)
+
+```
+
+It can be noticed that the learning algorithm decides to split the
+domain of the parent into two intervals even though we have set the
+argument `numIntervals` to five. This is because the BIC score is not
+improved any further by splitting the domain into more than two
+intervals.
+
+The resulting conditional density (a MOP in this case) can be plotted
+using `plotConditional()`. The sample points can be overlaid by setting
+the argument `points` to `TRUE`.
+
+``` {r}
+par(mar=c(2,3,2,2))
+## Plot the conditional density of gvh given mcg
+plotConditional(P, data = trainingData, nameChild = "gvh", points = TRUE)
+```
+
+## MoTBF distributions associated with the network structure
+
+The last step is to learn the distributions tied to the Bayesian network
+learned previously. For doing this task, the `motbf.fit()`
+function of the **MoTBFs** package is used. The graph is a mandatory
+argument, that can be of class `"bn"`, `"graphNEL"` or `"network"`.
+Other mandatory arguments are the `data`, the maximum number of
+intervals for splitting the domain of the parents (`numIntervals`), and
+the type of basis function (`POTENTIAL_TYPE`). The function also accepts
+additional arguments, but they are not listed here.
+
+In the example, the DAG was obtained using the **bnlearn** package and
+therefore it is an object of class `"bn"`. As an example, we will use a
+maximum of 4 intervals and `"MTE"` potentials when learning the
+densities (i.e. exponential basis functions).
+
+``` {r, message = FALSE}
+## Learn the distributions of a Bayesian network
+bn <- motbf.fit(dag, data = trainingData, numIntervals = 4, POTENTIAL_TYPE = "MTE")
+```
+
+The returned object is of class `"motbf_fit"` and `"motbf"`. The results are reported using the generic `print()` function for objects of class `"motbf_fit"`.
+
+```{r}
+print(bn)
+```
+
+Notice how nodes in the DAG with only discrete parents contain as many
+functions as configurations of the parents, whereas nodes that have
+continuous parents have at most 4 functions for each parent and,
+finally, nodes that have mixed parents contain as many functions as
+configurations of the discrete parents times the number of regions into
+which the domain of the continuous parents is split.
+
+The BIC criterion is used to decide the number of splitting points of
+the domain of the continuous parent nodes and to choose the number of
+basis functions used. The function `BiC.MoTBFBN()` can be used to
+compute the log-likelihood and the BIC score of a dataset given the
+Bayesian network.
+
+```{r}
+BiC.MoTBFBN(bn, data = testData)
+```
+
+
+## Learn MoTBF distributions in a full hybrid network using prior knowledge
+We will now exemplify the use of prior knowledge in the learning
+process. In order to illustrate the approach, we first select a small
+subset of the `Ecoli` dataset using `TrainingandTestData()`. In the next
+example the percentage of the test data is 99%, which means the training
+data is only 1% of the full dataset.
+
+``` {r}
+## Obtain small training subset
+set.seed(4)
+dataTT <- TrainingandTestData(data, percentage_test = 0.99)
+
+trainingData <- dataTT$Training
+testData <- dataTT$Test
+nrow(trainingData)
+```
+
+
+There are 13 entries in the training dataset. We are going to fit MoTBFs
+with and without prior information.
+
+Learning univariate and conditional distributions and Bayesian networks
+can be done using the functions `learnMoTBFpriorInformation()` and
+`motbf_fit()`. The arguments for these functions are the same as
+previously explained and, in addition, it is necessary to specify the
+expert confidence in the prior knowledge, `s`, and the prior dataset
+`priorData`. On the one hand, to generate an artificial prior dataset
+the `generateNormalPriorData()` function can be used.
+
+``` {r}
+## Generate artificial prior dataset
+means <- sapply(data, function(x){ifelse(is.numeric(x), mean(x),NA)})
+set.seed(4)
+priorData <- generateNormalPriorData(dag, data = trainingData, size = 5000, means = means)
+```
+
+On the other hand, argument *s* takes values on the interval [0,*N*],
+where *N* is the sample size, and is used to synchronize the support of
+the prior knowledge and the sample. We refer the reader to [[3](#ref-Per15)] for the
+details. In this example we will use the `aac` variable from the data
+set, have `s = 5` as confidence level, and set `"MOP"` as potential
+type.
+
+```{r}
+## Learn univariate distribution using prior information
+f <- learnMoTBFpriorInformation(priorData$aac, trainingData$aac, s = 5, POTENTIAL_TYPE = "MOP", returnAll = TRUE)
+
+print(f)  
+```
+
+`learnMoTBFpriorInformation()` returns the fitted model using the
+training data only (`$dataFunction`), the model fit using the prior data
+only (`$priorFunction`) and the model fit that combines the training
+data and the prior data (`$posteriorFunction`). The three univariate
+densities can be plotted using the generic method `plot()`.
+
+```{r}
+plot(f$posteriorFunction, xlim = f$domain, ylim = c(0,2.1), lwd = 3)
+plot(f$dataFunction, xlim = f$domain, add = TRUE, col = 2, lwd = 3, lty = 2)
+plot(f$priorFunction, xlim = f$domain, add = TRUE, col = 4, lwd = 3, lty = 3)
+legend("topleft", legend = c("Posterior", "Data", "Prior"), col = c(1,2,4), lty = 1:3, lwd = 3, inset = c(0, -0.7), xpd = TRUE)
+```
+
+```{r}
+## Log-likelihood of the model that uses prior information
+  sum(log(as.function(f$posteriorFunction)(testData$aac)))
+
+## Log-likelihood of the model that does not use prior information
+  sum(log(as.function(f$dataFunction)(testData$aac)))
+
+```
+
+The best model, taking into account the log-likelihood, is the MoTBF
+which uses the prior data, `f$posteriorFunction`.
+
+The last step is to incorporate the prior knowledge in the full Bayesian
+network. For this analysis we are not going to print out the results
+(which could be done using the generic function `print()`), because the structure
+is similar to the previous Bayesian network representations. As an
+example, we will use `numIntervals = 2`, `POTENTIAL_TYPE = "MOP"`, and
+`s = 5`.
+
+```{r, message=FALSE}
+## Fit Bayesian network using prior information
+priorBN <- motbf.fit(dag, trainingData, numIntervals = 2,
+                           POTENTIAL_TYPE = "MOP", s = 5, priorData = priorData)
+
+
+## Fit BN without using prior information
+BN <- motbf.fit(dag, trainingData, numIntervals = 2,
+                           POTENTIAL_TYPE = "MOP")
+
+# Compute log-likelihood 
+logLikelihood.MoTBFBN(priorBN, data = testData)
+
+logLikelihood.MoTBFBN(BN, data = testData)
+
+```
+
+Looking at the log-likelihood corresponding to the network with and
+without prior data, we can see that, in this example, incorporating
+prior knowledge is better when data is scarce.
+
+
+## Inference
+
+After a Bayesian network has been constructed, the **MoTBFs** package
+can be used to obtain the conditional density of any variable in the
+network given that some other variables have been observed. The
+conditional distribution is obtained by forward sampling. As an example,
+consider a network estimated from the `ecoli` dataset:
+
+```{r, message=FALSE}
+## Learn a Bayesian network
+dag <- LearningHC(data)
+
+bn <- motbf.fit(dag, data = data, numIntervals = 4,
+                         POTENTIAL_TYPE = "MOP")
+```
+
+The observed values are specified using a data frame. 
+We can obtain an approximation of the posterior probability distribution of a target variable given a set of observed variables using the `get_approx_posterior()` function, which runs the forward sampling algorithm if the `evidence` parameter is `NULL`, or the likelihood weighting algorithm otherwise.
+
+In the example, we are assuming that we want to compute the conditional density 
+of `alm2` given that `lip="0.48"`, `alm1 = 0.55` and `gvh = 0.9`. We set the number 
+of random samples to generate to `size = 100`.
+
+```{r}
+# Specify the evidence set and target variable
+obs <- data.frame(lip = "0.48", alm1 = 0.55, gvh = 0.9, stringsAsFactors=FALSE)
+node <- "alm2"
+
+# Get the conditional distribution of 'node' and the generated sample
+set.seed(4)
+ap_post = get_approx_posterior(bn, target = node, 
+                     evidence = obs, size = 100, maxParam = 8)
+
+ap_post$fx
+```
+
+The output consists of the posterior density and the sample from which
+the density parameters were estimated.
+
+The posterior can also be computed using exact inference. The variable elimination algorithm is implemented for MOP distributions only. We will use the same query, applying the exact solution.
+
+```{r, message=F}
+ex_post = variableElimination(bn, target = node, evidence = obs)
+
+```
+
+```{r, messages=FALSE, warning=FALSE}
+# Plot the posterior distribution obtained with each solution
+plot(ap_post$fx, col = "red") 
+plot(ex_post, add = T, col = "blue")
+legend("topleft", legend = c("Approximate", "Exact"), col = c("red", "blue"), lwd = 1,  inset = c(0, -0.5), xpd = TRUE)
+
+```
+
+
+## Structural learning
+The **MoTBFs** package implements the Tree Augmented Naive Bayes model for MOP distributions, based on the Chow-Liu algorithm. The main function is `fit_tan()`, whose mandatory arguments are `"target"` (the class variable) and `"data"` (the dataset). Note that `"target"` might be either discrete or continuos and the variables in `"data"` can also be of either type. 
+
+Some optional arguments are `"root"` (if not specified, the function chooses the variable with highest mutual information with the target), and `"mutualInfoCond"` (a matrix containing the conditional mutual information, can be computed using the `mutual_information_tan()` function; if not given, `fit_tan()` computes it internally). Moreover, the optional argument `"fit.args"` allows to specify optional arguments accepted by function `motbf.fit()`. The returned object of `fit_tan()` is of class `"motbf_fit"`.
+
+```{r, eval = requireNamespace("Rgraphviz", quietly = TRUE)}
+# Build a TAN model for classification
+  bn_tan_cl = fit_tan("lip",data)
+  bnlearn::graphviz.plot(getDAG(bn_tan_cl))
+
+
+# Compute mutual information of each variable with mcg. 
+# Firstly, discrete variables must be coerced to factor
+  data[sapply(data, is.character)] = lapply(data[sapply(data, is.character)], as.factor)
+  MI = mutual_information_tan(data,"mcg")
+# Build a TAN model for regression
+  bn_tan_reg = fit_tan("mcg",data, mutualInfoCond = MI)
+  bnlearn::graphviz.plot(getDAG(bn_tan_reg))
+```
+
+On the other hand, the package also contains a wrapper to the TAN implementation (function `tree.bayes()`) of the **bnlearn** package, which requires to discretize the continuous variables, and to the hill-climbing algoritm (function `hc()`). The returned object is of class `"bn"`, i.e., it is just a DAG, which can be used as an argument of the `motbf.fit()` function to learn the full model. This wrapper is in function `getStructure()`, whose arguments are `"data"`, `"method"` (a character string matching either `"NB"`, for naive Bayes model; `"TAN"`; or `"HC"`, for the hill-climbing algorithm), and `"target"` (needed only for NB and TAN).
+
+```{r, eval = requireNamespace("Rgraphviz", quietly = TRUE)}
+# Naive Bayes structure
+nb = getStructure(data, "NB", "mcg")
+bnlearn::graphviz.plot(nb)
+
+# TAN wrapper (continuous variables are internally discretized)
+tan_disc = getStructure(data, "TAN", "mcg")
+bnlearn::graphviz.plot(tan_disc)
+
+# HC wrapper
+hc_bnlearn = getStructure(data, "HC")
+bnlearn::graphviz.plot(hc_bnlearn)
+```
+
+## References
+
+<div id="refs" class="references csl-bib-body" line-spacing="2">
+
+<div id="ref-Lichman:2013" class="csl-entry">
+
+<span class="csl-left-margin">1. </span><span
+class="csl-right-inline">Lichman, M. (2013). UCI machine learning
+repository. University of California, Irvine, School of Information;
+Computer Sciences. Retrieved from <http://archive.ics.uci.edu/ml></span>
+
+</div>
+
+<div id="ref-Sch78" class="csl-entry">
+
+<span class="csl-left-margin">2. </span><span
+class="csl-right-inline">Schwarz, G. (1978). Estimating the dimension of
+a model. *Annals of Statistics*, *6*, 461–464.</span>
+
+</div>
+
+<div id="ref-Per15" class="csl-entry">
+
+<span class="csl-left-margin">3. </span><span
+class="csl-right-inline">Pérez-Bernabé, I., Fernández, A., Rumí, R., &
+Salmerón, A. (2016). Parameter learning in hybrid Bayesian networks
+using prior knowledge. *Data Mining and Knowledge Discovery*, *30*,
+576–604.</span>
+
+</div>
+
+</div>

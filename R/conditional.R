@@ -22,13 +22,14 @@
 #' function. If specified, the output is the function which gets the best BIC with, at most, 
 #' this number of parameters. By default, it is set to \code{NULL}.
 #' @param s A \code{"numeric"} value indicating the expert's confidence in the prior knowledge. 
-#' This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+#' This argument takes values on the interval \eqn{[0, N]}, where \eqn{N} is the sample size, and is used
 #' to synchronize the support of the prior knowledge and the sample.
 #' By default, it is \code{NULL}, and must be modified only if prior information is to be 
 #' incorporated in the learning process.
 #' @param priorData An object of class \code{"data.frame"}, corresponding to the prior information.
 #' @param conditionalfunction The output of the internal function \code{learn.tree.Intervals}.
 #' @param mm One of the inputs and the output of the recursive internal function \code{"conditional"}.
+#' @param scale A \code{"logical"} value indicating whether to standardize the numeric variables to have mean 0 and standard deviation 1.
 #' @return The main function \code{conditionalMethod} returns a list with the name of the parents, 
 #' the different intervals and the fitted densities
 #' @details The main function, \code{conditionalMethod()}, fits truncated basis functions for the conditioned variable 
@@ -83,28 +84,29 @@
 #' numIntervals = intervals, POTENTIAL_TYPE = potential)
 #' BICscoreMoTBF(treeParent1, data, nameParents = parent1, nameChild = child)
 #' }
-
+#' 
 #' ###############################################################################
 #' ###############################################################################
+#' 
 #' @export
-conditionalMethod <- function(data, nameParents, nameChild, numIntervals, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL)
+conditionalMethod <- function(data, nameParents, nameChild, numIntervals, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL, scale = FALSE)
 {
   if((POTENTIAL_TYPE=="MOP")||(POTENTIAL_TYPE=="MTE")){
     data <- newData(data, nameChild, nameParents)
-    
+    # browser()
     ## Domains
-    if(is.character(data[,nameChild])) domainChild <- discreteVariablesStates(nameChild, data)[[1]]$states
+    if(is.factor(data[,nameChild])) domainChild <- levels(data[,nameChild])
     else domainChild <- range(data[,nameChild])
     
     if(is.numeric(data[,nameParents])) domainParents <- range(data[,nameParents])
     else{
-      domainParents <- lapply(1:length(nameParents), function(i) if(is.numeric(data[,nameParents[i]])) range(data[,nameParents[i]]) else discreteVariablesStates(nameParents[i], data)[[1]]$states)
+      domainParents <- lapply(1:length(nameParents), function(i) if(is.numeric(data[,nameParents[i]])) range(data[,nameParents[i]]) else levels(data[,nameParents[i]]))
       names(domainParents) <- nameParents
     }
     
     ## Recursive process
     mm <- c()
-    mm <- conditional(data, nameParents, nameChild, domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam, s, priorData)
+    mm <- conditional(data, nameParents, nameChild, domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam, s, priorData, scale = scale)
     return(mm)
   }else{
     return(message("Unknown method, please use MOP or MTE"))
@@ -113,10 +115,10 @@ conditionalMethod <- function(data, nameParents, nameChild, numIntervals, POTENT
 
 #'@rdname conditionalmotbf.learning
 #'@export
-conditional <- function(data, nameParents, nameChild, domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL)
-{  
+conditional <- function(data, nameParents, nameChild, domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL, scale = FALSE){  
+  
   ## select the parent who get the best BIC score when its domain is splitted
-  f <- select(data, nameParents, nameChild, domainChild, domainParents, numIntervals, POTENTIAL_TYPE, maxParam, s, priorData)
+  f <- select(data, nameParents, nameChild, domainChild, domainParents, numIntervals, POTENTIAL_TYPE, maxParam, s, priorData, scale = scale)
   nameParents <- nameParents[which(nameParents!=f$parent)]
   
   for(i in 1:length(f$t)){
@@ -124,24 +126,25 @@ conditional <- function(data, nameParents, nameChild, domainChild, domainParents
     mm[[length(mm)+1]] <- m
     if(is.numeric(data[,f$parent])){
       dataInterval <- splitdata(data, f$parent, f$t[[i]]$interval[1], f$t[[i]]$interval[2])
-      if(nrow(dataInterval)>20||length(nameParents)==0){
+      if(nrow(dataInterval)>=0||length(nameParents)==0){
         if(length(nameParents)==0){
           mm <- mm
         } else {
           mm[[length(mm)]]$Px <- NULL
           
           ## An recursive process
-          mm <- conditional(dataInterval, nameParents, nameChild,domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam, s, priorData)
+          mm <- conditional(dataInterval, nameParents, nameChild,domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam, s, priorData, scale = scale)
         }
       }
     } else{
       dataInterval <- subset(data,(data[,f$parent]==f$t[[i]]$interval))
-      if(nrow(dataInterval)>20||(length(nameParents)==0)){
+      
+      if(nrow(dataInterval)>=0||(length(nameParents)==0)){
         if(length(nameParents)==0){
           mm <- mm
         } else {
           mm[[length(mm)]]$Px <- NULL
-          mm <- conditional(dataInterval, nameParents, nameChild,domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam, s, priorData)
+          mm <- conditional(dataInterval, nameParents, nameChild,domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam, s, priorData, scale = scale)
         }
       }
     }
@@ -151,11 +154,13 @@ conditional <- function(data, nameParents, nameChild, domainChild, domainParents
 
 #'@rdname conditionalmotbf.learning
 #'@export
-select <- function(data, nameParents, nameChild, domainChild, domainParents, numIntervals, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL)
+select <- function(data, nameParents, nameChild, domainChild, domainParents, numIntervals, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL, scale=FALSE)
 {
+  # browser()
   bestbic <- -10^10; bestvalues <- 0; Bic <- 0
   for(i in 1:length(nameParents)){
-    t <- learn.tree.Intervals(data, nameParents[i], nameChild, domainParents, domainChild, numIntervals, POTENTIAL_TYPE, maxParam, s, priorData)
+    t <- learn.tree.Intervals(data, nameParents[i], nameChild, domainParents, domainChild, numIntervals, POTENTIAL_TYPE, maxParam, s, priorData, scale = scale)
+    
     Bic <- BICscoreMoTBF(t, data, nameParents[i], nameChild)
     values <- list(parent=nameParents[i], t=t)
     
@@ -169,8 +174,9 @@ select <- function(data, nameParents, nameChild, domainChild, domainParents, num
 
 #'@rdname conditionalmotbf.learning
 #'@export
-learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, domainChild, numIntervals, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL)
+learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, domainChild, numIntervals, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL, scale=FALSE)
 {
+  
   X <- data[, nameParents]
   Y <- data[, nameChild]
   if(is.numeric(domainParents)) Xrange <- domainParents
@@ -186,9 +192,12 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
       Yf <- Y[which(X>bestb)]
       Xf <- X[which(X>bestb)]
       if(length(Y)==0) next
-      if(is.character(Y)){
-        cutPoints <- discreteVariablesStates(nameChild, data)[[1]]$states
-        pD <- probDiscreteVariable(cutPoints, Yf)
+      if(is.factor(Y)){
+        
+        # cutPoints <- discreteVariablesStates(nameChild, data)[[1]]$states
+        cutPoints = levels(Y)
+        # pD <- probDiscreteVariable(cutPoints, Yf)
+        pD <- probDiscreteVariable(Yf)
         pos <- which(domainChild%in%cutPoints)
         coeff <- rep(0,length(domainChild))
         pD$coeff <- replace(coeff, pos, pD$coeff)
@@ -197,8 +206,10 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
         prob <- list(pD)
         bestBIC <-  getBICDiscreteBN(prob)
       } else{
-        if(is.null(priorData)) P <- univMoTBF(Yf, POTENTIAL_TYPE, domainChild, maxParam=maxParam)
-        else P <- learnMoTBFpriorInformation(priorD, Yf, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        
+        if(is.null(priorData)) P <- univMoTBF(Yf, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
+        # else P <- learnMoTBFpriorInformation(priorD, Yf, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        else P <- learnMoTBFpriorInformation(priorD, Yf, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
         bestBIC <- BICMoTBF(P, Yf)
       }
       b <- B[i]
@@ -206,12 +217,14 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
       Yl <- Yf[which(Xf<=b)]
       if(length(Yl)<=5) break
       if(length(Yl)==0) next
-      if(max(Yl)==min(Yl)) next
+      # if(max(Yl)==min(Yl)) next # max() and min() are not meaningful for factors
       
       ## discrete child variable
-      if(is.character(Yl)){
+      if(is.factor(Yl)){
+        if(length(unique(Yl))==1) next
         cutPoints <- unique(Yl)
-        pD <- probDiscreteVariable(cutPoints, Yl)
+        # pD <- probDiscreteVariable(cutPoints, Yl)
+        pD <- probDiscreteVariable(Yl)
         pos <- which(domainChild%in%cutPoints)
         coeff <- rep(0,length(domainChild))
         pD$coeff <- replace(coeff, pos, pD$coeff)
@@ -219,18 +232,26 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
         pD$sizeDataLeaf <- replace(coeff, pos, pD$sizeDataLeaf)
         Px1 <- pD
       } else{
-        if(is.null(priorD)) Px1 <- univMoTBF(Yl, POTENTIAL_TYPE, domainChild, maxParam=maxParam) 
-        else Px1 <- learnMoTBFpriorInformation(priorD, Yl, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        
+        if(max(Yl)==min(Yl)) next
+        
+        if(is.null(priorD)) Px1 <- univMoTBF(Yl, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale) 
+        # else Px1 <- learnMoTBFpriorInformation(priorD, Yl, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        else Px1 <- learnMoTBFpriorInformation(priorD, Yl, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
       }
       
       Xr <- Xf[Xf>b]; Xr <- sort(Xr)
       Y22 <- Yf[which(Xf>b)]; Y22 <- sort(Y22)
       if(length(Y22)==0) next
-      if(max(Y22)==min(Y22)) next
+      # if(max(Y22)==min(Y22)) next
       
-      if(is.character(Y22)){
+      if(is.factor(Y22)){
+        
+        if(length(unique(Y22))==1) next
+        
         cutPoints <- unique(Y22)
-        pD <- probDiscreteVariable(cutPoints, Y22)
+        # pD <- probDiscreteVariable(cutPoints, Y22)
+        pD <- probDiscreteVariable(Y22)
         pos <- which(domainChild%in%cutPoints)
         coeff <- rep(0,length(domainChild))
         pD$coeff <- replace(coeff, pos, pD$coeff)
@@ -238,11 +259,15 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
         pD$sizeDataLeaf <- replace(coeff, pos, pD$sizeDataLeaf)
         Px2 <- pD
       } else{
-        if(is.null(priorD)) Px2 <- univMoTBF(Y22, POTENTIAL_TYPE, domainChild, maxParam=maxParam)
-        else Px2 <- learnMoTBFpriorInformation(priorD, Y22, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        
+        if(max(Y22)==min(Y22)) next
+        
+        if(is.null(priorD)) Px2 <- univMoTBF(Y22, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
+        # else Px2 <- learnMoTBFpriorInformation(priorD, Y22, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        else Px2 <- learnMoTBFpriorInformation(priorD, Y22, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
       }
       
-      if(is.character(Y)){
+      if(is.factor(Y)){
         DiscreteBN <-  list(Px1, Px2)
         BICT <-  getBICDiscreteBN(DiscreteBN)
       } else {
@@ -263,9 +288,10 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
     
     if(is.null(points)){
       Y <- Y[which(X==X)]
-      if(is.character(Y)){
-        cutPoints <- unique(Y)
-        pD <- probDiscreteVariable(cutPoints, Y)
+      if(is.factor(Y)){
+        cutPoints <- levels(Y)
+        # pD <- probDiscreteVariable(cutPoints, Y)
+        pD <- probDiscreteVariable(Y)
         pos <- which(domainChild%in%cutPoints)
         coeff <- rep(0,length(domainChild))
         pD$coeff <- replace(coeff, pos, pD$coeff)
@@ -276,8 +302,9 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
         values <- list(Px=prob, interval=c(Xrange[1], Xrange[2]))
       } else{
         v <- c()
-        if(is.null(priorData)) P <- univMoTBF(Y, POTENTIAL_TYPE, domainChild, maxParam=maxParam)
-        else P <- learnMoTBFpriorInformation(priorD, Y, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        if(is.null(priorData)) P <- univMoTBF(Y, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
+        # else P <- learnMoTBFpriorInformation(priorD, Y, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam)$posteriorFunction 
+        else P <- learnMoTBFpriorInformation(priorD, Y, s, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
         values <- list(Px=P, interval=c(Xrange[1], Xrange[2]))
       }
       v[[length(v)+1]] <- values
@@ -303,14 +330,18 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
       
       return(v) 
     }
-  } else {
-    B <- discreteVariablesStates(nameParents, data)[[1]]$states
+  } else {# Discrete parent
+    
+    # B <- discreteVariablesStates(nameParents, data)[[1]]$states
+    B = levels(data[,nameParents])
     v <- c()
     for(i in 1:length(B)){
+      # browser()
       Y1 <- Y[which(X==B[i])]
-      if(is.character(Y1)){
-        cutPoints <- unique(Y1)
-        pD <- probDiscreteVariable(cutPoints, Y1)
+      if(is.factor(Y1)){
+        cutPoints <- levels(Y1)
+        # pD <- probDiscreteVariable(cutPoints, Y1)
+        pD <- probDiscreteVariable(Y1)
         pos <- which(domainChild%in%cutPoints)
         coeff <- rep(0,length(domainChild))
         pD$coeff <- replace(coeff, pos, pD$coeff)
@@ -320,18 +351,32 @@ learn.tree.Intervals <- function(data, nameParents, nameChild, domainParents, do
         v[[length(v)+1]] <- values
         
       } else{
-        if(is.null(priorData)){
-          P <- univMoTBF(Y1, POTENTIAL_TYPE, domainChild, maxParam=maxParam) 
+        if(length(Y1)==0){# When a combination of parents is not observed
+          # assign a uniform distribution
+          # browser()
+          # P <- asMOPString(1/diff(domainChild))
+          P <- do.call(paste0("as",POTENTIAL_TYPE,"String"), list(1/diff(domainChild)))
+          P <- list(Function = P, Subclass = tolower(POTENTIAL_TYPE), Domain = domainChild)
+          # P <- motbf(P)
+          # class(P) <-  c(class(P), tolower(POTENTIAL_TYPE))
+          P = do.call(paste0("new_",tolower(POTENTIAL_TYPE)), list(P))
+          # next
         }else{
-          priorChild <- priorData[,nameChild]
-          if(ncol(priorData)!=1){
-            priorParent <- priorData[,nameParents]
-            priorD <- priorChild[which(priorParent==B[i])]
-            P <- learnMoTBFpriorInformation(priorD, Y1, s, POTENTIAL_TYPE, domainChild)$posteriorFunction 
-          } else {
-            P <- univMoTBF(Y1, POTENTIAL_TYPE, domainChild, maxParam=maxParam)
+          if(is.null(priorData)){
+            P <- univMoTBF(Y1, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale) 
+          }else{
+            priorChild <- priorData[,nameChild]
+            if(ncol(priorData)!=1){
+              priorParent <- priorData[,nameParents]
+              priorD <- priorChild[which(priorParent==B[i])]
+              # P <- learnMoTBFpriorInformation(priorD, Y1, s, POTENTIAL_TYPE, domainChild)$posteriorFunction
+              P <- learnMoTBFpriorInformation(priorD, Y1, s, POTENTIAL_TYPE, domainChild, scale = scale)
+            } else {
+              P <- univMoTBF(Y1, POTENTIAL_TYPE, domainChild, maxParam=maxParam, scale = scale)
+            }
           }
         }
+
         
         values <- list(Px=P, interval=B[i])
         v[[length(v)+1]] <- values
@@ -372,7 +417,7 @@ BICscoreMoTBF <- function(conditionalfunction, data, nameParents, nameChild)
       
       ## Discrete Parent
       if(is.numeric(Y)){ 
-        
+        # browser()
         ## Continuous child
         domain <- Y[which(X==conditionalfunction[[i]]$interval)] 
         if(is.motbf(conditionalfunction[[i]]$Px)) values <- as.function(conditionalfunction[[i]]$Px)(domain)
@@ -452,92 +497,6 @@ BICMultiFunctions <- function(Px, X){
   return(BiC)
 }
 
-#' Plot Conditional Functions
-#' 
-#' Plot conditional MoTBF densities.
-#' 
-#' @param conditionalFunction the output of function \link{conditionalMethod}. 
-#' A list containing the the interval of the parent and the final conditional density (MTE or MOP).
-#' @param data An object of class \code{data.frame}, corresponding to the dataset used to fit the conditional density.
-#' @param nameChild A \code{character} string, corresponding to the name of the child variable in the conditional density. By default, it is \code{NULL}.
-#' @param points A logical value. If \code{TRUE}, the sample points are overlaid.
-#' @param color If not specified, a default palette is used. 
-#' @param ... Additional graphical parameters passed to filled.contour().
-#' @details If the number of parents is greater than one, then the error message 
-#' "It is not possible to plot the conditional function." is reported.
-#' @return A plot of the conditional density function.
-#' @seealso \link{conditionalMethod}
-#' @export
-#' @examples
-#' ## Data
-#' X <- rnorm(1000)
-#' Y <- rnorm(1000, mean=X)
-#' data <- data.frame(X=X,Y=Y)
-#' cov(data)
-#' 
-#' ## Conditional Learning
-#' parent <- "X"
-#' child <- "Y"
-#' intervals <- 5
-#' potential <- "MTE"
-#' P <- conditionalMethod(data, nameParents=parent, nameChild=child, 
-#' numIntervals=intervals, POTENTIAL_TYPE=potential)
-#' plotConditional(conditionalFunction=P, data=data)
-#' plotConditional(conditionalFunction=P, data=data, points=TRUE)
-#' 
-plotConditional <- function(conditionalFunction, data, nameChild=NULL, points=FALSE, color=NULL,...)
-{
-  opar <- par(no.readonly =TRUE)       
-  on.exit(par(opar)) 
-  
-  ## Define the color
-  if(is.null(color)) color <- colorRampPalette(c("#FFFFD9", "#EDF8B1", "#C7E9B4", "#7FCDBB", "#41B6C4", "#1D91C0", "#225EA8", "#253494", "#081D58"))
-  
-  nameParent <- conditionalFunction[[1]]$parent
-  if(length(nameParent)==1){ 
-    if(is.null(nameChild)){
-      if(ncol(data)==2) nameChild <- colnames(data)[which(colnames(data)!=nameParent)]
-      else (stop("The name of the child variable is needed because the number of columns in the dataset is bigger than two."))
-    }else{
-      if(ncol(data)==2)
-        if(colnames(data)[which(colnames(data)!=nameParent)]!=nameChild)
-          (stop("The name of the child variable has not been found in the dataset."))
-    }
-    X <- data[, nameParent]
-    Y <- data[, nameChild]
-    
-    xgrid <- seq(min(Y),max(Y),length.out=50) 
-    ygrid <- seq(min(X),max(X),length.out=50)
-    griddata <- as.data.frame(expand.grid(xgrid,ygrid))
-    D <- c()
-    for(i in 1:length(conditionalFunction)){
-      j <- which((griddata[,2]>=conditionalFunction[[i]]$interval[1])&(griddata[,2]<=conditionalFunction[[i]]$interval[2]))
-      gdi <- griddata[j,]
-      D <- c(D,as.function(conditionalFunction[[i]]$Px)(gdi[,1]))
-    }
-    d <- matrix(D, nrow = length(xgrid), ncol = length(ygrid), byrow=F)
-    zlim <- range(d, finite=TRUE)
-    zlim[1] <- 0
-    nlevels <- 20
-    levels <- pretty(zlim, nlevels)
-    nlevels <- length(levels)
-
-    filled.contour(x = ygrid, y = xgrid, z = t(d), nlevels = nlevels,
-                   levels = levels, col = color(nlevels),                           
-                   plot.title = {title(xlab = nameParent, ylab = nameChild, cex.lab = 2)},
-                   ...
-    )
-    if(points){
-      mar.orig <- par("mar")
-      w <- (3 + mar.orig[2]) * par("csi") * 2.54
-      layout(matrix(c(2, 1), ncol = 2), widths = c(1, lcm(w)))
-      points(data[,c(nameParent, nameChild)])
-      par(mfrow=c(1,1))
-    }
-  }else{
-    (stop("It is not possible to plot the conditional function."))
-  }
-}
 
 #' Summary of conditional MoTBF densities
 #' 

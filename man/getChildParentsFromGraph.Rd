@@ -10,11 +10,11 @@ getChildParentsFromGraph(graph, nameVars = NULL)
 \item{graph}{A directed acyclic graph of the class \code{"graphNEL"},
 \code{"network"} or \code{"bn"}.}
 
-\item{nameVars}{A character array containing the names of the variables in the graph. 
+\item{nameVars}{A character array containing the names of the variables in the graph.
 This parameter is only used when \code{graph} is of class \code{"network"}.}
 }
 \value{
-A list where each element is a vector containing the name of a variable 
+A list where each element is a vector containing the name of a variable
 and its parents in the graph.
 }
 \description{

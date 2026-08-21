@@ -10,20 +10,20 @@ A data frame with 336 rows, 8 variables and the class.
 \url{http://archive.ics.uci.edu/ml/datasets/Ecoli}
 }
 \description{
-This data set contains information of Escherichia coli. It is a 
-bacterium of the genus Escherichia that is commonly found in the 
+This data set contains information of Escherichia coli. It is a
+bacterium of the genus Escherichia that is commonly found in the
 lower intestine of warm-blooded organism.
 }
 \details{
 \describe{
-  \item{Sequence Name}{Accession number for the SWISS-PROT database.}
-  \item{mcg}{McGeoch's method for signal sequence recognition.} 
-  \item{gvh}{Von Heijne's method for signal sequence recognition.} 
-  \item{lip}{Von Heijne's Signal Peptidase II consensus sequence score. Binary attribute.}
-  \item{chg}{Presence of charge on N-terminus of predicted lipoproteins. Binary attribute.}
-  \item{aac}{Score of discriminant analysis of the amino acid content of outer membrane and periplasmic proteins.}
-  \item{alm1}{Score of the ALOM membrane spanning region prediction program.}
-  \item{alm2}{Score of ALOM program after excluding putative cleavable signal regions from the sequence.}
-  \item{Class}{Class variable. 8 possibles states.}
+\item{Sequence Name}{Accession number for the SWISS-PROT database.}
+\item{mcg}{McGeoch's method for signal sequence recognition.}
+\item{gvh}{Von Heijne's method for signal sequence recognition.}
+\item{lip}{Von Heijne's Signal Peptidase II consensus sequence score. Binary attribute.}
+\item{chg}{Presence of charge on N-terminus of predicted lipoproteins. Binary attribute.}
+\item{aac}{Score of discriminant analysis of the amino acid content of outer membrane and periplasmic proteins.}
+\item{alm1}{Score of the ALOM membrane spanning region prediction program.}
+\item{alm2}{Score of ALOM program after excluding putative cleavable signal regions from the sequence.}
+\item{Class}{Class variable. 8 possibles states.}
 }
 }

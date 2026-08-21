@@ -2,35 +2,33 @@
 % Please edit documentation in R/functions.R
 \name{subsetData}
 \alias{subsetData}
+\alias{splitFolds}
 \alias{TrainingandTestData}
-\alias{newData}
 \alias{splitdata}
 \title{Dataset subsetting}
 \usage{
-TrainingandTestData(data, percentage_test, discreteVariables = NULL)
+splitFolds(data, k)
 
-newData(data, nameX, nameY)
+TrainingandTestData(data, percentage_test, discreteVariables = NULL)
 
 splitdata(data, nameVariable, min, max)
 }
 \arguments{
 \item{data}{A dataset of class \code{data.frame}.}
 
-\item{percentage_test}{The proportion of data that goes to the test set (between 0 and 1).}
+\item{k}{The number of folds for k-fold cross validation, used in splitFolds function.}
 
-\item{discreteVariables}{A \code{character} vector with the name of the discrete variables.}
+\item{percentage_test}{The proportion of data that goes to the test set (between 0 and 1), used in TrainingandTestData function.}
 
-\item{nameX}{A \code{character} vector with the name of the child variable in the conditional method.}
+\item{discreteVariables}{A \code{character} vector with the name of the discrete variables in the dataset.}
 
-\item{nameY}{A \code{character} vector with the name of the parent variables in the conditional method.}
+\item{nameVariable}{A \code{character} vector with the name of the variable to be filtered, used in splitdata function.}
 
-\item{nameVariable}{A \code{character} vector with the name of the variable to be filtered.}
-
-\item{min, max}{Boundary values to filter out.}
+\item{min, max}{Boundary values to filter out, used in splitdata function.}
 }
 \value{
-\code{TrainingandTestData()} returns a list of 2 elements containing the train and test datasets. 
-\code{newData()} and \code{splitdata()} return a subset of variables or observations, respectively.
+\code{TrainingandTestData()} returns a list of 2 elements containing the train and test datasets.
+\code{splitdata()} returns a subset of observations.
 }
 \description{
 Collection of functions for subsetting a \code{"data.frame"} by rows or columns, and
@@ -43,7 +41,6 @@ X <- rnorm(1000)
 Y <- rchisq(1000, df = 8)
 Z <- rep(letters[1:10], times = 1000/10)
 data <- data.frame(X = X, Y = Y, Z = Z)
-data <- discreteVariables_as.character(dataset = data, discreteVariables ="Z")
 
 ## Training and Test Datasets
 TT <- TrainingandTestData(data, percentage_test = 0.2)
@@ -51,7 +48,6 @@ TT$Training
 TT$Test
 
 ## Subset Dataset
-newData(data, nameX = "X", nameY = "Z")
 splitdata(data, nameVariable = "X", min = 2, max= 3)
 }
 }

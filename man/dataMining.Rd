@@ -38,8 +38,8 @@ scaleData(dataset, scale)
 \item{factor}{A boolean value indicating if the variables should be considered as
 \code{"factor"} or as \code{"character"}. By default it is set to \code{FALSE}.}
 
-\item{binary}{By default it is set to \code{FALSE}, indicating that only binary entries are 
-used for continuous variables; a \code{TRUE} value means that binary entries are used to 
+\item{binary}{By default it is set to \code{FALSE}, indicating that only binary entries are
+used for continuous variables; a \code{TRUE} value means that binary entries are used to
 discretize the full dataset taking into account the states the discrete variables.}
 
 \item{namevariables}{an array with the names of the varibles.}
@@ -50,11 +50,11 @@ discretize the full dataset taking into account the states the discrete variable
 
 \item{X}{A \code{"numeric"} vector with the data values of a continuous variable.}
 
-\item{scale}{A \code{"numeric"} vector (when it refers to a single variable) or a \code{"list"} 
+\item{scale}{A \code{"numeric"} vector (when it refers to a single variable) or a \code{"list"}
 containing the name(s) of the variable(s) and the scale value.}
 }
 \description{
-Collection of functions for discretizing, standardizing, converting factors to 
+Collection of functions for discretizing, standardizing, converting factors to
 characters and other usufull methods for pre-processing datasets.
 }
 \details{
@@ -64,7 +64,7 @@ characters and other usufull methods for pre-processing datasets.
 
 \code{standardizeDataset()} standardizes all the variables in a data set.
 
-\code{discretizeVariablesEWdis()} discretizes the continuous variables in a dataset using 
+\code{discretizeVariablesEWdis()} discretizes the continuous variables in a dataset using
 equal width binning.
 
 \code{discreteVariablesStates()} extracts the states of the qualitative variables.
@@ -96,4 +96,5 @@ nstates(DiscreteVariablesStates = l)
 ## Continuous variables
 quantileIntervals(X = data[,1], numIntervals = 4)
 quantileIntervals(X = data[,2], numIntervals = 10)
+
 }

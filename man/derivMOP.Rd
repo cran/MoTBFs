@@ -38,6 +38,6 @@ subclass(Px)
 }
 }
 \seealso{
-\link{univMoTBF} for learning and \link{derivMoTBF} for 
+\link{univMoTBF} for learning and \link{derivMoTBF} for
 general \code{"motbf"} models.
 }

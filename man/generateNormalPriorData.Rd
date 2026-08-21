@@ -13,11 +13,11 @@ generateNormalPriorData(graph, data, size, means, deviations = NULL)
 
 \item{size}{A positive integer indicating the number of records to generate for each variable in the dataset.}
 
-\item{means}{A \code{"numeric"} vector with the average of the variables whose prior information is available. 
+\item{means}{A \code{"numeric"} vector with the average of the variables whose prior information is available.
 The names in the vector must be the same as the names of the variables in the data.frame.}
 
-\item{deviations}{A \code{"numeric"} vector with the standard deviations of the variables whose prior information is available. 
-The names of the vector must be the same as the names of the variables in the data.frame. 
+\item{deviations}{A \code{"numeric"} vector with the standard deviations of the variables whose prior information is available.
+The names of the vector must be the same as the names of the variables in the data.frame.
 If not specified, the standard deviation of each variable is computed from 'data'.}
 }
 \value{

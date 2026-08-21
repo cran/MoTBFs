@@ -1,145 +1,113 @@
-#' Class \code{"motbf"}
-#' 
-#' Defines an object of class \code{"motbf"} and other basic functions for manipulating 
-#' \code{"motbf"} objects.
-#' 
-#' @name Class-MoTBF
-#' @rdname Class-MoTBF
-#' @param x Preferably, a list containing an \code{'mte'} or \code{'mop'} univariate expression
-#' and other posibles elements like a \code{"numeric"} vector with the domain of the variable, 
-#' the number of iterations needed to solve the optimization problem, among others.
-#' Any \R object can be entered, but the utility of this function is not to transform
-#' objects of other classes into objects of class \code{"motbf"}.
-#' @param class By default is \code{"motbf"}.
-#' @param ... Additional arguments, not needed for these methods.
-#' @seealso \link{asMOPString} and \link{asMTEString}
-#' @examples
-#' ## Subclass 'MOP'
-#' param <- c(1,2,3,4,5)
-#' MOPString <- asMOPString(param)
-#' fMOP <- motbf(MOPString)
-#' print(fMOP) ## fMOP
-#' as.character(fMOP)
-#' as.list(fMOP)
-#' is(fMOP) 
-#' is.motbf(fMOP)
-#' 
-#' ## Subclass 'MTE'
-#' param <- c(6,7,8,9,10)
-#' MTEString <- asMTEString(param)
-#' fMTE <- motbf(MTEString)
-#' print(fMTE) ## MTE
-#' as.character(fMTE)
-#' as.list(fMTE)
-#' is(fMTE) 
-#' is.motbf(fMTE)
-#' @export
+### CLASS CONSTRUCTORS #####
+# Low-level constructor for motbf objects
+# 
+# Defines an object of class \code{"motbf"}, os subclasses, and other basic functions for manipulating
+# \code{"motbf"} objects.
+# 
+# @param x Preferably, a list containing an \code{'mte'} or \code{'mop'} univariate expression
+# and other posibles elements like a \code{"numeric"} vector with the domain of the variable,
+# the number of iterations needed to solve the optimization problem, among others.
+# Any \R object can be entered, but the utility of this function is not to transform
+# objects of other classes into objects of class \code{"motbf"}.
+# @examples
+# ## Subclass 'MOP'
+# param <- c(1,2,3,4,5)
+# MOPString <- asMOPString(param)
+# fMOP <- motbf(MOPString)
+# print(fMOP) ## fMOP
+# as.character(fMOP)
+# as.list(fMOP)
+# is(fMOP)
+# is.motbf(fMOP)
+# 
+# ## Subclass 'MTE'
+# param <- c(6,7,8,9,10)
+# MTEString <- asMTEString(param)
+# fMTE <- motbf(MTEString)
+# print(fMTE) ## MTE
+# as.character(fMTE)
+# as.list(fMTE)
+# is(fMTE)
+# is.motbf(fMTE)
+#' @noRd
 motbf <- function(x=0)
 {
-  if(!is.list(x)) x <- list(Function = x)
-  result <- x
-  class(result) <- "motbf"
-  result
+  if(!is.list(x)) x <- list(Function = noquote(x))
+  # result <- x
+  # class(result) <- c("univmotbf","motbf")
+  # result
+  structure(x, class = c("univmotbf", "motbf"))
 }
 
-#' @rdname Class-MoTBF
-#' @export
-print.motbf <- function(x, ...) print(x[[1]])
-
-#' @rdname Class-MoTBF
-#' @export
-as.character.motbf <- function(x, ...) as.character(x[[1]])
-
-#' @rdname Class-MoTBF
-#' @export
-as.list.motbf <- function(x, ...) as.list(x[[1]])
-
-#' @rdname Class-MoTBF
-#'@export
-is.motbf <- function(x, class="motbf") is(x, class)
-
-#' Summary of an \code{"motbf"} object
-#' 
-#' Summarize an \code{"motbf"} object by describing its main features.
-#' 
-#' @name summary.motbf
-#' @rdname summary.motbf
-#' @param object An object of class \code{"motbf"}.
-#' @param x An object of class \code{"summary.motbf"}.
-#' @param ... further arguments passed to or from other methods.
-#' @return The summary of an \code{"motbf"} object. It contains a list of
-#' elements with the most important information of the object.
-#' @seealso \link{univMoTBF}
-#' @examples
-#' ## Subclass 'MOP'
-#' X <- rnorm(1000)
-#' P <- univMoTBF(X, POTENTIAL_TYPE="MOP") ## or POTENTIAL_TYPE="MTE"
-#' summary(P)
-#' attributes(sP <- summary(P))
-#' attributes(sP)
-#' sP$Function
-#' sP$Subclass
-#' sP$Iterations
-#' 
-#' ## Subclass 'MTE'
-#' X <- rnorm(1000)
-#' P <- univMoTBF(X, POTENTIAL_TYPE="MTE")
-#' summary(P)
-#' attributes(sP <- summary(P))
-#' attributes(sP)
-#' sP$Function
-#' sP$Subclass
-#' sP$Iterations
-#' @method summary motbf
-#' @export
-summary.motbf <- function(object, ...)
-{
-  l <- lapply(1:length(object), function(i) object[[i]])
-  names(l) <- attributes(object)$names
-  l[[length(l)+1]] <- class(object)
-  names(l)[length(l)] <- "Class"
-  l[[length(l)+1]] <- coef(object)
-  names(l)[length(l)] <- "Coeff"
-  class(l) <- "summary.motbf"
-  l
+#' @noRd
+new_motbf <- function(x){
+  if(!is.list(x)) x <- list(Function = noquote(x))
+  structure(x, class = c("motbf"))
 }
 
-#' @rdname summary.motbf
-#' @export
-print.summary.motbf <- function(x, ...)
-{
-  cat("\n MoTBFs FOR UNIVARIATE DISTRIBUTIONS \n")
-  cat("\n Model:"); cat("\n", x$Function, "\n")
-  cat("\n Class:", x$Class)
-  cat("\n Subclass:", x$Subclass, "\n")
-  cat("\n Coefficients:"); cat("\n", x$Coeff, "\n")
-  if(!is.null(x$Domain)){ 
-    cat("\n Domain:")
-    cat("\n (",x$Domain[[1]], ", ",x$Domain[[2]],")", sep="","\n")
-  }
-  if(!is.null(x$Iterations)&&!is.null(x$Iterations)){
-    cat("\n Number of Iterations:", x$Iterations, "\n")
-    cat("\n Processing Time:", x$Time, attributes(x$Time)$units, "\n")
-  }
-  
+#' @noRd
+new_univmotbf <- function(x){
+  if(!is.list(x)) x <- list(Function = noquote(x))
+  structure(x, class = c("univmotbf", "motbf"))
+}
+
+#' @noRd
+new_mop <- function(x){
+  if(!is.list(x)) x <- list(Function = noquote(x))
+  structure(x, class = c("univmotbf", "mop", "motbf"))
+}
+
+#' @noRd
+new_mte <- function(x){
+  if(!is.list(x)) x <- list(Function = noquote(x))
+  structure(x, class = c("univmotbf", "mte", "motbf"))
+}
+
+# Class \code{"piecewisemop"}
+#' @noRd
+new_piecewisemop <- function(x){
+  structure(x, class = c("piecewisemop", "motbf"))
+}
+
+#' @noRd
+new_jointmotbf <- function(x){
+  if(!is.list(x)) x <- list(Function = noquote(x))
+  structure(x, class = c("jointmotbf", "motbf"))
+}
+
+
+# Class \code{"motbf_fit"}
+#' @noRd
+new_motbf_fit <- function(x){
+  structure(x, class = c("motbf_fit", "motbf"))
+}
+
+#' @noRd
+new_motbf_fit_node <- function(x){
+  structure(x, class = c("motbf.fit.node"))
+}
+
+# Class \code{"motbf_fit_cv"}
+#' @noRd
+new_motbf_fit_cv <- function(x){
+  structure(x, class = c("motbf_fit_cv", "motbf"))
 }
 
 
 
 #' Class \code{"jointmotbf"}
 #' 
-#' Defines an object of class \code{"jointmotbf"} and other basic functions for 
+#' DEPRECATED - Defines an object of class \code{"jointmotbf"} and other basic functions for 
 #' manipulating \code{"jointmotbf"} objects.
 #' 
-#' @name Class-JointMoTBF
-#' @rdname Class-JointMoTBF
+# @name Class-JointMoTBF
+# @rdname Class-JointMoTBF
+#' @noRd
 #' @param x Preferably, a list containing an expression
-#' and other posibles elements like a \code{"numeric"} matrix with the domain of the variables, 
+#' and other possible elements like a \code{"numeric"} matrix with the domain of the variables, 
 #' the dimension of the variables, the number of iterations needed to solve the optimization problem,
 #' among others. Any \R object can be entered, but the utility of this function is not to transform
 #' objects of other classes into objects of class \code{"jointmotbf"}.
-#' @param class By default is \code{"jointmotbf"}.
-#' @param ... Additional arguments, not needed by these methods.
 #' @seealso \link{jointMoTBF}
 #' @examples
 #' ## n.parameters is the product of the dimensions
@@ -151,113 +119,170 @@ print.summary.motbf <- function(x, ...)
 #' 
 #' print(jointF) ## jointF
 #' as.character(jointF)
-#' as.list(jointF)
 #' is(jointF)
 #' is.jointmotbf(jointF)
-#' @export
 jointmotbf <- function(x = 0)
 {
-  if(!is.list(x)) x <- list(Function = x)
+  if(!is.list(x)) x <- list(Function = noquote(x))
   result <- x
-  class(result) <- "jointmotbf"
+  class(result) <- c("jointmotbf", "motbf")
   result
 }
 
-#' @rdname Class-JointMoTBF
-#' @export
-print.jointmotbf <- function(x, ...) print(x[[1]])
 
-#' @rdname Class-JointMoTBF
-#' @export
-as.character.jointmotbf <- function(x, ...) as.character(x[[1]])
+## CLASS COERTION ########
 
-#' @rdname Class-JointMoTBF
-#' @export
-as.list.jointmotbf <- function(x, ...) as.list(x[[1]])
-
-#' @rdname Class-JointMoTBF
-#' @export
-is.jointmotbf <- function(x, class="jointmotbf") is(x, class)
-
-#' Summary of a \code{"jointmotbf"} object
-#' 
-#' Summarize a \code{"jointmotbf"} object by describing its main features.
-#' 
-#' @name summary.jointmotbf
-#' @rdname summary.jointmotbf
-#' @param object An object of class \code{"jointmotbf"}.
-#' @param x An object of class \code{"summary.jointmotbf"}.
-#' @param ... further arguments passed to or from other methods.
-#' @return The summary of a \code{"jointmotbf"} object. It contains a list of
-#' elements with the most important information about the object.
-#' @seealso \link{parametersJointMoTBF} and \link{jointMoTBF}
-#' @examples
-#' ## 1. EXAMPLE
-#' X <- rnorm(100)
-#' Y <- rexp(100)
-#' data <- data.frame(X, Y)
-#' dim <- c(3,4)
-#' param <- parametersJointMoTBF(data, dimensions=dim)
-#' P <- jointMoTBF(param)
-#' summary(P)
-#' attributes(sP <- summary(P))
-#' attributes(sP)
-#' sP$Function
-#' sP$Domain
-#' sP$Iterations
-#' 
-#' ##############################################################################
-#' ## MORE EXAMPLES #############################################################
-#' ##############################################################################
-#' \donttest{
-#' X <- rnorm(100)
-#' Y <- rexp(100)
-#' Z <- rnorm(100, mean=1)
-#' data <- data.frame(X, Y, Z)
-#' dim <- c(3,2,4)
-#' param <- parametersJointMoTBF(data, dimensions=dim)
-#' P <- jointMoTBF(param)
-#' summary(P)
-#' attributes(sP <- summary(P))
-#' sP$Function
-#' sP$Domain
-#' sP$Iterations
+#' Coerce MOTBF Objects to Character or Function
+#'
+#' Converts \code{'motbf'} and \code{'jointmotbf'} objects into character string expressions or executable R functions.
+#'
+#' @param x An object of class \code{'motbf'} or \code{'jointmotbf'}.
+#' @param ... Further arguments passed to or from other methods. Not used currently.
+#'
+#' @return 
+#' \itemize{
+#'   \item \code{as.character}: Returns a character string representing the mathematical expression of the object.
+#'   \item \code{as.function}: Returns an executable R function that accepts numeric arguments to evaluate the MoTBF expression.
 #' }
-#' ##############################################################################
-#' ##############################################################################
-#' @method summary jointmotbf
-#' @export
-summary.jointmotbf <- function(object, ...)
-{
-  l <- lapply(1:length(object), function(i) object[[i]])
-  names(l) <- attributes(object)$names
-  l[[length(l)+1]] <- class(object)
-  names(l)[length(l)] <- "Class"
-  l[[length(l)+1]] <- coef(object)
-  names(l)[length(l)] <- "Coeff"
-  class(l) <- "summary.jointmotbf"
-  l
+#'
+#' @name coercion-motbf
+#' @rdname coercion-motbf
+#' 
+#' @examples
+#' 
+#' ## Example 1
+#' X <- rchisq(5000, df = 3)
+#' P <- univMoTBF(X, POTENTIAL_TYPE = "MOP"); P
+#' as.function(P)(10)
+#' 
+#' ## Example 2
+#' data <- data.frame(X = rnorm(100), Y = rexp(100))
+#' dim <- c(3,2)
+#' P <- jointmotbf.fit(data, dimensions = dim)
+#' density <- as.function(P)(data[,1], data[,2])
+#' sum(log(density))
+#' 
+#' @exportS3Method base::as.character motbf
+as.character.motbf <- function(x, ...){ 
+  as.character(x[[1]])
 }
 
-#' @rdname summary.jointmotbf
-#' @export
-print.summary.jointmotbf <- function(x, ...)
-{
-  cat("\n MoTBFs FOR MULTIVARIATE DISTRIBUTIONS \n")
-  cat("\n Model:"); cat("\n", x$Function, "\n")
-  cat("\n Class:", x$Class, "\n")
-  cat("\n Coefficients:"); cat("\n", x$Coeff, "\n")
-  if(!is.null(x$Domain)){ 
-    for(i in 1:ncol(x$Domain)){
-      cat("\n Domain ", nVariables(x)[i], ":", sep="")
-      cat("\n (",x$Domain[1,i], ", ",x$Domain[2,i],")", sep="")
-    }
-    cat("\n")
-  }
-  if(!is.null(x$Iterations)&&!is.null(x$Iterations)){
-    cat("\n Number of Iterations:", x$Iterations, "\n")
-    cat("\n Processing Time:", x$Time, attributes(x$Time)$units, "\n")
-  }
+#' @rdname coercion-motbf
+#' @exportS3Method base::as.function motbf
+as.function.motbf <- function(x, ...){
+
+  v <- getMotbfVar(x)
+
+  f = eval(parse(text = paste("f <- function(",v,")",x)))
+  formals(f) <- formals(f)[1:length(v)]
+  names(formals(f)) <- v
+  return(f)
   
+}
+
+#' @rdname coercion-motbf
+#' @exportS3Method base::as.character jointmotbf
+as.character.jointmotbf <- function(x, ...){
+  as.character(x[[1]])
+}
+
+
+#' @rdname coercion-motbf
+#' @exportS3Method base::as.function jointmotbf
+as.function.jointmotbf <- function(x, ...)
+{
+  P <- x[[1]]
+  # v <- getMotbfVar(P)
+  v <- attr(x$Domain, "dimnames")[[2]]
+  f= eval(parse(text = paste0("f <- function(",paste0(v, collapse = ', '),")",P)))
+  
+  formals(f) <- formals(f)[1:length(v)]
+  names(formals(f)) <- v
+  return(f)  
+}
+
+
+
+
+## CHECK CLASS ########
+
+#' Check MoTBF Classes and Subclasses
+#'
+#' Utility functions to check whether an object belongs to a specific MoTBF class, or to identify its underlying subclass (\code{'mop'} or \code{'mte'}).
+#'
+#' @param x An object to be checked.
+#' @param class Character string specifying the target class name.
+#' @param fx An object to determine the subclass for.
+#'
+#' @return 
+#' \itemize{
+#'   \item \code{is.*}: Logical value (\code{TRUE} or \code{FALSE}) indicating if the object belongs to the checked class.
+#'   \item \code{subclass}: A character string (\code{"mop"} or \code{"mte"}) specifying the underlying family of the object.
+#' }
+#'
+#' @name is.motbf
+#' @rdname is.motbf
+#' @export
+is.motbf <- function(x, class = "motbf"){ 
+  is(x, class)
+}
+
+#' @rdname is.motbf
+#' @export
+is.univmotbf <- function(x, class = "univmotbf"){ 
+  is(x, class)
+}
+
+
+#' @rdname is.motbf
+#' @export
+is.jointmotbf <- function(x, class = "jointmotbf"){ 
+  is(x, class)
+}
+
+#' @rdname is.motbf
+#' @export
+is.motbf_fit <- function(x, class = "motbf_fit"){
+  is(x, class)
+}
+
+#' @rdname is.motbf
+#' @export
+is.motbf_fit_cv<- function(x, class = "motbf_fit_cv"){
+  is(x, class)
+}
+
+#' @rdname is.motbf
+#' @export
+is.mte <- function(x){
+  if(is(x, 'mte')){
+    return(TRUE)
+  }
+  subclass = tryCatch({x$Subclass}, error=function(e){NULL})
+  if(!is.null(subclass)) return(subclass=="mte")
+  f <- x[[1]] 
+  l <- length(strsplit(as.character(f), split="exp", fixed=TRUE)[[1]])-1
+  return(l!=0&&is.motbf(x))
+}
+
+#' @rdname is.motbf
+#' @export
+is.mop <- function(x){
+  if(is(x, 'mop')){
+    return(TRUE)
+  }
+  subclass = tryCatch({x$Subclass}, error=function(e){NULL})
+  if(!is.null(subclass)) return(subclass=="mop")
+  f <- x[[1]] 
+  l <- length(strsplit(as.character(f), split="exp", fixed=TRUE)[[1]])-1
+  return(l==0&&is.motbf(x))
+}
+
+#' @rdname is.motbf
+#' @export
+subclass <- function(fx)
+{
+  if(is.mop(fx)) return("mop")
+  if(is.mte(fx)) return("mte")
 }
 

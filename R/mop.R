@@ -78,6 +78,8 @@
 #' attributes(fMOP$bestPx)
 #' hist(data, prob=TRUE, main="")
 #' plot(fMOP$bestPx, col=2, xlim=range(data), add=TRUE)
+
+
 #' @export
 mop.learning <- function(X, nparam, domain)
 {
@@ -93,10 +95,9 @@ mop.learning <- function(X, nparam, domain)
     P <- asMOPString(1/diff(domain))
     P <- list(Function = P, Subclass = "mop", Domain = domain,
               Iterations = 0, Time = 0)
-    P <- motbf(P)
+    P <- new_mop(P)
     return(P)
   }
-  
   xx=rep(1,n); xi <- 0
   for(i in 1:nparam){
     xi=cbind(x^i)
@@ -142,58 +143,81 @@ mop.learning <- function(X, nparam, domain)
   ## Solve the optimization problem
   tr=tryCatch(solve.QP(XX, Xy, AA, B, meq=2), error = function(e) NULL)
   finaltm <- Sys.time() - tm
-  if(is.null(tr)==T){
+  if(is.null(tr)==TRUE){
     return(NULL)
   }else{
     soluc <-tr
     parameters <- soluc$solution
     Px <- asMOPString(parameters)
     Px <- list(Function=Px, Subclass="mop")
-    Px <- motbf(Px)
+    Px <- new_mop(Px)
     
     ## Derivative (PDF)
     Px <-derivMoTBF(Px)
+    
+    # Garantizar que integra 1
+    # browser()
+    k = integrateMOP(Px,lower = domain[1],domain[2])
+    
+    if(abs(1-k)>10^-6){
+      Px = multiplyMOPbyConstant(Px,1/k)
+    }
     
     #return(Px)
     P <- asMOPString(coef(Px))
     P <- list(Function = P, Subclass = "mop", Domain = domain,
               Iterations = tr$iterations[1], Time = finaltm)
-    P <- motbf(P)
+    P <- new_mop(P)
     return(P)
   }
 }
+
  
 #' @rdname mop.learning
 #' @export
 bestMOP=function(X, domain, maxParam=NULL)
 {
+  # browser()
+  if(is.null(maxParam)){
+    maxParam = 10
+  } 
   bestBIC <- -10^10;  bestPx <- 0; degreeN <- 0
   degree <- 1; i <- 0; vecBIC <- c()
   if(!is.null(maxParam)){
-    Pxs=list()
-    repeat{
-      if(!is.null(maxParam)&&(degree>maxParam)) break
-      if(i==4) break
-      
-      ## Learning parameters with a fix number of degree
-      Px=mop.learning(X, degree, domain) #fit function
-      if((is.null(Px)==T)&&(!is.motbf(bestPx))) {
-        degree <- degree+1
-        i <- i+1
+    # Pxs=list()
+    nparam = maxParam
+    continue = TRUE
+    bestPx = mop.learning(X,1,domain)
+    bestBIC = sum(log(as.function(bestPx)(X)))
+    while(nparam>1){
+      # Control
+      if(!continue){
+        break
+      }
+      continue = FALSE
+      # Learning Mop
+      Px=mop.learning(X, nparam, domain)
+      if(is.null(Px)) {
+        nparam <- nparam-1
+        continue = TRUE
         next
       }
-      if((is.null(Px)==T)&&(is.motbf(bestPx))) break
-      
-      ## compute the BIC score
-      degree <- degree+1
-      BiC <- sum(log(as.function(Px)(X)))
-      #BiC <- BICMoTBF(Px,X)
-      Pxs[[length(Pxs)+1]] <- Px
-      vecBIC <- c(vecBIC,BiC)
+      BiC = tryCatch(BICMoTBF(Px,X),
+        # Esto puede generar NaN},
+        warning = function(w) {
+          continue<-TRUE
+          return(-10^10)},
+        error = function(e) {
+          continue<-TRUE
+          -10^-10
+        })
+      if(BiC>bestBIC){
+        bestBIC = BiC
+        bestPx = Px
+        continue = TRUE
+      }
+      nparam = nparam-1
     }
-    p <- which(vecBIC==max(vecBIC))
-    bestBIC <- vecBIC[p]
-    bestPx <- Pxs[[p]]
     degreeN <- length(coef(bestPx))    
   } else{
     repeat{
@@ -202,12 +226,12 @@ bestMOP=function(X, domain, maxParam=NULL)
       
       ## Learning parameters with a fix number of degree
       Px=mop.learning(X, degree, domain) #fit function
-      if((is.null(Px)==T)&&(!is.motbf(bestPx))) {
+      if((is.null(Px)==TRUE)&&(!is.motbf(bestPx))) {
         degree <- degree+1
         i <- i+1
         next
       }
-      if((is.null(Px)==T)&&(is.motbf(bestPx))) break
+      if((is.null(Px)==TRUE)&&(is.motbf(bestPx))) break
       
       ## compute the BIC score
       BiC <- BICMoTBF(Px,X)
@@ -244,9 +268,95 @@ bestMOP=function(X, domain, maxParam=NULL)
     
   }
   
-  result <- list(bestPx=bestPx, bestBIC=bestBIC, degreeN=degreeN+1, vecBIC=vecBIC)
+  result <- list(bestPx=bestPx, bestBIC=bestBIC, degreeN=degreeN-1, vecBIC=vecBIC)
   return(result)
 }
+
+
+# bestMOP=function(X, domain, maxParam=NULL)
+# {
+#   bestBIC <- -10^10;  bestPx <- 0; degreeN <- 0
+#   degree <- 1; i <- 0; vecBIC <- c()
+#   if(!is.null(maxParam)){
+#     Pxs=list()
+#     repeat{
+#       if(!is.null(maxParam)&&(degree>maxParam)) break
+#       if(i==4) break
+#       
+#       ## Learning parameters with a fix number of degree
+#       
+#       Px=mop.learning(X, degree, domain) #fit function
+#       if((is.null(Px)==TRUE)&&(!is.motbf(bestPx))) {
+#         degree <- degree+1
+#         i <- i+1
+#         next
+#       }
+#       if((is.null(Px)==TRUE)&&(is.motbf(bestPx))) break
+#       
+#       ## compute the BIC score
+#       degree <- degree+1
+#       
+#       BiC <- sum(log(as.function(Px)(X)))
+#       #BiC <- BICMoTBF(Px,X)
+#       Pxs[[length(Pxs)+1]] <- Px
+#       vecBIC <- c(vecBIC,BiC)
+#     }
+#     p <- which(vecBIC==max(vecBIC))
+#     bestBIC <- vecBIC[p]
+#     bestPx <- Pxs[[p]]
+#     degreeN <- length(coef(bestPx))    
+#   } else{
+#     repeat{
+#       if(!is.null(maxParam)&&(degree>maxParam)) break
+#       if(i==4) break
+#       
+#       ## Learning parameters with a fix number of degree
+#       Px=mop.learning(X, degree, domain) #fit function
+#       if((is.null(Px)==TRUE)&&(!is.motbf(bestPx))) {
+#         degree <- degree+1
+#         i <- i+1
+#         next
+#       }
+#       if((is.null(Px)==TRUE)&&(is.motbf(bestPx))) break
+#       
+#       ## compute the BIC score
+#       BiC <- BICMoTBF(Px,X)
+#       vecBIC <- c(vecBIC,BiC)
+#       if(is.na(BiC)) break
+#       
+#       if(length(vecBIC)<=2){
+#         if(BiC>bestBIC){
+#           bestBIC <- BiC
+#           bestPx <- Px
+#           degreeN <- degree-1
+#           degree <- degree+1
+#         } else {
+#           degree <- degree+1
+#           next
+#         }
+#       } else{
+#         if(BiC>bestBIC){
+#           bestBIC <- BiC
+#           bestPx <- Px
+#           degreeN <- degree-1
+#           degree <- degree+1
+#         } else{
+#           if(bestBIC==vecBIC[length(vecBIC)-1]){
+#             if(length(unique(vecBIC))==1) break
+#             degree <- degree+1
+#             next
+#           } else{
+#             break
+#           }
+#         }
+#       }
+#     }
+#     
+#   }
+#   
+#   result <- list(bestPx=bestPx, bestBIC=bestBIC, degreeN=degreeN+1, vecBIC=vecBIC)
+#   return(result)
+# }
 
 #' Parameters to MOP String
 #' 
@@ -303,6 +413,9 @@ asMOPString <- function(parameters)
 #' plot(fx2, xlim=range(data), col="red", add=TRUE)
 #' coeffMOP(fx2) ## coef(fx2)
 #' coeffPol(fx2)
+
+
+
 #' @export
 coeffMOP <- function(fx)
 {
@@ -314,19 +427,19 @@ coeffMOP <- function(fx)
   }
   
   f1 <- substr(fx[1], 1, 1)
-  t <- unlist(sapply(1:length(fx), function(i) strsplit(fx[i], split="-", fixed = T)[[1]]))
+  t <- unlist(sapply(1:length(fx), function(i) strsplit(fx[i], split="-", fixed = TRUE)[[1]]))
   for(i in 1:length(t)) t[i] <- paste("-", t[i], sep="")
   if(f1!=substr(t[1], 1, 1)) t[1] <- substr(t[1], 2, nchar(t[1]))
   
   t2 <- c()
   for(i in 1:(length(t))){
-    t1 <- strsplit(t[i], split="+", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
+    t1 <- strsplit(t[i], split="+", fixed = TRUE, perl = FALSE, useBytes = FALSE)[[1]]
     t2 <- c(t2,t1)
   }
   
   t3 <- c()
   for(i in 1:(length(t2))){
-    t1 <- strsplit(t2[i], split="*", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
+    t1 <- strsplit(t2[i], split="*", fixed = TRUE, perl = FALSE, useBytes = FALSE)[[1]]
     t3 <- c(t3,t1[1])
   }
   
@@ -354,12 +467,12 @@ coeffPol <- function(fx)
 {
   param <- coef(fx)
   string <- noquote(as.character(fx))
-  for(i in 1:length(param)) string <- unlist(strsplit(string, split=param[i], fixed=T))
-  string <- unlist(strsplit(string, split="+", fixed=T))
+  for(i in 1:length(param)) string <- unlist(strsplit(string, split=param[i], fixed=TRUE))
+  string <- unlist(strsplit(string, split="+", fixed=TRUE))
   if(string[1]=="") string <- string[-1]
   if(length(string)==(length(param)-1)) coeff <- 0
   else coeff <- c()
-  string <- strsplit(string, split="^", fixed=T)
+  string <- strsplit(string, split="^", fixed=TRUE)
   t <- sapply(1:length(string), function(i) string[[i]][2])
   t[is.na(t)] <- 1
   coeff <- as.numeric(c(coeff, t))
@@ -412,71 +525,121 @@ derivMOP <- function(fx)
   }
   str <- noquote(str)
   str <- list(Function = str, Subclass= "mop")
-  str <- motbf(str)
+  str <- new_mop(str)
   return(str)  
 }
 
-#' Integration of MOPs
-#' 
-#' Method to calculate the non-defined integral of an \code{"motbf"} object of \code{'mte'} subclass.
-#' 
-#' @param fx An \code{"motbf"} object of subclass \code{'mop'}.
-#' @return The non-defined integral of the function.
-#' @seealso \link{univMoTBF} for learning and \link{integralMoTBF} 
-#' for a more complete function to get defined and non-defined integrals
-#' of class \code{"motbf"}.
-#' @export
-#' @examples
-#' 
-#' ## 1. EXAMPLE
-#' X <- rexp(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
-#' integralMOP(Px)
-#' 
-#' ## 2. EXAMPLE
-#' X <- rnorm(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
-#' integralMOP(Px)
-#' 
-#' \dontrun{
-#' ## 3. EXAMPLE
-#' X <- rnorm(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
-#' integralMOP(Px)
-#' ## Error in integralMOP(Px): fx is an 'motbf' function but not 'mop' subclass.
-#' class(Px)
-#' subclass(Px)
-#' }
 
-integralMOP <- function(fx)
-{
-  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
-  if(is.motbf(fx)&&!is.mop(fx)) stop("fx is an 'motbf' function but not 'mop' subclass.")
+#' Expected Value of an MoP Density Function
+#'
+#' Computes the expected value (mean) of a Mixture of Polynomials (MoP) function over its domain.
+#'
+#' @param fx An object of class \code{'mop'} representing an MoP probability density function.
+#'
+#' @return A numeric value representing the expected value of the distribution.
+#' @export
+#' 
+expectedValueMOP = function(fx){
+  f = fx
+  if('piecewisemop' %in% class(f)){
+    class(f) = 'piecewisemop'
+    res = sapply(f, expectedValueMOP)
+    return(sum(res))
+  }
+  # get coefficients and exponents
+  des = splitMOP(f)
+  coef = des[[1]]
+  expo = des[[2]]
   
-  #options(warn=-1)
+  # variable
+  v = des[[3]]
   
-  suppressWarnings({
-    parameters <- coeffMOP(fx)
-    mu <- tryCatch(meanMOP(fx), error = function(e) NA) 
-    str <- paste(parameters[1], "*x", sep="")
-    if(length(parameters)==1){
-      f <- noquote(str)
-      f <- motbf(f)
-      return(f)
-    }
-    for(i in 2:length(parameters)){
-      if(parameters[i]>=0) sign <- "+" else sign <- ""
-      if(is.na(mu)){
-        str <- paste(str, sign, (parameters[i]/i), "*x^", i, sep="")
-      }else{
-        if(mu>=0) signmean <- "-" else signmean <- "+"
-        str <- paste(str,sign,parameters[i]/i,"*(x",signmean, mu, ")^",i, sep="")
-      }
-    }
-    f <- noquote(str)
-    f <- list(Function = f, Subclass = "mop")
-    f <- motbf(f)
-  })
+  # get degree of each term
+  b = ifelse(expo == "", 0,expo)# exponente para término independiente
+  b = gsub(paste0('\\*',v, '|\\^'),'',b)
+  b = as.numeric(ifelse(b == '', 1, b))
   
-  return(f)
+  
+  lower = f$Domain[1]
+  upper = f$Domain[2]
+  
+  fx <- function(x){sum(coef/(b+2)*x^(b+2))}
+  return(fx(upper) - fx(lower))
+}
+
+
+expectedValue = function(fx){
+  f = fx
+  if('piecewisemop' %in% class(f)){
+    class(f) = 'piecewisemop'
+    res = sapply(f, expectedValue)
+    return(sum(res))
+  }
+  l = f$Domain[1]
+  u = f$Domain[2]
+  
+  f = as.function(f)
+  g = function(x){ return(x*f(x))};
+  
+  
+  res = integrate(g,l,u)
+  return(res$value);
+  
+}
+
+splitMOP <- function(mop){
+  
+  # Extraer bases y exponentes
+  coefmop = coeffMOP(mop)
+  str = as.character(abs(coefmop));str
+  
+  test = tryCatch({as.character(mop$Function)}, error=function(e){NULL})
+  if(is.null(test) & is.numeric(mop) & length(mop)==1){
+    test = mop
+  }
+
+  
+  # remove sci notation
+  test = gsub('[0-9]e-[0-9]','', test)
+  test = gsub('[0-9]e\\+[0-9]','', test)
+  
+  # Split each term by + or -
+  terms = strsplit(test, split = c("(-)|(\\+)"))[[1]]
+  # If first coef is negative, remove first empty element
+  if(coefmop[1]<0){
+    terms = terms[-1]
+  }
+  # split by * within each term
+  
+  terms = strsplit(terms, split = '(?<=.)(?=\\*)', perl = TRUE)
+  
+  # keep exponents (if mop is a univ distribution, they are in the 2nd element; 
+  # if mop is s joint distribution, they are in the 2nd to n element: therefore, use grep())
+  # if("univmotbf"%in%class(mop)){
+  #   exponents = sapply(terms, '[',2);exponents
+  #   exponents = ifelse(is.na(exponents), '', exponents);exponents
+  # }else if("jointmotbf"%in%class(mop)){
+  #   exponents = sapply(terms, grep, pattern = "\\*", value = TRUE)
+  #   exponents = lapply(exponents, function(x) ifelse(length(x)==0, '', x))
+  #   exponents = sort(unique(unlist(exponents)))
+  # }
+  exponents = sapply(terms, grep, pattern = "\\*", value = TRUE)
+  exponents = lapply(exponents, function(x) if(length(x)==0){''}else{x})
+  expo = sapply(exponents, paste0, collapse = '')
+
+  # get variables
+  variables = sort(unique(unlist(exponents)))
+  lp = unlist(variables)
+  
+  tm1 = strsplit(lp, '(\\*|\\^)')
+  
+  tm2 = suppressWarnings({sapply(tm1, function(x)ifelse(!is.na(as.numeric(x)),"", x))})
+  
+  tm3 = unique(unlist(tm2))
+  res = tm3[tm3!=""]
+  vars = unique(res)
+  if(length(vars)==0){
+    vars = ""
+  }
+  return(list(Coefficients = coefmop, Exponents = expo, Variables = vars )) 
 }

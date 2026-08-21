@@ -17,7 +17,8 @@ conditionalMethod(
   POTENTIAL_TYPE,
   maxParam = NULL,
   s = NULL,
-  priorData = NULL
+  priorData = NULL,
+  scale = FALSE
 )
 
 conditional(
@@ -31,7 +32,8 @@ conditional(
   POTENTIAL_TYPE,
   maxParam = NULL,
   s = NULL,
-  priorData = NULL
+  priorData = NULL,
+  scale = FALSE
 )
 
 select(
@@ -44,7 +46,8 @@ select(
   POTENTIAL_TYPE,
   maxParam = NULL,
   s = NULL,
-  priorData = NULL
+  priorData = NULL,
+  scale = FALSE
 )
 
 learn.tree.Intervals(
@@ -57,7 +60,8 @@ learn.tree.Intervals(
   POTENTIAL_TYPE,
   maxParam = NULL,
   s = NULL,
-  priorData = NULL
+  priorData = NULL,
+  scale = FALSE
 )
 
 BICscoreMoTBF(conditionalfunction, data, nameParents, nameChild)
@@ -69,27 +73,29 @@ BICscoreMoTBF(conditionalfunction, data, nameParents, nameChild)
 
 \item{nameChild}{A \code{"character"} string containing the name of the child variable.}
 
-\item{numIntervals}{A positive integer indicating the maximum number of intervals 
+\item{numIntervals}{A positive integer indicating the maximum number of intervals
 for splitting the domain of the parent variables.}
 
-\item{POTENTIAL_TYPE}{A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding 
+\item{POTENTIAL_TYPE}{A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding
 to the type of basis function.}
 
-\item{maxParam}{A positive integer which indicates the maximum number of coefficients in the 
-function. If specified, the output is the function which gets the best BIC with, at most, 
+\item{maxParam}{A positive integer which indicates the maximum number of coefficients in the
+function. If specified, the output is the function which gets the best BIC with, at most,
 this number of parameters. By default, it is set to \code{NULL}.}
 
-\item{s}{A \code{"numeric"} value indicating the expert's confidence in the prior knowledge. 
-This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+\item{s}{A \code{"numeric"} value indicating the expert's confidence in the prior knowledge.
+This argument takes values on the interval \eqn{[0, N]}, where \eqn{N} is the sample size, and is used
 to synchronize the support of the prior knowledge and the sample.
-By default, it is \code{NULL}, and must be modified only if prior information is to be 
+By default, it is \code{NULL}, and must be modified only if prior information is to be
 incorporated in the learning process.}
 
 \item{priorData}{An object of class \code{"data.frame"}, corresponding to the prior information.}
 
+\item{scale}{A \code{"logical"} value indicating whether to standardize the numeric variables to have mean 0 and standard deviation 1.}
+
 \item{domainChild}{A \code{"numeric"} vector with the range of the child variable.}
 
-\item{domainParents}{An object of class \code{"matrix"} with the range of the parent 
+\item{domainParents}{An object of class \code{"matrix"} with the range of the parent
 variables, or a \code{"numeric"} vector if there is only one parent.}
 
 \item{mm}{One of the inputs and the output of the recursive internal function \code{"conditional"}.}
@@ -97,19 +103,19 @@ variables, or a \code{"numeric"} vector if there is only one parent.}
 \item{conditionalfunction}{The output of the internal function \code{learn.tree.Intervals}.}
 }
 \value{
-The main function \code{conditionalMethod} returns a list with the name of the parents, 
+The main function \code{conditionalMethod} returns a list with the name of the parents,
 the different intervals and the fitted densities
 }
 \description{
 Collection of functions used for learning conditional MoTBFs,
-computing the internal BIC, selecting the parents that get 
+computing the internal BIC, selecting the parents that get
 the best BIC value, and other internal functions required to learn the
 conditional densities.
 }
 \details{
-The main function, \code{conditionalMethod()}, fits truncated basis functions for the conditioned variable 
+The main function, \code{conditionalMethod()}, fits truncated basis functions for the conditioned variable
 for each configuration of splits of the parent variables. The domain of the parent variables is splitted
-in different intervals and univariate functions are fitted in these 
+in different intervals and univariate functions are fitted in these
 ranges. The remaining above described functions are internal to the main function.
 }
 \examples{
@@ -158,8 +164,10 @@ nameChild = child, domainParents = domainParent1, domainChild = domainC,
 numIntervals = intervals, POTENTIAL_TYPE = potential)
 BICscoreMoTBF(treeParent1, data, nameParents = parent1, nameChild = child)
 }
+
 ###############################################################################
 ###############################################################################
+
 }
 \seealso{
 \link{printConditional}

@@ -17,7 +17,7 @@ rnormMultiv(n, dataParents, dataChild)
 A \code{"numeric"} vector giving the prior data values.
 }
 \description{
-Generate a multivariate normal data vector taking into account the real data and the 
+Generate a multivariate normal data vector taking into account the real data and the
 relationships with other variables in the dataset.
 }
 \examples{

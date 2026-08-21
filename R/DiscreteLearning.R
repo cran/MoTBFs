@@ -1,44 +1,61 @@
 #' Probability distribution of discrete variables
 #' 
-#' Compute the probabilities of a discrete variable from a dataset.
+#' Compute the probabilities of a discrete variable from a data set using Laplace correction.
 #' 
-#' @param stateNames A \code{"character"} array indicating the states of the variable.
-#' @param Variable A \code{"numeric"} array containing the records of the variable.
-#' @return A list of  \code{"numeric"} arrays:
-#' \item{coeff}{Contains the probabilities.}
-#' \item{sizeDataLeaf}{Number of records in each leaf of the discrete tree.}
+#' @param x a \code{"factor"} containing the records of the discrete variable.
+#' @return A list of 2 elements:
+#' \item{coeff}{a named vector that contains the probabilities.}
+#' \item{sizeDataLeaf}{a vector containing the number of records in each leaf of the discrete tree.}
+#' @details Laplace correction is used to avoid the zero probability problem, with \eqn{\alpha = 1} as smoothing factor.
+#' Therefore, the probability for each state, \eqn{\theta_i}, is computed as
+#'  \deqn{\theta_i = \frac{x_i + 1}{N + K}}{%
+#'  \theta_i =  (x_i + 1)/(N + K)}
+#'  for \eqn{i = 0, 1, \ldots, K}, 
+#'  where \eqn{x_i} is the number of records of state \eqn{i}, 
+#'  \eqn{N} is the total number of records, and 
+#'  \eqn{K} is the total number of states.
 #' @seealso \link{discreteVariablesStates}
 #' @export
 #' @examples
-#' ## Discrete Variable
-#' data <- data.frame(X=rep(c("yes", "no", "maybe"), 500))
-#' data <- discreteVariables_as.character(data, "X")
-#' n <- nrow(data)
-#' 
-#' ## Probabilities
-#' s <- discreteVariablesStates(namevariables="X", discreteData=data)
-#' states <- s[[1]]$states
-#' p <- probDiscreteVariable(stateNames=states, Variable=data$X)
+#' ## Simulate discrete variable
+#' x <- factor(sample(c('yes', 'no', 'maybe'), 500, replace = TRUE), 
+#'   levels = c('yes', 'no', 'maybe'))
+#'  
+#' ## Compute probabilities
+#' p <- probDiscreteVariable(x)
 #' p
+#' 
 #'
-probDiscreteVariable <- function(stateNames, Variable)
-{
+# probDiscreteVariable <- function(stateNames, Variable)
+# {
+#   coeff <- c(); sizeDataLeaf <- c()
+#   for(j in 1:length(stateNames)){
+#     sizeDataLeaf <- c(sizeDataLeaf, length(which(Variable==stateNames[j])))
+#     probability <- (length(which(Variable==stateNames[j]))+1)/(length(Variable)+length(stateNames))###Corrección de laplace
+#     coeff <- c(coeff, probability) 
+#   }
+#   names(coeff) <- stateNames
+#   return(list(coeff=coeff,sizeDataLeaf=sizeDataLeaf))
+# }
+
+probDiscreteVariable <- function(x){
+  stateNames = levels(x)
   coeff <- c(); sizeDataLeaf <- c()
   for(j in 1:length(stateNames)){
-    sizeDataLeaf <- c(sizeDataLeaf, length(which(Variable==stateNames[j])))
-    probability <- (length(which(Variable==stateNames[j]))+1)/(length(Variable)+length(stateNames))###Corrección de laplace
+    sizeDataLeaf <- c(sizeDataLeaf, length(which(x==stateNames[j])))
+    probability <- (length(which(x==stateNames[j]))+1)/(length(x)+length(stateNames))###Corrección de laplace
     coeff <- c(coeff, probability) 
   }
   names(coeff) <- stateNames
   return(list(coeff=coeff,sizeDataLeaf=sizeDataLeaf))
 }
 
-#' BIC scxore and log-likelihood
+
+
+#' BIC score and log-likelihood
 #' 
 #' Compute the loglikelihood and the BIC score for discrete models, i.e multinomial Bayesian Networks.
 #' 
-#' @name goodnessDiscreteVariables
-#' @rdname goodnessDiscreteVariables
 #' @param discreteBN A list of multiples lists. Each list contains two entries,
 #' the probabilities and the size of the data which is in each leaf of the discrete tree.
 #' @param sameData A logical argument; \code{FALSE} means that different datasets were used for learning.
@@ -67,12 +84,12 @@ probDiscreteVariable <- function(stateNames, Variable)
 #' ## 2. EXAMPLE 
 #' ## Discrete variables
 #' X <- rep(c("1", "2", "3"), 500)
-#' data <- data.frame(X=as.character(X))
+#' data <- data.frame(X = X)
 #' s <- discreteVariablesStates(namevariables="X", discreteData=data)
 #' p1 <- probDiscreteVariable(stateNames = s[[1]]$states, Variable = data[,1])
 #' 
 #' Y <- rep(c("YES", "NO"), 100)
-#' data <- data.frame(Y = as.character(Y))
+#' data <- data.frame(Y = Y)
 #' s <- discreteVariablesStates(namevariables = "Y", discreteData = data)
 #' p2 <- probDiscreteVariable(stateNames = s[[1]]$states, Variable = data[,1])
 
@@ -84,20 +101,20 @@ probDiscreteVariable <- function(stateNames, Variable)
 #' 
 #' ## BIC
 #' getBICDiscreteBN(P, sameData = TRUE)
-#' @export
+#' @noRd
 getlogLikelihoodDiscreteBN <- function(discreteBN){
   loglike <- 0
   for(i in 1:length(discreteBN)){
-    coeff <- discreteBN[[i]]$coeff[discreteBN[[i]]$coeff!=0]
-    size <- discreteBN[[i]]$sizeDataLeaf[discreteBN[[i]]$sizeDataLeaf!=0]
+    # coeff <- discreteBN[[i]]$coeff[discreteBN[[i]]$coeff!=0]
+    # size <- discreteBN[[i]]$sizeDataLeaf[discreteBN[[i]]$sizeDataLeaf!=0]
+    coeff <- discreteBN[[i]]$coeff
+    size <- discreteBN[[i]]$sizeDataLeaf
     loglike <- loglike + sum(log(coeff)*(size))
   }
   return(loglike)
 }
 
-
-#' @rdname goodnessDiscreteVariables
-#' @export
+#' @noRd
 getBICDiscreteBN <- function (discreteBN, sameData = FALSE) 
 {
   if(sameData) l <- length(discreteBN) else l <- 1
@@ -114,25 +131,25 @@ getBICDiscreteBN <- function (discreteBN, sameData = FALSE)
 #' 
 #' @param BN A discrete learning.
 #' @return The results are shown on the screen.
-#' @export
-printDiscreteBN <- function(BN)
-{
-  cat("Potential(", BN$Child,")\n", sep="")
-  if((length(BN$functions)<2)&&(length(BN$functions[[1]])==2)){
-    cat(BN$functions[[1]]$coeff, "\n")
-  } else{
-    for(j in 1:length(BN$functions)){
-      if(is.character(BN$functions[[j]]$interval)){
-        cat("Parent:", BN$functions[[j]]$parent, "   \t Range =", paste("\"", BN$functions[[j]]$interval,"\"", sep=""),"\n")
-        if(!is.null(BN$functions[[j]]$Px$coeff)) cat(BN$functions[[j]]$Px$coeff, "\n")
-      } else {
-        cat("Parent:", BN$functions[[j]]$parent, "   \t Range:", BN$functions[[j]]$interval[1], "<",BN$functions[[j]]$parent,"<", BN$functions[[j]]$interval[2], "\n")
-        if(is.null(BN$functions[[j]]$Px[[1]])) next
-        if(is.numeric(BN$functions[[j]]$Px[[1]])) cat(BN$functions[[j]]$Px[[1]], "\n")
-        else for(i in 1:length(BN$functions[[j]]$Px)) cat(BN$functions[[j]]$Px[[i]]$coeff, "\n")
-      }
-    }
-  }
-  cat("\n")
-}
+#' @noRd
+# printDiscreteBN <- function(BN)
+# {
+#   cat("Potential(", BN$Child,")\n", sep="")
+#   if((length(BN$functions)<2)&&(length(BN$functions[[1]])==2)){
+#     cat(BN$functions[[1]]$coeff, "\n")
+#   } else{
+#     for(j in 1:length(BN$functions)){
+#       if(is.character(BN$functions[[j]]$interval)){
+#         cat("Parent:", BN$functions[[j]]$parent, "   \t Range =", paste("\"", BN$functions[[j]]$interval,"\"", sep=""),"\n")
+#         if(!is.null(BN$functions[[j]]$Px$coeff)) cat(BN$functions[[j]]$Px$coeff, "\n")
+#       } else {
+#         cat("Parent:", BN$functions[[j]]$parent, "   \t Range:", BN$functions[[j]]$interval[1], "<",BN$functions[[j]]$parent,"<", BN$functions[[j]]$interval[2], "\n")
+#         if(is.null(BN$functions[[j]]$Px[[1]])) next
+#         if(is.numeric(BN$functions[[j]]$Px[[1]])) cat(BN$functions[[j]]$Px[[1]], "\n")
+#         else for(i in 1:length(BN$functions[[j]]$Px)) cat(BN$functions[[j]]$Px[[i]]$coeff, "\n")
+#       }
+#     }
+#   }
+#   cat("\n")
+# }
 

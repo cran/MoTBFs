@@ -9,8 +9,8 @@ preprocessedData(data, strangeElements)
 \arguments{
 \item{data}{A dataset of class \code{"matrix"} or \code{"data.frame"},}
 
-\item{strangeElements}{A \code{"character"} string which contains the elementes to remove.}
+\item{strangeElements}{A \code{"character"} string which contains the elements to remove.}
 }
 \description{
-Delete rows of a dataset wich contains anomalous values.
+Delete rows of a dataset which contains anomalous values.
 }

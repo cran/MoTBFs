@@ -1,9 +1,12 @@
+# library(bnlearn)
+# library(ggm)
+
 #' Check discreteness of a node
 #' 
 #' This function allows to check whether a node is discrete or not
 #' @param node A character (name of node) or numeric (index of node in the bn list) input. 
 #' @param bn A list of lists obtained from \link{MoTBFs_Learning}.
-#' @return \code{is.discrete} returns \code{TRUE} or \code{FALSE} depending on whether the node is discrete or not.
+#' @return \code{is.discrete} returns TRUE or FALSE depending on whether the node is discrete or not.
 #' @export
 #' @examples  
 #' 
@@ -32,15 +35,7 @@
 #'   is.discrete(3, bn)  
 
 is.discrete <- function(node, bn) {
-  if(is.character(node)){
-   node <-  which(lapply(bn, `[[`, "Child") == node)
-  }
-  # if(!is.null(bn[[node]]$functions[[1]]$coeff) || !is.null(bn[[node]]$functions[[1]]$Px$coeff))){
-  #   discrete <- TRUE
-  # }else{
-  #   discrete <- FALSE
-  # }
-  if(bn[[node]]$varType =="Discrete"){
+  if(bn[[node]]$type =="Discrete"){
     discrete <-  TRUE
   }else{
     discrete <- FALSE
@@ -52,9 +47,8 @@ is.discrete <- function(node, bn) {
 
 #' Get the states of all discrete nodes from a MoTFB-BN
 #' 
-#' This function returns the states of all discrete nodes from a list obtained from \link{MoTBFs_Learning}.
-#' @param bn A list of lists obtained from \link{MoTBFs_Learning}.
-#' @param dag A network of class \code{"bn"}.
+#' This function returns the states of all discrete node from a list obtained from \link{motbf.fit}.
+#' @param bn A list of lists obtained from \link{motbf.fit}.
 #' @return \code{discreteStatesFromBN} returns a list of length equal to the number of discrete nodes in the network. Each element of the list corresponds to a node and contains a character vector indicating the states of the node.
 #' @export
 #' @examples 
@@ -73,32 +67,24 @@ is.discrete <- function(node, bn) {
 #'   dag <- LearningHC(data)
 #' 
 #' ## Learn a BN
-#'   bn <- MoTBFs_Learning(dag, data, POTENTIAL_TYPE = "MTE")
+#'   bn <- motbf.fit(dag, data, POTENTIAL_TYPE = "MTE")
 #' 
 #' ## Get the states of the discrete nodes
 #' 
-#'   discreteStatesFromBN(bn, dag)
-
-
-discreteStatesFromBN <- function(bn, dag){
-  variables <- unique(unlist(lapply(bn, `[[`, "Child")))
-  n <- length(variables)
-  k <- 0
+#'   discreteStatesFromBN(bn)
+#'   
+discreteStatesFromBN <- function(bn){
   
+  variables <- names(bn)
+ 
   discreteStates <- list()
-  for( i in 1:n){
-    if(is.discrete(i, bn)){
-      k <- k+1
-      if(is.root(variables[i], dag)){
-        states <- names(bn[[i]]$functions[[1]]$coeff)
-      }else if(!is.null(names(bn[[i]]$functions[[1]]$Px$coeff))){ 
-        states <- names(bn[[i]]$functions[[1]]$Px$coeff)
-      }else{
-        states <- names(bn[[i]]$functions[[1]]$Px[[1]]$coeff)
-      }
-      
-      discreteStates[[k]] <- states
-      names(discreteStates)[k] <- variables[i]
+  k=1
+  
+  for (i in variables) {
+    if(is.discrete(i,bn)){
+      discreteStates[[k]]<-unique(bn[[i]]$functions[[i]])
+      names(discreteStates)[k]<-i
+      k=k+1
     }
   }
   
@@ -109,9 +95,9 @@ discreteStatesFromBN <- function(bn, dag){
 #' Root nodes
 #' 
 #' \code{is.root} checks whether a node has parents or not.
-#' @param node A character string indicating the name of the node.
+#' @param node A character string indicating the node's name.
 #' @param dag An object of class \code{"bn"}.
-#' @return \code{is.root} returns \code{TRUE} or \code{FALSE} depending on whether the node is root or not.  
+#' @return \code{is.root} returns TRUE or FALSE depending on whether the node is root or not.  
 #' @importFrom bnlearn root.nodes
 #' @export
 #' @examples 
@@ -135,19 +121,18 @@ discreteStatesFromBN <- function(bn, dag){
 is.root <- function(node, dag){
   r <- root.nodes(dag)
   if(node %in% r){
-    root = T
+    root = TRUE
   }else{
-    root = F
+    root = FALSE
   }
   return(root)
 }
 
 
-#' Data frame initialization for forward sampling
+#' Initialize Data Frame
 #' 
 #' The function \code{r.data.frame()} initializes a data frame with as many columns as nodes in the MoTBF-network. It also asings each column its data type, i.e., numeric or character. In the case of character columns, the states of the variable are extracted from the \code{"bn"} argument and included as levels.
 #' @param bn A list of lists obtained from the function \link{MoTBFs_Learning}.
-#' @param dag An object of class \code{"bn"}, representing the graph of the bayesian network.
 #' @return An object of class \code{"data.frame"}, which contains the data type of each column and has no rows.
 #' @export
 #' @examples 
@@ -166,14 +151,14 @@ is.root <- function(node, dag){
 #'   dag <- LearningHC(data)
 #'   
 #' ## Learn a BN
-#'   bn <- MoTBFs_Learning(dag, data, POTENTIAL_TYPE = "MTE")
+#'   bn <- motbf.fit(dag, data, POTENTIAL_TYPE = "MTE")
 #'   
 #' ## Initialize a data.frame containing 3 columns (x, y and z) with their attributes.
-#'   r.data.frame(bn, dag)
+#'   r.data.frame(bn)
 
-r.data.frame <- function(bn, dag){
+r.data.frame <- function(bn){
   # Extraer nombre nodos 
-  variables <- unique(unlist(lapply(bn, `[[`, "Child")))
+  variables <- names(bn)
   n <- length(variables)
   
   # Crear df vacio
@@ -182,13 +167,12 @@ r.data.frame <- function(bn, dag){
   
   # Determinar si el nodo es discreto o continuo
   for(i in 1:n){
-    if(is.discrete(i, bn) == T){
+    if(is.discrete(i,bn) == TRUE){
       
-      rdf[,i] <- as.character(rdf[,i])
-      
+      rdf[,i] <- as.factor(rdf[,i])
       # AÑADIR ESTADOS COMO ATRIBUTOS
       # encontrar estados variable discreta
-      states <- discreteStatesFromBN(bn, dag)
+      states <- discreteStatesFromBN(bn)
       states_idx <- which(names(states) == colnames(rdf[i]))
       states_node <- states[[states_idx]]
       levels(rdf[,i]) <- states_node
@@ -220,15 +204,15 @@ r.data.frame <- function(bn, dag){
 is.observed <- function(node, evi){
 
   if(node %in% colnames(evi)){
-    observed = T
+    observed = TRUE
   }else{
-    observed = F
+    observed = FALSE
   }
   return(observed)
 }
 
 
-#' Value of parent nodes
+#' Value of Parent Nodes
 #' 
 #' This function returns a \code{data.frame} of dimension '1xn' containing the values of the 'n' parents of a 'node' of interest. 
 #' Use this function if you have a random sample and an observed sample with information about the parents.
@@ -238,7 +222,7 @@ is.observed <- function(node, evi){
 #' @param obs A \code{data.frame} of dimension '1xm' containing an instance of the 'm' variables that belong to the evidence set.
 #' @param rdf A \code{data.frame} of dimension '1xk' containing an instance of the 'k' variables sampled from the bayesian network.
 #' @return  A \code{data.frame} containing the values of the parents of 'node'. 
-#' @export
+#' @noRd
 #' @examples 
 #' 
 #' ## Dataset
@@ -266,17 +250,16 @@ is.observed <- function(node, evi){
 #' ## Get the values of the parents of node "alm2"
 #'   parentValues("alm2", bn, obs, rdf)
 #' 
-
+# FUNCION OBSOLETA
 parentValues <- function(node, bn, obs, rdf){
-  node_idx <- which(lapply(bn, `[[`, "Child") == node)
-  cases <- bn[[node_idx]]$functions
-  node_par <- unique(unlist(lapply(cases, `[[`, "parent")))
+ 
+  node_par <- bn[[node]]$parents
   
   if(is.null(node_par)){
     return(parent_value = NULL)
   }
   
-  parent_sampled_values <- rdf[1,which(colnames(rdf) %in% node_par), drop = F]
+  parent_sampled_values <- rdf[1,which(colnames(rdf) %in% node_par), drop = FALSE]
   parent_value <- parent_sampled_values
   for(i in 1:length(node_par)){
     p <- node_par[i]
@@ -293,7 +276,7 @@ parentValues <- function(node, bn, obs, rdf){
 }
   
 
-#' Find fitted conditional MoTBFs
+#' Find Fitted Conditional MoTBFs
 #' 
 #' This function returns the conditional probability function of a node given an MoTBF-bayesian network and the value of its parents.
 #' @param node A \code{character} string, representing the tardet variable.
@@ -323,22 +306,28 @@ parentValues <- function(node, bn, obs, rdf){
 #' 
 findConditional <- function(node, bn, evi = NULL){
   
-  node_idx <- which(lapply(bn, `[[`, "Child") == node)
-  cases <- bn[[node_idx]]$functions
+  if(!is.null(evi)){
+    if(nrow(evi)>1){
+      stop("There are more than one value in the observation of the parents")
+    }
+  }
   
-  node_par <- unique(unlist(lapply(cases, `[[`, "parent")))
+  node_par <- bn[[node]]$parents
   
   # NODO RAIZ
   if(is.null(node_par)){
-    if(is.discrete(node, bn)){
+    if(is.discrete(node,bn)){
       
       # extraer la probabilidad de cada estado
-      fx <- bn[[node_idx]]$functions[[1]]$coeff
+      indx<-paste("CPD_",node,sep = "")
+      distr<-as.vector(bn[[node]]$functions[[indx]])
+      names(distr)<-bn[[node]]$functions[[node]]
+      fx <- distr
       
     }else{
       # extraer funcion de densidad
-      fx <- bn[[node_idx]]$functions[[1]]
-      
+      indx<-paste("CPD_",node,sep = "")
+      fx <- bn[[node]]$functions[[indx]][[1]]
     }
     # NODOS HIJOS
   }else{
@@ -353,122 +342,67 @@ findConditional <- function(node, bn, evi = NULL){
       stop(paste("Some parents of node",node,"are not included in the evidence set"))
     }
     
-    # buscar la funcion correspondiente segun valor de los padres
-    j = 0
-    acotado = NULL
-    case_p = NULL
-    located_parent = NULL
-    update = F
-    for(k in 1:length(node_par)){
-      int_fx = F
-      i = 0
-      while (int_fx == F) {
-        j = j+1
-        i = i+1
-        if(j > length(cases)){
-          acotado = "descartar"
-          break
-        }
-        
-        if(k == 1){
-          p <- node_par[k]
-          
-          # casos (listas) en las que p es el padre
-          case_p <- which(lapply(cases, `[[`, "parent") == p)
-        }
-        
-        ## My workaround when the parents change order in the conditional distribution list
-        if(update == T){
-          orden_par <- unlist(unique(lapply(cases, `[[`, "parent")[acotado[1]:acotado[2]]))
-          if(!is.null(located_parent)){
-            orden_par <- orden_par[-which(orden_par %in% located_parent)]
-          }
-          
-          update = F
-          node_par <- c(rep(NA, abs(length(orden_par)-length(node_par))), orden_par)
-          
-          p <- node_par[k]
-          
-          # casos (listas) en las que p es el padre
-          case_p <- which(lapply(cases, `[[`, "parent") == p)
-        }
-        
-        if(!is.null(acotado)){
-          case_p <- case_p[which(case_p >= acotado[1])]
-        }
-        
-        
-        if(!is.null(case_p)){
-          j = case_p[i]
-        }
-        
-        # si 'p' no es el padre del caso 'j', saltar iteracion
-        if(cases[[j]]$parent != p){
-          next
-        }
-        
-        parent_value <- evi[1,p]
-        
-        if(!is.discrete(p, bn)){
-          lower_int <- cases[[j]]$interval[1]
-          upper_int <- cases[[j]]$interval[2]
-          if(lower_int <= parent_value & upper_int >= parent_value){
-            int_fx = T
-            
-            if(is.null(acotado) & length(node_par)>1){
-              if(j == max(case_p)){
-                acotado <- c(j, length(cases))
-                update = T
-              }else{
-                acotado <- c(j, case_p[which(case_p == j)+1])
-                update = T
-              }
-            }else if(!is.null(acotado) & length(node_par)>1){
-              acotado[1] <- j
-              update = T
-            }
-          }
-        }else{
-          if(cases[[j]]$interval == parent_value){
-            int_fx = T
-            if(is.null(acotado)  & length(node_par)>1){
-              if(j == max(case_p)){
-                acotado <- c(j, length(cases))
-                update = T
-              }else{
-                acotado <- c(j, case_p[which(case_p == j)+1])
-                update = T
-              }
-            }
-          }
-        }
-        if(update==T){
-          located_parent <- c(located_parent, p)
-        }
-      }
-    }
+    #For each parent node we check the positions where its observation matches in functions data frame
+    coinci<-list()
+    cont=1
+    h=nrow(bn[[node]]$functions)
     
-    # el valor "j" es el indice de la lista donde se encuentra la funcion correcta
-    if(!is.null(acotado)){
-      if((acotado[1]== "descartar")||(j<acotado[1])|| (j>acotado[2])){
-        fx <- NA
-        return(fx)
-      }
-    }
-    if(is.discrete(node, bn)){
-      if(!is.null(cases[[j]]$Px$coeff)){
-        fx <- cases[[j]]$Px$coeff
+    for (k in node_par) {
+      
+      p=evi[1,k]
+      adi<-c()
+      
+      if(is.discrete(k,bn)){
+        for(j in 1:h){
+          if(p==bn[[node]]$functions[[k]][[j]]){
+            adi<-append(adi,j)
+          }
+        }
+        
       }else{
-        fx <- cases[[j]]$Px[[1]]$coeff
+        
+        for (j in 1:h) {
+          exi=bn[[node]]$functions[[k]][[j]]['min',]
+          exd=bn[[node]]$functions[[k]][[j]]['max',]
+          
+          if(p>=exi & p<=exd){
+            adi<-append(adi,j)
+          }
+        }
       }
       
+      coinci[[cont]]=adi
+      cont=cont+1
     }
-    else{
-      fx <- cases[[j]]$Px
+    
+    names(coinci)=node_par
+    
+    #We look for the intersection of all observations and their positions in functions data frame
+    
+    inter<-coinci[[1]]
+    if(length(coinci)==1){
+      pos<-min(inter)
+    } else{
+      for (i in 1:(length(node_par)-1)) {
+      inter<-intersect(inter,coinci[[i+1]])
+     }
+    }
+    pos<-min(inter)
+    
+    #We select the distribution in position pos in functions data frame
+    
+    indx<-paste("CPD_",node,sep = "")
+    
+    if(is.discrete(node,bn)){
+      sts<-length(discreteStatesFromBN(bn)[[node]])
+      distr<-as.vector(bn[[node]]$functions[[indx]][c(pos:(pos+sts-1))])
+      names(distr)<-bn[[node]]$functions[[node]][c(1:sts)]
+      fx <- distr
+    }else{
+      fx<-bn[[node]]$functions[[indx]][[pos]]
     }
   }
-  
-  return(fx)
+    return(fx)
 }
 
 
@@ -496,141 +430,45 @@ findConditional <- function(node, bn, evi = NULL){
 #'   motbf_type(bn)
 
 motbf_type <- function(bn){
-  n <- length(bn)
-  for(i in 1: n){
-    if(!is.discrete(bn[[i]]$Child, bn)){
-      k <- length(bn[[i]]$functions)
-      for(j in 1: k)
-        if(!is.null(lapply(bn[[i]]$functions, `[[`, "Px")[[k]])){
-          fx <- bn[[i]]$functions[[k]]
-          type <- toupper(subclass(fx$Px))
-          return(type)
-        }
-    }
+  subclass = unique(sapply(bn, '[[', 'subclass'))
+  type = toupper(subclass[subclass!= "Multinomial"])
+  if(length(type)==0){
+    type = 'MOP'
   }
+  # n <- length(bn)
+  # for(i in 1: n){
+  #   if(!is.discrete(bn[[i]]$node, bn)){
+  #     type <- toupper(bn[[i]]$subclass)
+  #     break
+  #   }
+  # }
+  return(type)
 }
 
 
 
-#' Sample generation from conditional MoTBFs
-#' 
-#' This function generates a sample from conditional MoTBFs.
-#' @param bn A list of lists obtained from the function \link{MoTBFs_Learning}.
-#' @param dag An object of class \code{"bn"}, representing the directed acyclic graph.
-#' @param obs A \code{data.frame} containing the observed variables. This argument can be omitted if no variable is observed.
-#' @param size A non-negative integer giving the number of instances to be generated.
-#' @param force_size \code{logical} indicating if the sample must be of the size indicated. As a default, it is set to TRUE.
-#' @return A \code{data.frame} containing the generated sample.
-#' @importFrom ggm topOrder
-#' @importFrom bnlearn amat
-#' @importFrom stats na.omit
-#' @export
-#' @examples 
-#' 
-#' ## Dataset
-#'   data("ecoli", package = "MoTBFs")
-#'   data <- ecoli[,-c(1,9)]
-#' 
-#' ## Get directed acyclic graph
-#'   dag <- LearningHC(data)
-#'   
-#' ## Learn bayesian network
-#'   bn <- MoTBFs_Learning(dag, data = data, numIntervals = 4, POTENTIAL_TYPE = "MTE")
-#'   
-#' ## Specify the evidence set 
-#'   obs <- data.frame(lip = "0.48", alm1 = 0.55, gvh = 1, stringsAsFactors=FALSE)
-#'   
-#' ## Get the conditional sample
-#'   sample_MoTBFs(bn, dag, obs, size = 10)
-#'   
-sample_MoTBFs<- function(bn, dag, obs = NULL, size, force_size = T){
-  
-  rdf <- r.data.frame(bn, dag)
-  
-  
-  # obtener orden topologico de las variables en el dag
-  topo_idx <- topOrder(amat(dag))
-  topo <- colnames(rdf)[topo_idx]
- 
-  check_size <- 0
-  s <- 0
-  #for(s in 1:size)
-    while(check_size < size){  
-      s <- s+1
-    # recorrer el vector de nodos ordenado topologicamente
-    for(h in 1:length(topo)){
-      # identificar nodo
-      node <- topo[h]
-      node_idx <- topo_idx[h]
-      
-      # Comprobar que estoy en el nodo correcto
-      if(node != bn[[node_idx]]$Child){
-        stop("No se ha cogido el nodo correcto")
-      }
-      
-      # Variables muestradas en la iteracion s
-      rdf_i <- rdf[s,, drop = F]
-      
-      # Valor de los padres en la iteracion s
-      evi <- parentValues(node, bn, obs, rdf_i)
-      
-      # Funcion condicionada del nodo
-      fx <- findConditional(node, bn, evi)
-      
-      # Descartar muestra si el valor de los padres es incompatible
-
-      # Muestrear
-      if(is.discrete(node, bn)){
-        # caso discreto
-        if(any(is.na(fx))){
-          rdf[s,] <- NA
-          
-          break
-        }
-        states <- levels(rdf[,node])
-        Y <- sample(states, 1, replace = T, prob = fx)
-        
-      }else{
-        # caso continuo
-        if(length(fx)==1| is.null(fx)){
-          rdf[s,] <- NA
-          
-          break
-        }
-        Y <- rMoTBF(size = 1, fx = fx)
-      }
-      
-      # guardar resultados
-      rdf[s,node] <- Y 
-      
-    }
-    check_size <- nrow(na.omit(rdf))
-    if(force_size == F && s == size){
-      break
-    }
-  }  
-  rdf[,colnames(obs)] <- obs
-  rdf <- na.omit(rdf)
-  
-  return(rdf)
-  
-}
 
 
-
-#' Forward Sampling
+#' Approximate inference
 #' 
-#' \code{forward_sampling()} returns the conditional distribution of a target variable given a set of oberved variables.
-#' The forward sampling algorithm approximates the conditional distribution from a random sample. 
-#' @param bn A list of lists obtained from the function \link{MoTBFs_Learning}.
-#' @param dag An object of class \code{"bn"}, representing the directed acyclic graph.
+#' \code{get_approx_posterior()} returns an approximation to the posterior probability distribution 
+#' of a target variable given a set of observed variables. The inference process is based on sample generation. See details.
+#' 
+#' @param bn An object of class \code{motbf_fit}, obtained from function \link{motbf.fit}.
 #' @param target A character string equal to the name of the variable of interest.
-#' @param evi A \code{data.frame} containing the observed variables.
-#' @param size A positive integer giving the number of instances to be generated.
+#' @param evidence A \code{data.frame} of one row containing the value of the observed variables.
+#' @param size A non-negative integer giving the number of random samples to generate from \code{bn}.
+#' @param parallel \code{logical} indicating if the particle generation should be parallelized. As a default, it is set to FALSE.
 #' @param ... Optional arguments passed on to the \code{\link{univMoTBF}} function. \code{evalRange}, \code{nparam} and \code{maxParam} can be specified. \code{POTENTIAL_TYPE} is taken from the 'bn' object.
 #' 
+#' @details
+#' If any node is observed, i.e., argument \code{evidence} is not NULL, 
+#' samples are generated from the Bayesian network using the likelihood weighting algorithm. 
+#' Otherwise, i.e., no node is observed, samples are generated using the forward sampling algorithm.
+#' 
 #' @references Henrion, M. (1988). Propagating uncertainty in Bayesian networks by probabilistic logic sampling. In Machine Intelligence and Pattern Recognition (Vol. 5, pp. 149-163). North-Holland.
-#' @return A list containing the conditional distribution of the target variable and a data.frame with the generated sample.
+#' @return A list of two elements: 1) the posterior probability distribution of the target variable, and 
+#' 2) a data.frame with the generated sample, whose weights are attached as an attribute called weights (if \code{evidence} is not NULL).
 #' @export
 #' @examples 
 #' 
@@ -642,29 +480,45 @@ sample_MoTBFs<- function(bn, dag, obs = NULL, size, force_size = T){
 #'   dag <- LearningHC(data)
 #'   
 #' ## Learn bayesian network
-#'   bn <- MoTBFs_Learning(dag, data = data, numIntervals = 4, POTENTIAL_TYPE = "MTE")
+#'   bn <- motbf.fit(dag, data = data, numIntervals = 4, POTENTIAL_TYPE = "MOP")
 #'   
 #' ## Specify the evidence set and target variable
 #'   obs <- data.frame(lip = "0.48", alm1 = 0.55, gvh = 1, stringsAsFactors=FALSE)
 #'   node <- "alm2"
 #'   
-#' ## Get the conditional distribution of 'node' and the generated sample
-#'   forward_sampling(bn, dag, target = node, evi = obs, size = 10, maxParam = 15)
+#' ## Get the posterior distribution of 'node' given "evidence" and the generated sample
+#'   get_approx_posterior(bn, target = node, evidence = obs, size = 10, maxParam = 15)
 #'   
-forward_sampling <- function(bn, dag, target, evi, size, ...){
+get_approx_posterior <- function(bn, target, evidence = NULL, size = 100, parallel = FALSE,...){
   
   start_time <- Sys.time()
   
-  rdf <- sample_MoTBFs(bn, dag, evi, size)
+  evi = evidence
+  evi<-evi[which(names(evi)!=target)]
+  
+  rdf <- sample_motbfs(bn, n = size, evidence = evi, parallel = parallel)
+  
+  y = rdf[,target]
+  if(!is.null(evidence)){
+    w = attr(rdf, 'w')
+    wn = w/sum(w)
+    y = sample(y, size*10, replace = TRUE, prob = wn)
+  }
+
+  
   
   type <- motbf_type(bn)
   
+ 
+  
   if(is.discrete(target, bn)){
-    states <- unique(rdf[,target])
-    var <- rdf[,target]
-    fx <- probDiscreteVariable(states, var)
+    states <- levels(bn)[[target]]
+    # var <- factor(rdf[,target], levels = states)
+    var <- factor(y, levels = states)
+    fx <- probDiscreteVariable(var)
   }else{
-    fx <- univMoTBF(rdf[,target], POTENTIAL_TYPE = type, ...)
+    fx <- univMoTBF(y, POTENTIAL_TYPE = type, ...)
+    # fx <- univMoTBF(rdf[,target], POTENTIAL_TYPE = type, ...)
   }
   
   
@@ -675,3 +529,252 @@ forward_sampling <- function(bn, dag, target, evi, size, ...){
   return(list(fx = fx, sample = rdf))
 }
 
+
+
+
+
+one_sample_motbfs = function(bn, sampling_order, rdf){
+  
+  for(i in 1:length(sampling_order)){
+    # identificar nodo
+    node <- sampling_order[i]
+    
+    
+    # Variables muestradas en la iteracion s
+    rdf_i <- rdf[1,, drop = FALSE]
+    
+    # Valor de los padres en la iteracion s
+    evi = rdf_i[,bn[[node]]$parents, drop = FALSE]
+    
+    
+    # Funcion condicionada del nodo
+    fx <-findConditional(node, bn, evi)
+    
+    # Descartar muestra si el valor de los padres es incompatible
+    
+    # Muestrear
+    if(is.discrete(node, bn)){
+      # caso discreto
+      if(any(is.na(fx))){
+        rdf[1,] <- NA
+        
+        break
+      }
+      states <- levels(rdf[,node])
+      Y <- sample(states, 1, replace = TRUE, prob = fx)
+      
+    }else{
+      # caso continuo
+      if(length(fx)==1| is.null(fx)){
+        rdf[1,] <- NA
+        
+        break
+      }
+      Y <- rMoTBF(size = 1, fx = fx)
+    }
+    
+    
+    # guardar resultados
+    rdf[1,node] <- Y 
+    
+  }
+  return(rdf)
+}
+
+
+one_sample_motbfs_evidence = function(bn, sampling_order, rdf, evidence = NULL){
+  # browser()
+  w = 1
+  for(i in 1:length(sampling_order)){
+    # identificar nodo
+    node <- sampling_order[i]
+    
+    
+    # Variables muestradas en la iteracion s
+    rdf_i <- rdf[1,, drop = FALSE]
+    
+    # Valor de los padres en la iteracion s
+    evi = rdf_i[,bn[[node]]$parents, drop = FALSE]
+    
+    
+    # Funcion condicionada del nodo
+    fx <-findConditional(node, bn, evi)
+    
+    # Nodo observado
+    if(node %in% colnames(evidence)){
+      Y = evidence[node]
+      
+      if(is.discrete(node, bn)){
+        a = unlist(Y)
+        w = w * unname(fx[a])
+      }else{
+        a = unlist(as.function(fx)(Y))
+        w = w * unname(a)
+      }
+    }else{
+      # Muestrear
+      if(is.discrete(node, bn)){
+        # caso discreto
+        if(any(is.na(fx))){
+          rdf[1,] <- NA
+          
+          break
+        }
+        states <- levels(rdf[,node])
+        Y <- sample(states, 1, replace = TRUE, prob = fx)
+        
+      }else{
+        # caso continuo
+        if(length(fx)==1| is.null(fx)){
+          rdf[1,] <- NA
+          
+          break
+        }
+        Y <- rMoTBF(size = 1, fx = fx)
+      }
+    }
+    
+    # guardar resultados
+    rdf[1,node] <- Y 
+    
+  }
+  return(list(sample = rdf, weights = w))
+}
+
+
+#' Generate Samples From an MoTBF Bayesian network
+#' 
+#' This function generates a sample from an MoTBF Bayesian network.
+#' @param bn An object of class motbf_fit, obtained from the function \link{motbf.fit}.
+#' @param n A non-negative integer giving the number of instances to be generated.
+#' @param parallel A \code{logical} value. If TRUE, parallelization is carried out. As a default, it is set to FALSE
+#' @param evidence A data.frame of one row containing the values for the observed variables. As a default, it is NULL.
+#' @return A \code{data.frame} containing the generated sample. Is evidence is not NULL, attribute 'w' contains the weight of each sample.
+#' @importFrom ggm topOrder
+#' @importFrom bnlearn amat
+#' @importFrom parallel mclapply
+#' @importFrom parallel detectCores
+#' @export
+#' @examples
+#'   data("ecoli", package = "MoTBFs")
+#'   dat <- ecoli[,-c(1,4,5,9)]
+#'   
+#'   # Build DAG
+#'   dag <- LearningHC(dat)
+#'   
+#'   # Learn BN parameters
+#'   bn = motbf.fit(dag, dat)
+#'  
+#'  # Get sample from bn
+#'  sam = sample_motbfs(bn, 50)
+#'  
+#'  
+sample_motbfs<- function(bn, n, parallel = FALSE, evidence = NULL){
+  
+  dag = getDAG(bn)
+  
+  rdf <- r.data.frame(bn)
+  
+  
+  # obtener orden topologico de las variables en el dag
+  topo_idx <- topOrder(amat(dag))
+  topo <- colnames(rdf)[topo_idx]
+  
+  if(is.null(evidence)){
+    sampling = one_sample_motbfs
+    args = list(bn = bn, sampling_order = topo, rdf = rdf)
+  }else{
+    sampling = one_sample_motbfs_evidence
+    args = list(bn = bn, sampling_order = topo, rdf = rdf, evidence = evidence)
+  }
+  
+  if(parallel){
+    cores = detectCores()-1
+    
+    res = mclapply(1:n, function(i){
+      do.call(sampling, args)
+    }, mc.cores = cores)
+    
+  }else{
+    res = lapply(1:n, function(i){
+      do.call(sampling, args)
+    })
+  }
+  
+  if(is.null(evidence)){
+    rdf <- do.call(rbind, res)
+  }else{
+    A = lapply(res, '[[',1)
+    
+    rdf <- do.call(rbind, A)
+    w = sapply(res, '[[',2)
+    
+    attr(rdf, 'weights') = w
+  }
+  
+  
+  return(rdf)
+  
+}
+# sample_motbfs<- function(bn, n, parallel = FALSE){
+#   
+#   dag = getDAG(bn)
+#   
+#   rdf <- r.data.frame(bn)
+#   
+#   
+#   # obtener orden topologico de las variables en el dag
+#   topo_idx <- topOrder(amat(dag))
+#   topo <- colnames(rdf)[topo_idx]
+#   
+#   if(parallel){
+#     cores = detectCores()-1
+#     
+#     res = mclapply(1:n, function(i){
+#       one_sample_motbfs(bn, topo, rdf)
+#     }, mc.cores = cores)
+#     
+#   }else{
+#     res = lapply(1:n, function(i){one_sample_motbfs(bn, topo, rdf)})
+#   }
+#   
+#   
+#   rdf <- do.call(rbind, res)
+#   
+#   return(rdf)
+#   
+# }
+
+
+#' Conditional probability queries
+#' 
+#' Compute conditional probability queries from a sample.
+#' @param sample A \code{data.frame} containing a sample.
+#' @param event A expression describing the event of interest
+#' @param evidence A expression describing the conditioning evidence. 
+#' @return The conditional probability: P(event|evidence).
+#' @export
+#' @examples
+#'   data("ecoli", package = "MoTBFs")
+#'   dat <- ecoli[,-c(1,4,5,9)]
+#'   
+#'   # Build DAG
+#'   dag <- LearningHC(dat)
+#'   
+#'   # Learn BN parameters
+#'   bn = motbf.fit(dag, dat)
+#'  
+#'  # Get sample from bn
+#'  sam = sample_motbfs(bn, 50)
+#'  
+#'  # Compute P(mcg > 0.6 | aac < 0.8 & alm2 < 0.3)
+#'  query(sam, event = (mcg >0.6), evidence = (aac<0.8 & alm2 <0.3))
+#'  
+query = function(sample, event, evidence){
+  
+  evi = eval(substitute(evidence), sample)
+  res = eval(substitute(event & evidence), sample)
+  
+  cp = sum(res)/sum(evi)
+  return(cp)
+}

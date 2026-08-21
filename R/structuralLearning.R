@@ -48,7 +48,7 @@ LearningHC <- function(dataset, numIntervals=NULL)
     if(length(pos)!=0) for(i in pos) dataset[,i] <- as.factor(dataset[,i])
     
     ## Estimate DAG
-    dag <- hc(dataset)
+    dag <- bnlearn::hc(dataset)
   }
   return(dag)
 }
@@ -94,9 +94,6 @@ getChildParentsFromGraph <- function(graph, nameVars=NULL){
   }else{
     stop('Graph class not supported')
   }
-  # if(class(graph)=="graphNEL") type <- 1
-  # if(class(graph)=="network")  type <- 2
-  # if(class(graph)=="bn")       type <- 3
   
   switch(type, 
          
@@ -132,3 +129,77 @@ getChildParentsFromGraph <- function(graph, nameVars=NULL){
 return(childrenAndParents)
 }
 
+#Función para aprender el dag de un Naive Bayes con la variable target como objetivo
+getNB <- function(df, target){
+  
+  red <- paste("[",target,"]", sep = "")
+  children <- colnames(df)[-which(colnames(df) == target)]
+  
+  for(i in 1:(length(children))){
+    nodo <- paste("[",children[i],"|",target, "]", sep= "")
+    red <- paste(red, nodo, sep = "")
+  }
+  
+  dag_NB <- model2network(red, ordering = colnames(df))
+  return(dag_NB)
+}
+
+
+getTAN = function(data, target){
+  dataD = discretizeVariablesEWdis(data, 4, factor = TRUE)
+  
+  dag = tree.bayes(dataD, target)
+  dag = model2network(modelstring(dag), ordering = colnames(data))
+  return(dag)
+}
+
+
+#' Hybrid Bayesian Network structure learning
+#' 
+#' Learn the structure of a hybrid Bayesian network, using a fixed method 
+#' (Naive Bayes, NB), a restricted method (Tree augmented Naive Bayes, TAN), 
+#' or an unrestricted method (the \bold{hill climbing}, HC, score-based local search method). 
+#' 
+#' @param data A dataset with discrete and continuous variables. If the discrete  
+#' variables are not of class \code{"factor"}, they are automatically converted.
+#' @param method A \code{"character"} string indicating the method to learn the structure: 
+#' NB (naive Bayes), TAN (Tree augmented Naive Bayes), or HC (hill climbing) are the available options.
+#' @param target An optional parameter only used in the case of NB and TAN to specify the class variable.
+#' @details \code{getStructure()} automatically converts non-numeric variables into factors
+#' before calling function \code{hc()} from the \code{bnlearn} package. In the case of TAN, it converts 
+#' all numeric and non-numeric variables into factors (using 4 equal width intervals) 
+#' before calling \code{tree.bayes()} from the \code{bnlearn} package.
+#' @return The output is a \code{"bn"} object containing the learned graph.
+#' @seealso \link[bnlearn]{hc}
+#' @importFrom bnlearn hc
+#' @importFrom bnlearn tree.bayes
+#' @importFrom bnlearn modelstring
+#' @export
+#' @examples
+#' 
+#' ## Data
+#' data(ecoli)
+#' ecoli <- ecoli[,-1] ## Sequence Name
+#' 
+#' ## DAG1
+#' dag1 <- getStructure(ecoli, method = "HC")
+#' dag1
+#' plot(dag1)
+#' 
+#' ## DAG2
+#' dag2 <- getStructure(ecoli, method = "TAN", target = "mcg")
+#' dag2
+#' plot(dag2)
+#' 
+#' 
+getStructure = function(data, method, target = NULL){
+  if(method == 'NB'){
+    DAG = getNB(data, target)
+  }else if(method == 'TAN'){
+    DAG = getTAN(data, target)
+  }else if(method == 'HC'){
+    DAG <- LearningHC(data)
+  }else{
+    stop("Argument 'method' must be either 'NB', 'TAN' or 'HC'. ")
+  }
+}

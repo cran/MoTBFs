@@ -57,6 +57,7 @@
 #' ## Continuous variables
 #' quantileIntervals(X = data[,1], numIntervals = 4)
 #' quantileIntervals(X = data[,2], numIntervals = 10)
+#' 
 #' @export
 whichDiscrete <- function(dataset, discreteVariables) which(colnames(dataset)%in%discreteVariables)
 
@@ -103,11 +104,18 @@ discretizeVariablesEWdis <- function(dataset, numIntervals, factor=FALSE, binary
 
 #' @rdname dataMining
 #' @export
-discreteVariablesStates <- function(namevariables, discreteData)
-{
+discreteVariablesStates <- function(namevariables, discreteData){
+  # discreteData[] <- lapply(discreteData, factor)
   variablesStates <- c()
   for(i in 1:length(namevariables)){
-    states <- sort(discreteData[,namevariables[i]][which(duplicated(discreteData[,namevariables[i]])==F)])
+    # states <- sort(discreteData[,namevariables[i]][which(duplicated(discreteData[,namevariables[i]])==FALSE)])
+    states <- unique(discreteData[,namevariables[i]])
+    # reorder states as the levels
+    states = states[match(levels(states),states)]
+    # remove possible NAs
+    states = states[!is.na(states)]
+    levels(states) = levels(discreteData[,namevariables[i]])
+    
     info <- list(variable=namevariables[i], states=states)
     variablesStates[[length(variablesStates)+1]] <- info
   }
@@ -137,6 +145,44 @@ scaleData <- function(dataset, scale)
   }   
 }
 
+check_data = function(data, names = NULL){
+  if(!is.data.frame(data)){
+    stop("Argument 'data' must be of class data.frame.")
+  }
+
+  # All observations in a column are missing
+  if(any(sapply(data, function(x){all(is.na(x))}))){
+    mc = names(which(sapply(data, function(x){all(is.na(x))})))
+    stop(paste0("Some columns in the dataset are completely missing: ", paste(mc, collapse = ', ')))
+  }
+  
+  # Remove observations with missing values
+  if(any(is.na(data))){
+    warning("Observations with NA values will be removed.")
+    data = stats::na.omit(data)
+  }
+  
+  if(!is.null(names)){
+    if(!all(names%in%colnames(data))){
+      mv = names[which(!(names%in%colnames(data)))]
+      stop(paste0("Some nodes are not in the dataset: ", paste(mv, collapse = ', ')))
+    }
+  }
+  
+  data = lapply(data, function(x){
+    if(is.integer(x)){
+      as.numeric(x)
+    }else if(is.character(x) | is.logical(x)){
+      as.factor(x)
+    }else{
+      x
+    }
+  })
+  
+  data = as.data.frame(data)
+  return(data)
+}
+
 #' Dataset subsetting
 #'
 #' Collection of functions for subsetting a \code{"data.frame"} by rows or columns, and
@@ -145,14 +191,13 @@ scaleData <- function(dataset, scale)
 #' @name subsetData
 #' @rdname subsetData
 #' @param data A dataset of class \code{data.frame}.
-#' @param percentage_test The proportion of data that goes to the test set (between 0 and 1).
-#' @param discreteVariables A \code{character} vector with the name of the discrete variables.
-#' @param nameX A \code{character} vector with the name of the child variable in the conditional method.
-#' @param nameY A \code{character} vector with the name of the parent variables in the conditional method.
-#' @param nameVariable A \code{character} vector with the name of the variable to be filtered.
-#' @param min,max Boundary values to filter out.
+#' @param k The number of folds for k-fold cross validation, used in splitFolds function.
+#' @param percentage_test The proportion of data that goes to the test set (between 0 and 1), used in TrainingandTestData function.
+#' @param nameVariable A \code{character} vector with the name of the variable to be filtered, used in splitdata function.
+#' @param min,max Boundary values to filter out, used in splitdata function.
+#' @param discreteVariables A \code{character} vector with the name of the discrete variables in the dataset.
 #' @return \code{TrainingandTestData()} returns a list of 2 elements containing the train and test datasets. 
-#' \code{newData()} and \code{splitdata()} return a subset of variables or observations, respectively.
+#' \code{splitdata()} returns a subset of observations.
 #' @examples
 #' \donttest{
 #' ## Dataset
@@ -160,7 +205,6 @@ scaleData <- function(dataset, scale)
 #' Y <- rchisq(1000, df = 8)
 #' Z <- rep(letters[1:10], times = 1000/10)
 #' data <- data.frame(X = X, Y = Y, Z = Z)
-#' data <- discreteVariables_as.character(dataset = data, discreteVariables ="Z")
 #' 
 #' ## Training and Test Datasets
 #' TT <- TrainingandTestData(data, percentage_test = 0.2)
@@ -168,18 +212,122 @@ scaleData <- function(dataset, scale)
 #' TT$Test
 #' 
 #' ## Subset Dataset
-#' newData(data, nameX = "X", nameY = "Z")
 #' splitdata(data, nameVariable = "X", min = 2, max= 3)
 #' }
+
+
 #' @export
-TrainingandTestData <- function(data, percentage_test, discreteVariables=NULL)
-{
+splitFolds = function(data, k){
+  for (i in 1:length(data)) {
+    if(is.character(data[,i])){
+      data[,i]=as.factor(data[,i])
+    }
+  }
+  N <- nrow(data)
+  randomN <- sample(1:N)
+
+  # number of data in each fold
+  
+  S = floor(seq(1, N, length.out=(k+1)))
+  
+  
+  index =list()
+  test = list()
+  train = list()
+  trainTest = list()
+  for(i in 1:k){
+    if(i != k){
+      index[[i]] = randomN[S[i]:(S[i+1]-1)]
+    }else{
+      index[[i]] = randomN[S[i]:(S[i+1])]
+    }
+    
+    test[[i]] = data[index[[i]],]
+    train[[i]] = data[-index[[i]],]
+    
+    trainTest[[i]] = trainFullRangeDomain(train[[i]], test[[i]], data)
+    
+  }
+  return(trainTest)
+}
+
+
+  
+trainFullRangeDomain = function(train, test, data){
+  XTraining <- train
+  XTest <- test
+  
+  discreteVariables <- colnames(data)[sapply(data, is.factor)]
+  for(i in which(colnames(data)%in%discreteVariables)){
+    trainingStates <- discreteVariablesStates(colnames(data)[i], XTraining)[[1]]$states
+    states <- discreteVariablesStates(colnames(data)[i], data)[[1]]$states
+    if(!all(states%in%trainingStates)){
+      s <- states[!(states%in%trainingStates)]
+      for(j in 1:length(s)){
+        pos <- which(XTest[,i]==s[j])
+        if(length(pos)>1) pos <- sample(pos,1)
+        XTraining[nrow(XTraining)+1,] <- XTest[pos,]
+        XTest <- XTest[-pos,]
+      }
+    }
+  }
+  
+  for(i in which(!(colnames(data)%in%discreteVariables))){
+    if(!(min(XTraining[,i], na.rm = TRUE)<=min(XTest[,i], na.rm = TRUE))){
+      pos <- which(min(XTest[,i], na.rm = TRUE)==XTest[,i])
+      if(length(pos)>1) pos <- sample(pos, 1)
+      XTraining[nrow(XTraining)+1,] <- XTest[pos,]
+      XTest <- XTest[-pos,]
+    }
+    
+    if(!(max(XTraining[,i], na.rm = TRUE)>=max(XTest[,i], na.rm = TRUE))){
+      pos=which(max(XTest[,i], na.rm = TRUE)==XTest[,i])
+      if(length(pos)>1) pos <- sample(pos, 1)
+      XTraining[nrow(XTraining)+1,] <- XTest[pos,]
+      XTest <- XTest[-pos,]
+    }
+  }
+  
+  if(any(is.na(XTest))| any(is.na(XTraining))){
+    na_train = stats::na.omit(XTraining)
+    na_test = stats::na.omit(XTest)
+    B = trainFullRangeDomain(na_train, na_test, data)
+    
+    row_test = sort(c(attr(B, 'index')$test, 
+                   as.numeric(names(attr(na_test, 'na.action')))))
+    row_train = sort(c(attr(B, 'index')$train, 
+                  as.numeric(names(attr(na_train, 'na.action')))))
+    XTraining = data[row_train,]
+    XTest = data[row_test,]
+  }else{
+    row_train = as.numeric(rownames(XTraining))
+    row_test = as.numeric(rownames(XTest))
+  }
+  
+  rownames(XTraining) <- 1:nrow(XTraining); rownames(XTest) <- 1:nrow(XTest)
+  result = list(Training = XTraining, Test = XTest)
+  
+  attr(result, "index") = list(train = row_train, test = row_test)
+  return(result)
+  
+  
+}
+#' @rdname subsetData    
+#' @export
+TrainingandTestData <- function(data, percentage_test, discreteVariables=NULL){
+
+  for (i in 1:length(data)) {
+    if(is.character(data[,i])){
+      data[,i]=as.factor(data[,i])
+    }
+  }
+  
   N <- nrow(data); n <- round(percentage_test*N)
   randomN <- sample(1:N,n)
   XTraining <- data[-randomN,]
   XTest <- data[randomN,]
   
-  if(is.null(discreteVariables)) discreteVariables <- colnames(data)[sapply(data, is.character)]
+  if(is.null(discreteVariables)) discreteVariables <- colnames(data)[sapply(data, is.factor)]
   for(i in which(colnames(data)%in%discreteVariables)){
     trainingStates <- discreteVariablesStates(colnames(data)[i], XTraining)[[1]]$states
     states <- discreteVariablesStates(colnames(data)[i], data)[[1]]$states
@@ -208,12 +356,17 @@ TrainingandTestData <- function(data, percentage_test, discreteVariables=NULL)
       XTest <- XTest[-pos,]
     }
   }
+  row_train = as.numeric(rownames(XTraining))
+  row_test = as.numeric(rownames(XTest))
   rownames(XTraining) <- 1:nrow(XTraining); rownames(XTest) <- 1:nrow(XTest)
-  return(list(Training=XTraining, Test=XTest))
+  result = list(Training = XTraining, Test = XTest)
+  
+  attr(result, "index") = list(train = row_train, test = row_test)
+  return(result)
 }
 
 #' @rdname subsetData
-#' @export
+#' @noRd
 newData <- function(data, nameX, nameY) return(data[, c(nameX, nameY)])
 
 #' @rdname subsetData
@@ -225,10 +378,10 @@ splitdata <- function(data, nameVariable, min, max){
 
 #' Data cleaning
 #' 
-#' Delete rows of a dataset wich contains anomalous values.
+#' Delete rows of a dataset which contains anomalous values.
 #' 
 #' @param data A dataset of class \code{"matrix"} or \code{"data.frame"},
-#' @param strangeElements A \code{"character"} string which contains the elementes to remove.
+#' @param strangeElements A \code{"character"} string which contains the elements to remove.
 #' @export
 preprocessedData <- function(data, strangeElements)
 {
@@ -259,3 +412,15 @@ clean <- function(envir = globalenv(), n = 2)
   rm(list = ll, envir = envir)
   for(i in 1:n) gc()
 }
+
+
+# Convert strings to pascal case
+pascalCase <- function(x) {
+  unname(sapply(x, function(x){
+    s <- strsplit(x, " ")[[1]]
+    paste(toupper(substring(s, 1,1)), tolower(substring(s, 2)),
+          sep="", collapse=" ")
+  }))
+  
+}
+

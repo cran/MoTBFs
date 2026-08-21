@@ -4,7 +4,7 @@
 #' Least square optimization is used to minimize the quadratic 
 #' error between the empirical cumulative distribution and the estimated one. 
 #' 
-#' @param data A \code{"numeric"} vector.
+#' @param x A \code{"numeric"} vector.
 #' @param POTENTIAL_TYPE A \code{"character"} string specifying the potential
 #' type, must be either \code{"MOP"} or \code{"MTE"}.
 #' @param evalRange A \code{"numeric"} vector that specifies the domain over
@@ -17,6 +17,7 @@
 #' @param maxParam A \code{"numeric"} value which indicates the maximum number of coefficients in the function. 
 #' By default, it is \code{NULL}; otherwise, the function which gets the best BIC score
 #' with at most this number of parameters is returned.
+#' @param scale A \code{"logical"} value indicating whether to standardize the numeric vector (x) to have mean 0 and standard deviation 1.
 #' @return \code{univMoTBF()} returns an object of class \code{"motbf"}. This object is a list containing several elements, 
 #' including its mathematical expression and other hidden elements related to the learning task. 
 #' The processing time is one of the values returned by this function and it can be extracted by $Time. 
@@ -68,30 +69,72 @@
 #' sum(log(as.function(f1)(Xtest)))
 #' sum(log(as.function(f2)(Xtest)))
 #' 
-univMoTBF <- function(data, POTENTIAL_TYPE, evalRange=NULL, nparam=NULL,  maxParam=NULL)
+
+univMoTBF <- function(x, POTENTIAL_TYPE, evalRange=NULL, nparam=NULL,  maxParam=NULL, scale = TRUE)
 {
-  if(is.null(evalRange)) evalRange <- range(data) else evalRange <- evalRange
+  # browser()
+  m = mean(x)
+  s = sd(x)
+  # if length(x) == 1, s = NA
+  if(is.na(s)){s = 0.1}
+  
+  if(scale){
+    x = (x-m)/s
+  }
+    
+  if(is.null(evalRange)){ 
+    evalRange <- range(x) 
+  }else{ 
+    evalRange <- evalRange
+    if(scale){
+      evalRange = (evalRange-m)/s
+    }
+  }
+  
   if(is.null(nparam)){
     if(POTENTIAL_TYPE=="MOP"){
-      P=bestMOP(data, evalRange, maxParam=maxParam)$bestPx
+      P=bestMOP(x, evalRange, maxParam=maxParam)$bestPx
     } else if(POTENTIAL_TYPE=="MTE"){
-      P=bestMTE(data, evalRange, maxParam=maxParam)$bestPx
+      P=bestMTE(x, evalRange, maxParam=maxParam)$bestPx
     } else{
       stop("Unknown method, please use MOP or MTE \n")
     } 
   } else {
     if(POTENTIAL_TYPE=="MOP"){
-      P <- mop.learning(data, nparam, evalRange)
+      P <- mop.learning(x, nparam, evalRange)
     } else if(POTENTIAL_TYPE=="MTE"){
-      P <- mte.learning(data, nparam, evalRange)
+      P <- mte.learning(x, nparam, evalRange)
     } else{
       stop("Unknown method, please use MOP or MTE")
     } 
   }
+  
+  attr(P, 'mean') = m
+  attr(P, 'sd') = s
+  if(POTENTIAL_TYPE=='MOP' & scale==TRUE){
+    P<-rescaledMOP(P)
+    
+    # Garantizar que integra a 1
+    k = integrate.motbf(P, P$Domain[1], P$Domain[2])
+    P = multiplyMOPbyConstant(P,1/k)
+  }
+  if(POTENTIAL_TYPE=="MTE" & scale==TRUE){
+    x = x*s+m
+    P<-rescaledMTE(P,x)
+  }
+  # class(P) = c(class(P), tolower(POTENTIAL_TYPE))
+  # add class
+  
+  P = do.call(paste0("new_",subclass(P)), list(P))
+  
+
   return(P)
 }
 
 
+
+  
+  
 #'Computing the BIC score of an MoTBF function
 #'
 #'Computes the Bayesian information criterion value (BIC) of a 
@@ -123,6 +166,7 @@ univMoTBF <- function(data, POTENTIAL_TYPE, evalRange=NULL, nparam=NULL,  maxPar
 #'
 #'
 BICMoTBF <- function(Px, X){
+  # browser()
   pPx  <-  as.function(Px)(X)
   size  <-  length(coef(Px))
   BiC  <- sum(log(pPx))-(1/2*(size+1)*log(length(X)))
@@ -175,55 +219,6 @@ coef.motbf <- function(object, ...)
 }
 
 
-#' Subclass \code{"motbf"} Functions
-#'
-#' Collection of functions for detecting the subclass of an \code{"motbf"}
-#' object. It can be \code{"mop"} or \code{"mte"}.
-#' 
-#' @name Subclass-MoTBF
-#' @rdname Subclass-MoTBF
-#' @param fx A function of the class \code{"motbf"}.
-#' @return \code{is.mte} and \code{is.mop} return a logical value, \code{TRUE} if it is an \code{"motbf"} object of the subclass
-#' \code{"mte"} or \code{"mop"}, respectly; or \code{FALSE} otherwise. 
-#' \code{subclass} returns a \code{"character"} string, \code{"mte"} or \code{"mop"}.
-#' @seealso \link{univMoTBF}
-#' @examples
-#' 
-#' ## MOP Function
-#' X <- rnorm(1000)
-#' P <- univMoTBF(X, POTENTIAL_TYPE="MOP")
-#' is.mop(P)
-#' subclass(P)
-#' 
-#' ## MTE Function
-#' X <- rchisq(1000, df=4)
-#' P <- univMoTBF(X, POTENTIAL_TYPE="MTE")
-#' is.mte(P)
-#' subclass(P)
-#' @export
-is.mte <- function(fx)
-{
-  if(!is.null(fx$Subclass)) return(fx$Subclass=="mte")
-  f <- fx[[1]]; l <- length(strsplit(f, split="exp", fixed=T)[[1]])-1
-  return(l!=0&&is.motbf(fx))
-}
-
-#' @rdname Subclass-MoTBF
-#' @export
-is.mop <- function(fx)
-{
-  if(!is.null(fx$Subclass)) return(fx$Subclass=="mop")
-  f <- fx[[1]]; l <- length(strsplit(f, split="exp", fixed=T)[[1]])-1
-  return(l==0&&is.motbf(fx))
-}
-
-#' @rdname Subclass-MoTBF
-#' @export
-subclass <- function(fx)
-{
-  if(is.mop(fx)) return("mop")
-  if(is.mte(fx)) return("mte")
-}
 
 
 #' Derivating MoTBFs
@@ -267,160 +262,4 @@ derivMoTBF <- function(fx)
   if(is.mte(fx)) f <- derivMTE(fx)
   return(f)
 }
-
-
-#' Integrating MoTBFs
-#' 
-#' Compute the integral of a one-dimensional mixture of truncated basis function 
-#' over a bounded or unbounded interval.
-#' 
-#' @param fx An object of class \code{"motbf"}.
-#' @param min The lower integration limit. By default it is NULL.
-#' @param max The upper integration limit. By default it is NULL.
-#' @details If the limits of the interval, min and max are NULL, then the output is
-#' the expression of the indefinite integral. If only 'min' contains a numeric value,
-#' then the expression of the integral is evaluated at this point.
-#' @return \code{integralMoTBF()} returns either the indefinite integral of the MoTBF 
-#' function, which is also an object of class \code{"motbf"}, or the definite integral, 
-#' wich is a \code{"numeric"} value.
-#' @seealso \link{univMoTBF}, \link{integralMOP} and \link{integralMTE}
-#' @export
-#' @examples
-#' 
-#' ## 1. EXAMPLE
-#' X <- rexp(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
-#' integralMoTBF(Px)
-#' integralMoTBF(Px, 1.2)
-#' integralMoTBF(Px, min(X), max(X))
-#' 
-#' ## 2. EXAMPLE
-#' X <- rnorm(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
-#' iP <- integralMoTBF(Px); iP
-#' plot(iP, xlim=range(X))
-#' integralMoTBF(Px, 0.2)
-#' integralMoTBF(Px, min(X), max(X))
-#' 
-#' ## 3. EXAMPLE
-#' X <- rchisq(1000, df = 3)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
-#' integralMoTBF(Px)
-#' integralMoTBF(Px, 1)
-#' integralMoTBF(Px, min(X), max(X))
-#' 
-#' \dontrun{
-#' ## 4. EXAMPLE
-#' Px <- "1+x+5"
-#' class(Px)
-#' integralMoTBF(Px)
-#' ## Error in integralMoTBF(Px): "fx is not an 'motbf' function."
-#'}
-
-integralMoTBF <- function(fx, min=NULL, max=NULL)
-{
-  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
-  if(is.null(min)&&is.null(max)){
-    if(is.mop(fx)) return(integralMOP(fx))
-    if(is.mte(fx)) return(integralMTE(fx))
-  } else if(!is.null(min)&&is.null(max)){
-    if(is.mop(fx)) return(as.function(integralMOP(fx))(min))
-    if(is.mte(fx)) return(as.function(integralMTE(fx))(min))
-  } else{
-    if(is.mop(fx)) return(as.function(integralMOP(fx))(max) - as.function(integralMOP(fx))(min))
-    if(is.mte(fx)) return(as.function(integralMTE(fx))(max) - as.function(integralMTE(fx))(min))
-  } 
-}
-
-#' Coerce an \code{"motbf"} object to a Function
-#'
-#' Takes an \code{"motbf"} object and contructs an \R function to evaluate it at points.
-#' 
-#' @param x An object of class \code{"motbf"}.
-#' @param ... Further arguments to be passed to or from the method. Not necessary for this method.
-#' @details This is an \code{S3} method for the generic function \link{as.function}.
-#' @return It returns a function to evaluate an object of class \code{"motbf"}.
-#' @export
-#' @examples
-#' 
-#' ## Data
-#' X <- rchisq(5000, df = 3)
-#' 
-#' ## Learning
-#' P <- univMoTBF(X, POTENTIAL_TYPE = "MOP"); P
-#' 
-#' ## Evaluation
-#' as.function(P)(min(X))
-#' as.function(P)(max(X))
-#' as.function(P)(10)
-#' density <- as.function(P)(X)
-#' 
-#' ## Plot
-#' hist(X, prob = TRUE, main = "")
-#' points(X, density, col=4, pch=16)
-#' 
-as.function.motbf <- function(x, ...)
-{
-  if(is.mte(x)){
-    string <- x[[1]]
-    return(as.function(alist(x = , eval(parse(text = string)))))
-  }else{
-    v <- nVariables(x)
-    string <- x[[1]]
-    f <- function(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,
-                  s,t,u,v,w,x,y,z) eval(parse(text = string))
-    formals(f) <- formals(f)[1:length(v)]
-    names(formals(f)) <- v
-    return(f)
-  } 
-}
-
-#' Plots for \code{'motbf'} objects
-#'
-#' Draws an \code{'motbf'} function.
-#' 
-#' @param x An object of class \code{'motbf'}.
-#' @param xlim The range to be encompassed by the x axis; by default \code{0:1}.
-#' @param ylim The range of the y axix.
-#' @param type As for \link{plot}.
-#' @param \dots Further arguments to be passed as for \link{plot}.
-#' @method plot motbf
-#' @return A plot of the specificated function.
-#' @export
-#' @examples
-#'
-#'## 1. EXAMPLE 
-#'## Data
-#'X <- rexp(2000)
-#'
-#'## Learning
-#'f1 <- univMoTBF(X, POTENTIAL_TYPE = "MOP"); f1
-#'f2 <- univMoTBF(X, POTENTIAL_TYPE = "MTE", maxParam = 10); f2
-#'f3 <- univMoTBF(X, POTENTIAL_TYPE = "MOP", nparam=10); f3
-
-#'## Plots
-#'plot(NULL, xlim = range(X), ylim = c(0,0.8), xlab="X", ylab="density")
-#'plot(f1, xlim = range(X), col = 1, add = TRUE)
-#'plot(f2, xlim = range(X), col = 2, add = TRUE)
-#'plot(f3, xlim = range(X), col = 3, add = TRUE)
-#'hist(X, prob = TRUE, add= TRUE)
-#' 
-#'## 2. EXAMPLE 
-#'## Data
-#'X <- c(rnorm(2000, mean = -3),rnorm(2000, mean = 3))
-#'
-#'## Learning
-#'f1 <- univMoTBF(X, POTENTIAL_TYPE = "MOP"); f1
-#'f2 <- univMoTBF(X, POTENTIAL_TYPE = "MTE"); f2
-
-#'## Plots
-#'plot(NULL, xlim = range(X), ylim = c(0,0.20), xlab="X", ylab="density")
-#'plot(f1, xlim = range(X), col = 2, add = TRUE)
-#'plot(f2, xlim = range(X), col = 4, add = TRUE)
-#'hist(X, prob = TRUE, add= TRUE)
-#' 
-plot.motbf <- function(x, xlim=0:1, ylim=NULL, type="l", ...){
-  plot(as.function(x), xlim = xlim, ylim = ylim, type="l", ylab="Px", ...)
-}
-
 

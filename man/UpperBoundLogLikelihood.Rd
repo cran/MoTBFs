@@ -19,7 +19,7 @@ UpperBoundLogLikelihood(f, data, min, max)
 A \code{"numeric"} value which is the log-likelihood of the evaluated ramdom function.
 }
 \description{
-Computes an upper bound of the expected loglikelihood of a dataset given a randomly 
+Computes an upper bound of the expected loglikelihood of a dataset given a randomly
 generated MoTBF density.
 }
 \examples{

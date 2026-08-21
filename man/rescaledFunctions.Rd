@@ -4,39 +4,43 @@
 \alias{rescaledFunctions}
 \alias{rescaledMoTBFs}
 \alias{rescaledMOP}
-\alias{ToStringRe_MOP}
 \alias{rescaledMTE}
 \alias{ToStringRe_MTE}
 \alias{meanMOP}
+\alias{rescale_motbf_fit}
 \title{Rescaling MoTBF functions}
 \usage{
-rescaledMoTBFs(fx, data)
+rescaledMoTBFs(fx, data = NULL)
 
-rescaledMOP(fx, data)
-
-ToStringRe_MOP(parameters, data)
+rescaledMOP(fx, data = NULL)
 
 rescaledMTE(fx, data)
 
-ToStringRe_MTE(parameters, data, num = 5)
+ToStringRe_MTE(parameters, data, num = 1)
 
 meanMOP(fx)
+
+rescale_motbf_fit(object, POTENTIAL_TYPE, data)
 }
 \arguments{
 \item{fx}{A function of class \code{"motbf"} learned from a scaled data.}
 
-\item{data}{A \code{"numeric"} vector containing the original data (non standardizded).}
+\item{data}{the original data set (non-scaled)}
 
 \item{parameters}{A \code{"numeric"} vector with the coefficients to create the rescaled MoTBF.}
 
 \item{num}{A \code{"numeric"} value which contains the denominator of the coefficient
 in the exponential. By default it is 5.}
+
+\item{object}{and object of class motbf_fit that has been learned with scaled data}
+
+\item{POTENTIAL_TYPE}{the potential of the model (either "MOP" or "MTE")}
 }
 \value{
 An \code{"motbf"} function of the original data.
 }
 \description{
-A collation of function to reescale an MoTBF function
+A collection of function to reescale an MoTBF function
 to the original offset and scale. This is useful when data was
 standardized previously to learning.
 }
@@ -54,7 +58,7 @@ hist(modX, prob = TRUE, add = TRUE)
 origF <- rescaledMoTBFs(f, X) 
 plot(origF, xlim = range(X), col=2)
 hist(X, prob = TRUE, add = TRUE)
-meanMOP(origF) 
+expectedValueMOP(origF) 
 mean(X)
 
 ## 2. EXAMPLE 
@@ -70,7 +74,8 @@ hist(modX, prob = TRUE, add = TRUE)
 origF <- rescaledMoTBFs(f, X) 
 plot(origF, xlim = range(X), col=2)
 hist(X, prob = TRUE, add = TRUE)
-
+expectedValueMTE(origF)
+mean(X)
 }
 \seealso{
 \link{univMoTBF}

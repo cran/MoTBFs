@@ -16,7 +16,7 @@ bestMTE(X, domain, maxParam = NULL)
 
 \item{domain}{A \code{"numeric"} containing the domain if the function to estimate.}
 
-\item{maxParam}{A \code{"numeric"} value indicating the maximum number of coefficients in the function. By default it is \code{NULL}; 
+\item{maxParam}{A \code{"numeric"} value indicating the maximum number of coefficients in the function. By default it is \code{NULL};
 otherwise, the output is the function which gets the best BIC with at most this number of parameters.}
 }
 \value{
@@ -28,25 +28,25 @@ otherwise, the output is the function which gets the best BIC with at most this 
 the errors.}
 \item{Time}{The CPU time consumed.}
 
-\code{bestMTE()} returns a list including the MTE function with the best BIC score, 
-the number of parameters, the best BIC value and an array contained 
+\code{bestMTE()} returns a list including the MTE function with the best BIC score,
+the number of parameters, the best BIC value and an array contained
 the BIC values of the evaluated functions.
 }
 \description{
-These functions fit mixtures of truncated exponentials (MTEs). 
-Least square optimization is used to  
-minimize the quadratic error between the empirical 
+These functions fit mixtures of truncated exponentials (MTEs).
+Least square optimization is used to
+minimize the quadratic error between the empirical
 cumulative distribution function and the estimated one.
 }
 \details{
 \code{mte.learning()}:
-The returned value \code{$Function} is the only visible element which contains the algebraic expression. 
+The returned value \code{$Function} is the only visible element which contains the algebraic expression.
 Using \link{attributes} the name of the others elements are shown and also they can be abstract with \code{$}.
 The \link{summary} of the function also shows all this elements.
 
 \code{bestMTE()}:
 The first returned value \code{$bestPx} contains the output of the \code{mte.learning()} function
-with the number of parameters which gets the best BIC value, taking into account the  
+with the number of parameters which gets the best BIC value, taking into account the
 Bayesian information criterion (BIC) to penalize the functions. It evaluates the two next functions,
 if the BIC doesn't improve then the function with the last best BIC is returned.
 }

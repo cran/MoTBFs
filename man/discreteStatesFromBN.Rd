@@ -4,18 +4,16 @@
 \alias{discreteStatesFromBN}
 \title{Get the states of all discrete nodes from a MoTFB-BN}
 \usage{
-discreteStatesFromBN(bn, dag)
+discreteStatesFromBN(bn)
 }
 \arguments{
-\item{bn}{A list of lists obtained from \link{MoTBFs_Learning}.}
-
-\item{dag}{A network of class \code{"bn"}.}
+\item{bn}{A list of lists obtained from \link{motbf.fit}.}
 }
 \value{
 \code{discreteStatesFromBN} returns a list of length equal to the number of discrete nodes in the network. Each element of the list corresponds to a node and contains a character vector indicating the states of the node.
 }
 \description{
-This function returns the states of all discrete nodes from a list obtained from \link{MoTBFs_Learning}.
+This function returns the states of all discrete node from a list obtained from \link{motbf.fit}.
 }
 \examples{
 
@@ -33,9 +31,10 @@ This function returns the states of all discrete nodes from a list obtained from
   dag <- LearningHC(data)
 
 ## Learn a BN
-  bn <- MoTBFs_Learning(dag, data, POTENTIAL_TYPE = "MTE")
+  bn <- motbf.fit(dag, data, POTENTIAL_TYPE = "MTE")
 
 ## Get the states of the discrete nodes
 
-  discreteStatesFromBN(bn, dag)
+  discreteStatesFromBN(bn)
+  
 }

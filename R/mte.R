@@ -70,6 +70,8 @@
 #' attributes(fMTE$bestPx)
 #' hist(data, prob=TRUE, main="")
 #' plot(fMTE$bestPx, col=2, xlim=range(data), add=TRUE)
+
+
 #' @export
 mte.learning <- function(X, nparam, domain)
 {
@@ -81,14 +83,15 @@ mte.learning <- function(X, nparam, domain)
   
   diffDomain <- round(abs(diff(domain))/2)
   seq <- c(0.5,5,50)
-  num <- seq[which(abs(seq-diffDomain)==min(abs(seq-diffDomain)))]
+  # num <- seq[which(abs(seq-diffDomain)==min(abs(seq-diffDomain)))]
+  num = 1
   ## N.records is equal 1
   if(length(x)==1){
     if(nparam!=1) return(NULL)
     P <- asMTEString(1/diff(domain), num)
     P <- list(Function = P, Subclass = "mte", Domain = domain,
               Iterations = 0, Time = 0)
-    P <- motbf(P)
+    P <- new_mte(P)
     return(P)
   }
   
@@ -97,7 +100,7 @@ mte.learning <- function(X, nparam, domain)
     P <- asMTEString(1/diff(domain), num)
     P <- list(Function = P, Subclass = "mte", Domain = domain,
               Iterations = 0, Time = 0)
-    P <- motbf(P)
+    P <- new_mte(P)
     return(P)
   }
   
@@ -108,7 +111,7 @@ mte.learning <- function(X, nparam, domain)
     P <- asMTEString(1/diff(domain), num)
     P <- list(Function = P, Subclass = "mte", Domain = domain,
               Iterations = 0, Time = 0)
-    P <- motbf(P)
+    P <- new_mte(P)
     return(P)
   }
   nparam <- (nparam - nparam%%2)/2
@@ -168,14 +171,14 @@ mte.learning <- function(X, nparam, domain)
   ## Solve the optimization problem
   tr <- tryCatch(solve.QP(XX, Xy, AA, B, meq=2), error = function(e) NULL) 
   finaltm <- Sys.time() - tm
-  if(is.null(tr)==T){
+  if(is.null(tr)==TRUE){
     return(NULL)
   }else{
     soluc <- tr 
     parameters <- soluc$solution; #parameters
     Px <- asMTEString(parameters, num)
     Px <- list(Function=Px, Subclass="mte")
-    Px <- motbf(Px)
+    Px <- new_mte(Px)
     
     ## Derivative (PDF)
     P <- derivMoTBF(Px)
@@ -183,7 +186,7 @@ mte.learning <- function(X, nparam, domain)
     P <- asMTEString(coef(P), num)
     P <- list(Function = P, Subclass = "mte", Domain = domain,
               Iterations = tr$iterations[1], Time = finaltm)
-    P <- motbf(P)
+    P <- new_mte(P)
     return(P)
   }
 }
@@ -203,12 +206,12 @@ bestMTE <- function(X, domain, maxParam=NULL)
       ## Compute an MTE function with a fixed number of parameters
       Pp <- mte.learning(X, nparam, domain)
       
-      if((is.null(Pp)==T)&&(!is.motbf(bestfx))) {
+      if((is.null(Pp)==TRUE)&&(!is.motbf(bestfx))) {
         nparam <- nparam+2
         i <- i+1
         next
       }
-      if((is.null(Pp)==T)&&(is.motbf(bestfx))) break
+      if((is.null(Pp)==TRUE)&&(is.motbf(bestfx))) break
       
       nparam <- nparam+2
       ## Compute the BIC score
@@ -229,12 +232,12 @@ bestMTE <- function(X, domain, maxParam=NULL)
       ## Compute an MTE function with a fixed number of parameters
       Pp <- mte.learning(X, nparam, domain)
       
-      if((is.null(Pp)==T)&&(!is.motbf(bestfx))) {
+      if((is.null(Pp)==TRUE)&&(!is.motbf(bestfx))) {
         nparam <- nparam+2
         i <- i+1
         next
       }
-      if((is.null(Pp)==T)&&(is.motbf(bestfx))) break
+      if((is.null(Pp)==TRUE)&&(is.motbf(bestfx))) break
       
       ## Compute the BIC score
       BiC <- BICMoTBF(Pp, X)
@@ -293,7 +296,7 @@ bestMTE <- function(X, domain, maxParam=NULL)
 #' param <- c(5.2,0.3,-3,4)
 #' asMTEString(param)
 #'  
-asMTEString  <-  function(parameters, num = 5) 
+asMTEString <- function(parameters, num = 5) 
 {
   str  <-  parameters[1]
   if(length(parameters)==1) return(noquote(paste(str,"+0*exp(", 1/num, "*x)", sep="")))
@@ -337,27 +340,28 @@ asMTEString  <-  function(parameters, num = 5)
 #' coeffMTE(fx2) ## coef(fx2)
 #' coeffExp(fx2)
 #'  
+
+
 #' @export
-coeffMTE <- function(fx)
-{
+coeffMTE <- function(fx){
   fx <- noquote(as.character(fx))
   f1 <- substr(fx, 1, 1)
-  t <- strsplit(fx, split="-", fixed = T)[[1]]
+  t <- strsplit(fx, split="-", fixed = TRUE)[[1]]
   for(i in 1:length(t)) t[i] <- paste("-", t[i], sep="")##le volvemos a añadir el simbolo negativo
   if(f1!=substr(t[1], 1, 1)) t[1] <- substr(t[1], 2, nchar(t[1]))
   t2 <- c()
   for(i in 1:length(t)){
-    t1 <- strsplit(t[i], split="+", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
+    t1 <- strsplit(t[i], split="+", fixed = TRUE, perl = FALSE, useBytes = FALSE)[[1]]
     t2 <- c(t2,t1)
   }
   t3 <- c()
   for(i in 1:length(t2)){
-    t1 <- strsplit(t2[i], split="*", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
+    t1 <- strsplit(t2[i], split="*", fixed = TRUE, perl = FALSE, useBytes = FALSE)[[1]]
     t3 <- c(t3,t1)
   }
   pos1 <- grep("e", t3)
   pos <- grep("exp", t3)
-  pos1 <- pos1[pos1%in%pos==F]
+  pos1 <- pos1[pos1%in%pos==FALSE]
   if(length(pos1)!=0){
     h1 <- c()
     for(i in pos1){
@@ -386,13 +390,13 @@ coeffExp <- function(fx){
   fx <- noquote(as.character(fx))
   t <- fx; t2 <- c()
   for(i in 1:length(t)){
-    t1 <- strsplit(t[i], split="(", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
+    t1 <- strsplit(t[i], split="(", fixed = TRUE, perl = FALSE, useBytes = FALSE)[[1]]
     t2 <- c(t2,t1)
   }
   pos <- grep("*x)", t2)
   t3 <- t2[pos]; t2 <- c()
   for(i in 1:length(t3)){
-    t1 <- strsplit(t3[i], split="*x)", fixed = T, perl = FALSE, useBytes = FALSE)[[1]]
+    t1 <- strsplit(t3[i], split="*x)", fixed = TRUE, perl = FALSE, useBytes = FALSE)[[1]]
     t2 <- c(t2,t1[1])
   }
   # options(warn=-1)
@@ -444,63 +448,72 @@ derivMTE <- function(fx)
   if((length(coeffderiv)==2)&&(coeffderiv[2]==0)) coeffderiv <- rep(0,2)
   P <- asMTEString(coeffderiv, 1/parExp[1])
   P <- list(Function=P, Subclass="mte")
-  P <- motbf(P)
+  P <- new_mte(P)
   return(P)
 }
 
-#' Integrating MTEs
-#' 
-#' Method to calculate the non-defined integral of an \code{"motbf"} object of \code{'mte'} 
-#' subclass.
-#' 
-#' @param fx An \code{"motbf"} object of subclass \code{'mte'}.
-#' @return The non-defined integral of the function.
-#' @seealso \link{univMoTBF} for learning and \link{integralMoTBF} 
-#' for a more complete function to get defined and non-defined integrals
-#' of class \code{"motbf"}.
-#' @export
-#' @examples
-#' 
-#' ## 1. EXAMPLE
-#' X <- rexp(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
-#' integralMTE(Px)
-#' 
-#' ## 2. EXAMPLE
-#' X <- rnorm(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MTE")
-#' integralMTE(Px)
-#' 
-#' \dontrun{
-#' ## 3. EXAMPLE
-#' X <- rnorm(1000)
-#' Px <- univMoTBF(X, POTENTIAL_TYPE="MOP")
-#' integralMTE(Px)
-#' ## Error in integralMTE(Px): fx is an 'motbf' function but not 'mte' subclass.
-#' class(Px)
-#' subclass(Px)
-#' }
 
-integralMTE <- function(fx)
-{  
-  if(!is.motbf(fx)) stop("fx is not an 'motbf' function.")
-  if(is.motbf(fx)&&!is.mte(fx)) stop("fx is an 'motbf' function but not 'mte' subclass")
+
+
+#' Expected Value of an MTE Density Function
+#'
+#' Computes the expected value (mean) of a Mixture of Truncated Exponentials (MTE) function over its domain.
+#'
+#' @param fx An object of class \code{'mte'} representing an MTE probability density function.
+#'
+#' @return A numeric value representing the expected value of the distribution.
+#' @export
+#' 
+expectedValueMTE = function(fx){
+  f = fx
+  # get coefficients and exponents
+  des = splitMTE(f)
+  a = des[[1]]
+  b = des[[2]]
   
-  parameters <- coeffMTE(fx)
-  coefExponential <- coeffExp(fx)[-1]
-  str <- paste(parameters[1], "*x", sep="")
-  if((length(parameters)-1)>0) {
-    for(i in 2:length(parameters)){
-      if((parameters[i]*(1/coefExponential[i-1]))>=0) sign <- "+" else sign <- ""
-      str <- paste(str,sign, parameters[i]*(1/coefExponential[i-1]), "*exp(",coefExponential[i-1],"*x)", sep="")
-    }
-  }else {
-    ## An MTE constant
-    str  <-  paste(str,"+0*exp(", 1/coefExponential[1], "*x)", sep="")
+  # variable
+  x = des[[3]]
+  
+  # get degree of each term
+  b = gsub(paste0('\\*',x, '|\\^'),'',b)
+  b = as.numeric(b)
+  b
+  
+  lower = f$Domain[1]
+  upper = f$Domain[2]
+  
+  if(b[1]==0){
+    a0 = a[1]
+    a = a[-1]
+    b = b[-1]
+  }else{
+    a0 = 0
   }
-  f <- noquote(str)
-  f <- list(Function = f, Subclass = "mte")
-  f <- motbf(f)
-  return(f)
+
+  fx = function(x){a0*x^2/2 + sum(a*(x/b-1/b^2)*exp(b*x))}
+  return(fx(upper) - fx(lower))
 }
 
+
+splitMTE <- function(f){
+  # Extraer bases y exponentes
+  coeff = coef(f)
+  
+  str = as.character(abs(coeff))
+  
+  test = tryCatch({as.character(f$Function)}, error=function(e){NULL})
+  if(is.null(test) & is.numeric(f) & length(f)==1){
+    test = f
+  }
+  
+  exponents = regmatches(test, gregexpr("(?=\\().*?(?<=\\))", test, perl=TRUE))[[1]]
+  
+  exponents = gsub("\\(|)", "", exponents)
+  f
+  
+  if(length(exponents)+1 == length(coeff)){
+    x = strsplit(exponents[1],"\\*")[[1]][2]
+    exponents = c(paste0('0*',x), exponents)
+  }
+  return(list(Coefficients = coeff, Exponents = exponents, Variables = x )) 
+}

@@ -2,14 +2,12 @@
 % Please edit documentation in R/Inference.R
 \name{r.data.frame}
 \alias{r.data.frame}
-\title{Data frame initialization for forward sampling}
+\title{Initialize Data Frame}
 \usage{
-r.data.frame(bn, dag)
+r.data.frame(bn)
 }
 \arguments{
 \item{bn}{A list of lists obtained from the function \link{MoTBFs_Learning}.}
-
-\item{dag}{An object of class \code{"bn"}, representing the graph of the bayesian network.}
 }
 \value{
 An object of class \code{"data.frame"}, which contains the data type of each column and has no rows.
@@ -33,8 +31,8 @@ The function \code{r.data.frame()} initializes a data frame with as many columns
   dag <- LearningHC(data)
   
 ## Learn a BN
-  bn <- MoTBFs_Learning(dag, data, POTENTIAL_TYPE = "MTE")
+  bn <- motbf.fit(dag, data, POTENTIAL_TYPE = "MTE")
   
 ## Initialize a data.frame containing 3 columns (x, y and z) with their attributes.
-  r.data.frame(bn, dag)
+  r.data.frame(bn)
 }

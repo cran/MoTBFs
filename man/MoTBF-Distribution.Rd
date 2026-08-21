@@ -18,15 +18,15 @@ inversionMethod(size, fx, domain = NULL, data = NULL)
 \item{domain}{A \code{"numeric"} vector indicating the lower and upper limits to sample from.
 If not specified, the range is taken from the object \code{fx}.}
 
-\item{data}{A \code{"numeric"} vector to be compared with the simulated sample. 
-By default, it is \code{NULL}; otherwise, the empirical cumulative distributions of both 
-the data and the simulated sample are plotted and the Kolmogorov Smirnov test 
+\item{data}{A \code{"numeric"} vector to be compared with the simulated sample.
+By default, it is \code{NULL}; otherwise, the empirical cumulative distributions of both
+the data and the simulated sample are plotted and the Kolmogorov Smirnov test
 is used to test whether or not both samples can be considered to be drawn from the same distribution.}
 }
 \value{
-\code{rMoTBF()} returns a \code{"numeric"} vector containing the simulated values. 
-\code{inversionMethod()} returns a list with the simulated values and the results 
-of the two-sample Kolmogorov-Smirnov test, as well as the plot of the CDFs of the 
+\code{rMoTBF()} returns a \code{"numeric"} vector containing the simulated values.
+\code{inversionMethod()} returns a list with the simulated values and the results
+of the two-sample Kolmogorov-Smirnov test, as well as the plot of the CDFs of the
 original and simulated data.
 }
 \description{
@@ -50,6 +50,7 @@ ks.test(X,Y)
 ## Plots
 hist(Y, prob = TRUE, add = TRUE)
 
+\donttest{
 ## 2. EXAMPLE 
 ## Data
 X <- rweibull(5000, shape=2)
@@ -67,8 +68,6 @@ Y <- inv$sample
 ## Plots
 plot(f, xlim = f$Domain)
 hist(Y, prob = TRUE, add = TRUE)
-
 }
-\seealso{
-\link{integralMoTBF}
+
 }

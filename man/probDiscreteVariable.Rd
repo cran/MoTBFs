@@ -4,32 +4,38 @@
 \alias{probDiscreteVariable}
 \title{Probability distribution of discrete variables}
 \usage{
-probDiscreteVariable(stateNames, Variable)
+probDiscreteVariable(x)
 }
 \arguments{
-\item{stateNames}{A \code{"character"} array indicating the states of the variable.}
-
-\item{Variable}{A \code{"numeric"} array containing the records of the variable.}
+\item{x}{a \code{"factor"} containing the records of the discrete variable.}
 }
 \value{
-A list of  \code{"numeric"} arrays:
-\item{coeff}{Contains the probabilities.}
-\item{sizeDataLeaf}{Number of records in each leaf of the discrete tree.}
+A list of 2 elements:
+\item{coeff}{a named vector that contains the probabilities.}
+\item{sizeDataLeaf}{a vector containing the number of records in each leaf of the discrete tree.}
 }
 \description{
-Compute the probabilities of a discrete variable from a dataset.
+Compute the probabilities of a discrete variable from a data set using Laplace correction.
+}
+\details{
+Laplace correction is used to avoid the zero probability problem, with \eqn{\alpha = 1} as smoothing factor.
+Therefore, the probability for each state, \eqn{\theta_i}, is computed as
+\deqn{\theta_i = \frac{x_i + 1}{N + K}}{%
+ \theta_i =  (x_i + 1)/(N + K)}
+for \eqn{i = 0, 1, \ldots, K},
+where \eqn{x_i} is the number of records of state \eqn{i},
+\eqn{N} is the total number of records, and
+\eqn{K} is the total number of states.
 }
 \examples{
-## Discrete Variable
-data <- data.frame(X=rep(c("yes", "no", "maybe"), 500))
-data <- discreteVariables_as.character(data, "X")
-n <- nrow(data)
-
-## Probabilities
-s <- discreteVariablesStates(namevariables="X", discreteData=data)
-states <- s[[1]]$states
-p <- probDiscreteVariable(stateNames=states, Variable=data$X)
+## Simulate discrete variable
+x <- factor(sample(c('yes', 'no', 'maybe'), 500, replace = TRUE), 
+  levels = c('yes', 'no', 'maybe'))
+ 
+## Compute probabilities
+p <- probDiscreteVariable(x)
 p
+
 
 }
 \seealso{

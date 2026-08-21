@@ -15,8 +15,8 @@ BICMoTBF(Px, X)
 A \code{"numeric"} value corresponding to the BIC score.
 }
 \description{
-Computes the Bayesian information criterion value (BIC) of a 
-mixture of truncated basis functions. The BIC score is the log likelihood 
+Computes the Bayesian information criterion value (BIC) of a
+mixture of truncated basis functions. The BIC score is the log likelihood
 penalized by the number of parameters of the function and the number of
 records of the evaluated data.
 }

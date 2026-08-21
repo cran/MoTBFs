@@ -10,7 +10,7 @@ LearningHC(dataset, numIntervals = NULL)
 \item{dataset}{A dataset with discrete and continuous variables. If the discrete
 variables are not of class \code{"factor"}, they are automatically converted.}
 
-\item{numIntervals}{A \code{"numeric"} value indicating the number of categories 
+\item{numIntervals}{A \code{"numeric"} value indicating the number of categories
 used when discretizing a continuous variable, corresponding to intervals of
 equal width. By default it is \code{NULL}, meaning that the continuous variables
 are not discretized.}
@@ -24,7 +24,7 @@ local search method.
 }
 \details{
 \code{LearningHC()} automatically converts non-numeric variables into factors
-before calling function \code{hc()} from the \code{bnlearn} package. \code{LearningHC()} can also 
+before calling function \code{hc()} from the \code{bnlearn} package. \code{LearningHC()} can also
 be used to discretize the dataset, using the equal width method, before calling \code{hc()}.
 }
 \examples{

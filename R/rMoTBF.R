@@ -18,7 +18,6 @@
 #' \code{inversionMethod()} returns a list with the simulated values and the results 
 #' of the two-sample Kolmogorov-Smirnov test, as well as the plot of the CDFs of the 
 #' original and simulated data.
-#' @seealso \link{integralMoTBF}
 #' @examples
 #' 
 #' ## 1. EXAMPLE
@@ -36,6 +35,7 @@
 #' ## Plots
 #' hist(Y, prob = TRUE, add = TRUE)
 #' 
+#' \donttest{
 #' ## 2. EXAMPLE 
 #' ## Data
 #' X <- rweibull(5000, shape=2)
@@ -53,19 +53,25 @@
 #' ## Plots
 #' plot(f, xlim = f$Domain)
 #' hist(Y, prob = TRUE, add = TRUE)
+#' }
 #' 
 #' @export
-rMoTBF <- function(size, fx, domain = NULL)
-{
+
+rMoTBF <- function(size, fx, domain = NULL){
   if(is.null(domain)) domain <- fx$Domain
   if(is.null(domain)) stop("Domain is required.")
-  CDF <- integralMoTBF(fx)
+  
+  CDF <- integrate.motbf(fx)
   intmin <- as.function(CDF)(min(domain))
   mUnif <- runif(size)
-  simulatedValues <- sampleMoTBF <- sapply(1:size, function(i)
-                     uniroot(as.function(motbf(paste(CDF,ifelse
-                     ((-intmin-mUnif[i])>=0, "+", ""),-intmin-
-                     mUnif[i], sep=""))), range(domain))$root)
+  
+  val = -intmin-mUnif
+  sn = ifelse(val>=0, "+", "")
+  
+  simulatedValues  <- sapply(1:size, function(i){
+    uniroot(as.function(new_univmotbf(paste(CDF,sn[i],val[i], sep=""))), range(domain))$root
+  })
+  
   return(simulatedValues)
 }
 
@@ -80,7 +86,7 @@ inversionMethod <- function(size, fx, domain = NULL, data = NULL)
   
   plot(ecdf(simulatedValues), cex = 0, main = "")
   if(!is.null(data)){
-    plot(ecdf(data), col="red", cex = 0, main = "", add = T)
+    plot(ecdf(data), col="red", cex = 0, main = "", add = TRUE)
     par(xpd = TRUE)
     legend(0, 1.4, c(expression(F(X)),expression(F(Simulated_Values))), 
          cex=0.8, col = c("red", "black"), lty = c(1,1), lwd = c(1,1), 

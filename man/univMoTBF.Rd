@@ -5,15 +5,16 @@
 \title{Fitting MoTBFs}
 \usage{
 univMoTBF(
-  data,
+  x,
   POTENTIAL_TYPE,
   evalRange = NULL,
   nparam = NULL,
-  maxParam = NULL
+  maxParam = NULL,
+  scale = TRUE
 )
 }
 \arguments{
-\item{data}{A \code{"numeric"} vector.}
+\item{x}{A \code{"numeric"} vector.}
 
 \item{POTENTIAL_TYPE}{A \code{"character"} string specifying the potential
 type, must be either \code{"MOP"} or \code{"MTE"}.}
@@ -27,20 +28,22 @@ and the best MoTBF is fitted taking into account the Bayesian information
 criterion (BIC) to score and select the functions. It evaluates the next two functions and,
 if the BIC value does not improve, the function with the best BIC score so far is returned.}
 
-\item{maxParam}{A \code{"numeric"} value which indicates the maximum number of coefficients in the function. 
+\item{maxParam}{A \code{"numeric"} value which indicates the maximum number of coefficients in the function.
 By default, it is \code{NULL}; otherwise, the function which gets the best BIC score
 with at most this number of parameters is returned.}
+
+\item{scale}{A \code{"logical"} value indicating whether to standardize the numeric vector (x) to have mean 0 and standard deviation 1.}
 }
 \value{
-\code{univMoTBF()} returns an object of class \code{"motbf"}. This object is a list containing several elements, 
-including its mathematical expression and other hidden elements related to the learning task. 
-The processing time is one of the values returned by this function and it can be extracted by $Time. 
-Although the learning process is always the same for a particular data sample, 
+\code{univMoTBF()} returns an object of class \code{"motbf"}. This object is a list containing several elements,
+including its mathematical expression and other hidden elements related to the learning task.
+The processing time is one of the values returned by this function and it can be extracted by $Time.
+Although the learning process is always the same for a particular data sample,
 the processing can vary inasmuch as it depends on the CPU.
 }
 \description{
 Function for fitting univariate mixture of truncated basis functions.
-Least square optimization is used to minimize the quadratic 
+Least square optimization is used to minimize the quadratic
 error between the empirical cumulative distribution and the estimated one.
 }
 \examples{

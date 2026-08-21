@@ -12,7 +12,9 @@ learnMoTBFpriorInformation(
   domain = range(data),
   coeffversion = 4,
   restrictDomain = TRUE,
-  maxParam = NULL
+  maxParam = NULL,
+  returnAll = FALSE,
+  scale = TRUE
 )
 }
 \arguments{
@@ -20,8 +22,8 @@ learnMoTBFpriorInformation(
 
 \item{data}{A \code{"numeric"} vector containing the observed data.}
 
-\item{s}{A \code{"numeric"} value which specifies the expert confidence in the prior knowledge. 
-This argument takes values on the interval \emph{[0, N]}, where \emph{N} is the sample size, and is used
+\item{s}{A \code{"numeric"} value which specifies the expert confidence in the prior knowledge.
+This argument takes values on the interval \eqn{[0, N]}, where \eqn{N} is the sample size, and is used
 to synchronize the support of the prior knowledge and the sample.}
 
 \item{POTENTIAL_TYPE}{A \code{"character"} string, either \emph{MOP} or \emph{MTE}, corresponding to the type of basis function.}
@@ -29,21 +31,25 @@ to synchronize the support of the prior knowledge and the sample.}
 \item{domain}{A \code{"numeric"} vector which contains the bounding values to fit the function.
 By default, it is the range of the data.}
 
-\item{coeffversion}{A \code{"numeric"} value between \code{1--4} which contains the used version for computing 
-the coefficients of the linear opinion pool to combine the prior function and the data function. 
+\item{coeffversion}{A \code{"numeric"} value between \code{1--4} which contains the used version for computing
+the coefficients of the linear opinion pool to combine the prior function and the data function.
 By default, \code{coeffversion = "4"} is used, so the combination
 depends on the goodness of the model versus another random model.}
 
 \item{restrictDomain}{A logical value. This argument allows to choose if the domain is used joining both domains,
-the prior one and the data domain or trimming them. By default, \code{TRUE} is used, so 
+the prior one and the data domain or trimming them. By default, \code{TRUE} is used, so
 the domain will be trimmed.}
 
-\item{maxParam}{A positive integer which indicates the maximum number of coefficients in the function. 
+\item{maxParam}{A positive integer which indicates the maximum number of coefficients in the function.
 If specified, the output is the function which gets the best BIC with, at most, this number of parameters.
 By default, it is set to \code{NULL}.}
+
+\item{returnAll}{A logical value indicating whether to return all prior, data and posterior functions (TRUE) or only the posterior (FALSE).}
+
+\item{scale}{A \code{"logical"} value indicating whether to standardize the numeric variables to have mean 0 and standard deviation 1.}
 }
 \value{
-A list with the elements
+If returnAll = TRUE, the function returns a list with the elements
 \item{coeffs}{An \code{"numeric"} vector with the two coefficients of the linear opinion pool}
 \item{posteriorFunction}{The final function after combining.}
 \item{priorFunction}{The fit of the prior data.}
@@ -69,7 +75,7 @@ testData <- test[test>=min(X)&test<=max(X)]
 type <- "MOP" 
 confident <- 3 ## confident <- 1,2,...,length(X)
 f <- learnMoTBFpriorInformation(priorData = priordata, data = X, s = confident,
-POTENTIAL_TYPE = type)
+POTENTIAL_TYPE = type, returnAll = TRUE)
 attributes(f)
 
 ## Log-likelihood

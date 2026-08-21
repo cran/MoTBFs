@@ -17,7 +17,7 @@ getCoefficients(fPI, rangeNewPriorData, fD, data, domain, coeffversion)
 
 \item{domain}{A \code{"numeric"} array with the domain of the data density function.}
 
-\item{coeffversion}{A \code{"numeric"} value between \code{1--4} which contains the used version for computing the coefficients in the linear 
+\item{coeffversion}{A \code{"numeric"} value between \code{1--4} which contains the used version for computing the coefficients in the linear
 opinion pool to combine the prior function and the data function. By default \code{coeffversion = "4"} is used, so the combination
 depends on the goodness of the model versus another random positive MoTBF model.}
 }
@@ -46,7 +46,7 @@ priordata <- rnorm(5000)
 confident <- 5
 type <- "MOP"
 f <- learnMoTBFpriorInformation(priorData = priordata, data = X, s = confident,
-POTENTIAL_TYPE = type)
+POTENTIAL_TYPE = type, returnAll = TRUE)
 attributes(f)
  
 ## Coefficients: linear opinion pool
