@@ -61,14 +61,14 @@
 #' numIntervals = intervals, POTENTIAL_TYPE = potential, maxParam = 15)
 #' printConditional(fMOP)
 #' }
-
 #' ##############################################################################
 #' 
 #' ##############################################################################
 #' ## Internal functions: Not needed to run #####################################
 #' ##############################################################################
 #' \donttest{
-#' domainP <- range(data[,parents])
+#' domainP <- lapply(parents, function(i)range(data[,i]))
+#' names(domainP) = parents
 #' domainC <- range(data[, child])
 #' t <- conditional(data, nameParents = parents, nameChild = child,
 #' domainParents = domainP, domainChild = domainC, numIntervals = intervals,
@@ -98,11 +98,15 @@ conditionalMethod <- function(data, nameParents, nameChild, numIntervals, POTENT
     if(is.factor(data[,nameChild])) domainChild <- levels(data[,nameChild])
     else domainChild <- range(data[,nameChild])
     
-    if(is.numeric(data[,nameParents])) domainParents <- range(data[,nameParents])
-    else{
-      domainParents <- lapply(1:length(nameParents), function(i) if(is.numeric(data[,nameParents[i]])) range(data[,nameParents[i]]) else levels(data[,nameParents[i]]))
-      names(domainParents) <- nameParents
-    }
+    domainParents <- lapply(nameParents, 
+                            function(pa){
+                              if(is.numeric(data[,pa])){
+                                return(range(data[,pa]))
+                              }else{
+                                return(levels(data[,pa])) 
+                              } 
+                            })
+    names(domainParents) <- nameParents
     
     ## Recursive process
     mm <- c()
@@ -118,6 +122,7 @@ conditionalMethod <- function(data, nameParents, nameChild, numIntervals, POTENT
 conditional <- function(data, nameParents, nameChild, domainChild, domainParents, numIntervals, mm, POTENTIAL_TYPE, maxParam=NULL, s=NULL, priorData=NULL, scale = FALSE){  
   
   ## select the parent who get the best BIC score when its domain is splitted
+  # browser()
   f <- select(data, nameParents, nameChild, domainChild, domainParents, numIntervals, POTENTIAL_TYPE, maxParam, s, priorData, scale = scale)
   nameParents <- nameParents[which(nameParents!=f$parent)]
   
@@ -125,7 +130,9 @@ conditional <- function(data, nameParents, nameChild, domainChild, domainParents
     m <- list(parent=f$parent, interval=f$t[[i]]$interval, Px=f$t[[i]]$Px)
     mm[[length(mm)+1]] <- m
     if(is.numeric(data[,f$parent])){
-      dataInterval <- splitdata(data, f$parent, f$t[[i]]$interval[1], f$t[[i]]$interval[2])
+      dataInterval <- splitdata(data, f$parent,
+                                f$t[[i]]$interval[1]-0.001*(f$t[[i]]$interval[1]==min(domainParents[[f$parent]])),
+                                f$t[[i]]$interval[2])
       if(nrow(dataInterval)>=0||length(nameParents)==0){
         if(length(nameParents)==0){
           mm <- mm
@@ -151,6 +158,7 @@ conditional <- function(data, nameParents, nameChild, domainChild, domainParents
   }
   return(mm)
 }
+
 
 #'@rdname conditionalmotbf.learning
 #'@export

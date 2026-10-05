@@ -159,6 +159,8 @@ fit_tan <- function(target, data,fit.args=NULL, root = NULL, all = FALSE,
 mutual_information_tan = function(data,target,fit.args = NULL,parallel = FALSE){
   # browser()
   # source("mutualInformation.R")
+  data = check_data(data)
+  fit.args=fit.args.null(fit.args)
   # Seleccionamos las variables
   var_i <- i <- NULL
   varNames = colnames(data)
@@ -296,7 +298,6 @@ fit.args.null = function(fit.args){
 # Funciones para calcular distribuciones---------------------------------------
 #' @noRd
 distX_cond = function(data,varX, varsCond, fit.args =NULL){
-  fit.args = fit.args.null(fit.args)
   # browser()
   varType = ifelse(is.numeric(data[,varX]),"Continuous","Discrete")
   distX_C = do.call(conditionalMethod,
@@ -311,7 +312,6 @@ distX_cond = function(data,varX, varsCond, fit.args =NULL){
 
 #' @noRd
 distVar = function(data,varName,fit.args){
-  fit.args = fit.args.null(fit.args)
   fit.args$s = NULL
   fit.args$priorData = NULL
   if(is.numeric(data[,varName])){
@@ -400,8 +400,6 @@ integrateVar = function(CPD,domain){
 mut_information_compute = function(data, nameVars=NULL, fit.args =NULL, all = FALSE,
                                    distY = NULL,distX_Y=NULL,distX = NULL){
 
-  # Chequeamos los argumentos para fijar las Mops------------
-  fit.args = fit.args.null(fit.args)
   # Control nameVars
   if(!is.null(nameVars)){
     data = data[,nameVars]
@@ -414,14 +412,9 @@ mut_information_compute = function(data, nameVars=NULL, fit.args =NULL, all = FA
   }else{
     nameVars = colnames(data)
   }
-  numLevels = sapply(data,nlevels)
-  if(any(numLevels<=1)){
-    stop("Some variable is not discrete with more than one value")
-  }
   # browser()
   X = nameVars[1]
   Y = nameVars[2]
-  discrete_Y = !is.numeric(data[,Y])
   distributions = list()
   nDist=0
   ## Distribucion de X|Y------------------------------------
@@ -511,7 +504,7 @@ mut_information_compute = function(data, nameVars=NULL, fit.args =NULL, all = FA
   }else{
     # Variable continua y discreta
     # Condiciona la variable discreta:
-    if(discrete_Y){
+    if(!is.numeric(data[,Y])){
       # Construimos el arbol para los calculos
       arbol = cbind(distX_Y,distX[,2,drop=FALSE])
       # Incluimos la probabilidad de Y
@@ -544,6 +537,7 @@ mut_information_compute = function(data, nameVars=NULL, fit.args =NULL, all = FA
 #' @noRd
 mut_information = function(data, nameVars=NULL, fit.args =NULL, all = FALSE){
   # Chequeamos los argumentos para fijar las Mops------------
+   data = check_data(data)
   fit.args = fit.args.null(fit.args)
   # Control nameVars
   if(!is.null(nameVars)){

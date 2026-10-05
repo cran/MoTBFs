@@ -1,7 +1,7 @@
 Package: MoTBFs
 Title: Learning Hybrid Bayesian Networks using Mixtures of Truncated
         Basis Functions
-Version: 2.0
+Version: 2.0.1
 Authors@R: c(
   person(given = "Inmaculada",
          family = "Pérez-Bernabé",
@@ -33,7 +33,7 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2026-08-21 18:49:24 UTC; amaldonado
+Packaged: 2026-10-05 19:03:12 UTC; amaldonado
 Author: Inmaculada Pérez-Bernabé [aut],
   Antonio Salmerón [aut],
   Thomas D. Nielsen [aut],
@@ -41,4 +41,4 @@ Author: Inmaculada Pérez-Bernabé [aut],
   Ana D. Maldonado [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-8253-2526>)
 Repository: CRAN
-Date/Publication: 2026-08-21 21:50:31 UTC
+Date/Publication: 2026-10-05 22:10:13 UTC

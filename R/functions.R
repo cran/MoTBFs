@@ -373,7 +373,7 @@ newData <- function(data, nameX, nameY) return(data[, c(nameX, nameY)])
 #' @export
 splitdata <- function(data, nameVariable, min, max){
   parent <- data[, nameVariable]
-  return(subset(data,((parent>=min)&(parent<=max))))
+  return(subset(data,((parent>min)&(parent<=max))))
 }
 
 #' Data cleaning

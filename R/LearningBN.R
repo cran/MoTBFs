@@ -219,6 +219,16 @@ getDAG = function(bn){
 #' @export
 logLikelihood.MoTBFBN <- function(object, data){
   
+  # browser()
+  disc <- names(which(sapply(data, is.factor)==TRUE))
+  
+  if(length(disc)!=0){ 
+    states <- discreteVariablesStates(disc, data)
+  }
+  min_cont = sapply(setdiff(colnames(data),disc),function(vari){
+    min(attributes(object)$levels[[vari]])
+  },simplify = FALSE)
+  
   originalData <- data; valuesT <- c()
   
   for(i in 1:length(object)){
@@ -252,11 +262,6 @@ logLikelihood.MoTBFBN <- function(object, data){
       Parents <- node$parents
       
       fullData <- c(); enter <- c(); data <- originalData
-      disc <- names(which(sapply(data, is.factor)==TRUE))
-      
-      if(length(disc)!=0){ 
-        states <- discreteVariablesStates(disc, data)
-      }
       
       #--------------------------------------------------------------------------#
       
@@ -276,6 +281,9 @@ logLikelihood.MoTBFBN <- function(object, data){
           
           if(is.numeric(originalData[,Parents[k]])){
             lower = fx[[j,Parents[k]]][1]
+            if(lower==min_cont[[Parents[k]]]){
+              lower = lower-0.001
+            }
             upper = fx[[j,Parents[k]]][2]
             data <- splitdata(data, Parents[k] , lower, upper)
           }else{

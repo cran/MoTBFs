@@ -148,7 +148,8 @@ printConditional(fMOP)
 ## Internal functions: Not needed to run #####################################
 ##############################################################################
 \donttest{
-domainP <- range(data[,parents])
+domainP <- lapply(parents, function(i)range(data[,i]))
+names(domainP) = parents
 domainC <- range(data[, child])
 t <- conditional(data, nameParents = parents, nameChild = child,
 domainParents = domainP, domainChild = domainC, numIntervals = intervals,

@@ -673,7 +673,7 @@ thorough excerpt of the <code>&quot;jointmotbf&quot;</code> object.</p>
 ## 
 ##  Number of Iterations: 51 
 ## 
-##  Processing Time: 0.002694845 secs</code></pre>
+##  Processing Time: 0.002761841 secs</code></pre>
 <p>The processing time, <code>P$Time</code>, can vary depending on the
 CPU, but the learning outcome will always be the same for a specific
 data sample.</p>
@@ -779,7 +779,7 @@ and <code>&quot;MTE&quot;</code> potentials when learning the densities
 ## [1] 1.12359550561798+0*exp(1.05693706191318*mcg)
 ## Parent: alm1      Range: 0.45 &lt; alm1 &lt; 1 
 ## Parent: lip       Value =  &quot;0.48&quot; 
-## [1] 0.258507227216329+0.125038108071494*exp(5.28468530956588*mcg)-0.320433056518257*exp(-5.28468530956588*mcg)-0.00221027286466645*exp(10.5693706191318*mcg)-2.61527685677068*exp(-10.5693706191318*mcg)+9.86301836901382e-06*exp(15.8540559286976*mcg)+3.17849091704381*exp(-15.8540559286976*mcg)
+## [1] 0.118694080930147+0.128837522888128*exp(5.28468530956588*mcg)+0.593105298126538*exp(-5.28468530956588*mcg)-0.00225468233610636*exp(10.5693706191318*mcg)-4.3912607053636*exp(-10.5693706191318*mcg)+1.01810924995526e-05*exp(15.8540559286976*mcg)+4.23681300891006*exp(-15.8540559286976*mcg)
 ## Parent: alm1      Range: 0.45 &lt; alm1 &lt; 1 
 ## Parent: lip       Value =  &quot;1&quot; 
 ## [1] 0.556915717393733+0.0796377643379347*exp(5.28468530956588*mcg)-2.98142905617842*exp(-5.28468530956588*mcg)-0.00076501787356927*exp(10.5693706191318*mcg)+3.13754385763789*exp(-10.5693706191318*mcg)
@@ -817,11 +817,11 @@ and <code>&quot;MTE&quot;</code> potentials when learning the densities
 ## Parent: alm1      Range: 0.71 &lt; alm1 &lt; 1 
 ## Parent: gvh       Range: 0.16 &lt; gvh &lt; 1 
 ## Parent: lip       Value =  &quot;0.48&quot; 
-## [1] -1.66122336611897+0.0694678523633136*exp(4.68957842101153*alm2)+9.76498160863297*exp(-4.68957842101153*alm2)+0.00526173195933795*exp(9.37915684202306*alm2)-23.1570734636348*exp(-9.37915684202306*alm2)-0.000122314620146376*exp(14.0687352630346*alm2)+24.023608781198*exp(-14.0687352630346*alm2)+6.43439431827203e-07*exp(18.7583136840461*alm2)-9.04021189479816*exp(-18.7583136840461*alm2)
+## [1] -1.99794509019173+0.154186001166171*exp(4.68957842101153*alm2)+7.747574887835*exp(-4.68957842101153*alm2)-0.00122705394191454*exp(9.37915684202306*alm2)-5.89789916644652*exp(-9.37915684202306*alm2)
 ## Parent: alm1      Range: 0.71 &lt; alm1 &lt; 1 
 ## Parent: gvh       Range: 0.16 &lt; gvh &lt; 1 
 ## Parent: lip       Value =  &quot;1&quot; 
-## [1] 0.0625235874946527+0.0437639725805153*exp(4.68957842101153*alm2)-0.101597981654157*exp(-4.68957842101153*alm2)</code></pre>
+## [1] 1.01010101010101+0*exp(4.68957842101153*alm2)</code></pre>
 <p>Notice how nodes in the DAG with only discrete parents contain as
 many functions as configurations of the parents, whereas nodes that have
 continuous parents have at most 4 functions for each parent and,
@@ -835,10 +835,10 @@ used to compute the log-likelihood and the BIC score of a dataset given
 the Bayesian network.</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">BiC.MoTBFBN</span>(bn, <span class="at">data =</span> testData)</span></code></pre></div>
 <pre><code>## $LogLikelihood
-## [1] 32.09624
+## [1] 26.53554
 ## 
 ## $BIC
-## [1] -83.5328</code></pre>
+## [1] -78.58178</code></pre>
 </div>
 <div id="learn-motbf-distributions-in-a-full-hybrid-network-using-prior-knowledge" class="section level2">
 <h2>Learn MoTBF distributions in a full hybrid network using prior
@@ -934,7 +934,7 @@ Bayesian network representations. As an example, we will use
 <span id="cb66-9"><a href="#cb66-9" tabindex="-1"></a></span>
 <span id="cb66-10"><a href="#cb66-10" tabindex="-1"></a><span class="co"># Compute log-likelihood </span></span>
 <span id="cb66-11"><a href="#cb66-11" tabindex="-1"></a><span class="fu">logLikelihood.MoTBFBN</span>(priorBN, <span class="at">data =</span> testData)</span></code></pre></div>
-<pre><code>## [1] -35.64878</code></pre>
+<pre><code>## [1] -35.99053</code></pre>
 <div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" tabindex="-1"></a><span class="fu">logLikelihood.MoTBFBN</span>(BN, <span class="at">data =</span> testData)</span></code></pre></div>
 <pre><code>## [1] -22.20795</code></pre>
 <p>Looking at the log-likelihood corresponding to the network with and
@@ -973,7 +973,7 @@ to <code>size = 100</code>.</p>
 <span id="cb71-6"><a href="#cb71-6" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4</span>)</span>
 <span id="cb71-7"><a href="#cb71-7" tabindex="-1"></a>ap_post <span class="ot">=</span> <span class="fu">get_approx_posterior</span>(bn, <span class="at">target =</span> node, </span>
 <span id="cb71-8"><a href="#cb71-8" tabindex="-1"></a>                     <span class="at">evidence =</span> obs, <span class="at">size =</span> <span class="dv">100</span>, <span class="at">maxParam =</span> <span class="dv">8</span>)</span></code></pre></div>
-<pre><code>## Processing Time: 1.73847889900208secs</code></pre>
+<pre><code>## Processing Time: 1.74930000305176secs</code></pre>
 <div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" tabindex="-1"></a>ap_post<span class="sc">$</span>fx</span></code></pre></div>
 <pre><code>## [1] 6.81076602642233-146.932848695937*x+1154.17777619494*x^2-4092.61854429109*x^3+7295.63939509001*x^4-6344.64924756399*x^5+2133.58529450247*x^6</code></pre>
 <p>The output consists of the posterior density and the sample from
